@@ -1,4 +1,5 @@
 /** @type {import('next').NextConfig} */
+
 const nextConfig = {
   async redirects() {
     return [
@@ -18,7 +19,11 @@ const nextConfig = {
       },
     ]
   },
-
+  compiler: {
+    styledComponents: true,
+  },
 };
+
+
 
 export default nextConfig;
