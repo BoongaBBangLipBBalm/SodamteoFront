@@ -1,7 +1,8 @@
 "use client"
+
 import React from 'react';
 import Link from 'next/link';
-
+import { useRouter } from 'next/navigation';
 import styled from 'styled-components';
 
 const Container = styled.div`
@@ -10,6 +11,7 @@ const Container = styled.div`
   justify-content: center;
   align-items: center;
   background-color: #f4f4f4;
+  width: 100%;
 `;
 
 const Form = styled.form`
@@ -50,12 +52,12 @@ const LinkText = styled.div`
   font-size: 14px;
 `;
 
-const Signup = () => {
-  const history = useHistory();
+const Signup: React.FC = () => {
+  const navigate = useRouter();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    history.push('/');
+    navigate('/');
   };
 
   return (
@@ -67,7 +69,7 @@ const Signup = () => {
         <Input type="password" placeholder="Password" required />
         <Button type="submit">Sign Up</Button>
         <LinkText>
-          Already have an account? <Link to="/">Login</Link>
+          Already have an account? <Link href="/login">Login</Link>
         </LinkText>
       </Form>
     </Container>
