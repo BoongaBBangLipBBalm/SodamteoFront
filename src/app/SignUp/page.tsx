@@ -1,75 +1,75 @@
 "use client"
 
 import React from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import styled from 'styled-components';
+import Link from 'next/link';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 const Container = styled.div`
-  display: flex;
-  height: 100vh;
-  justify-content: center;
-  align-items: center;
-  background-color: #f4f4f4;
   width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f4f4f4;
 `;
 
 const Form = styled.form`
+  width: 40%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   background: white;
   padding: 40px;
   border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-  width: 300px;
-`;
-
-const Title = styled.h2`
-  margin-bottom: 20px;
-  text-align: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);  
 `;
 
 const Input = styled.input`
+  width: 100%;
   margin-bottom: 15px;
-  padding: 10px;
+  padding: 15px;
   border: 1px solid #ddd;
   border-radius: 5px;
 `;
 
 const Button = styled.button`
-  padding: 10px;
+  width: 100%;
+  padding: 15px;
+  margin-top: 10px;
   background: #274c4b;
   color: white;
   border: none;
-  border-radius: 5px;
+  border-radius: 10px;
   cursor: pointer;
-  margin-top: 10px;
 `;
 
 const LinkText = styled.div`
-  margin-top: 10px;
-  text-align: center;
-  font-size: 14px;
+  margin: 20px 10px 0 0;
+  font-size: 14px; 
+  color: #5A5A5A;
+  align-self: flex-end;
 `;
 
 const Signup: React.FC = () => {
-  const navigate = useRouter();
+  const router = useRouter();
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    navigate('/');
+    router.push('/');
   };
 
   return (
     <Container>
       <Form onSubmit={handleSubmit}>
-        <Title>Sign Up</Title>
-        <Input type="text" placeholder="Name" required />
-        <Input type="email" placeholder="Email" required />
-        <Input type="password" placeholder="Password" required />
-        <Button type="submit">Sign Up</Button>
+        <Image src="/img/text-logo-green.svg" alt='logo image' width={230} height={100}/>
+        <Input type="text" placeholder="아이디" required />
+        <Input type="password" placeholder="비밀번호" required />
+        <Input type="text" placeholder="이름" required />
+        <Input type="email" placeholder="이메일" required />
+        <Button type="submit">회원가입</Button>
         <LinkText>
-          Already have an account? <Link href="/login">Login</Link>
+          <Link href="/login">로그인</Link>
         </LinkText>
       </Form>
     </Container>

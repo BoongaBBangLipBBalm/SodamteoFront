@@ -7,7 +7,7 @@ const variables = {
     navContainer: {
         width: "20%",
         height: "100vh",
-        backgroundColor: "#0E4642",
+        backgroundColor: "#274c4b",
     },
 };
 
