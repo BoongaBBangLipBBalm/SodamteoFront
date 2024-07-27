@@ -1,8 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { Line } from "react-chartjs-2";
+import Graph from "./components/Graph";
+import Range from "./components/Range";
+import AirConditioner from "./components/AirConditioner";
+
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -99,19 +103,6 @@ const AirConditionerSlider = styled.input.attrs({ type: 'range' })`
   flex-grow: 1;
 `;
 
-const data = {
-  labels: ["4 hour ago", "2 hour ago", "Now"],
-  datasets: [
-    {
-      label: "Temperature",
-      data: [15, 25, 22, 28, 20, 25],
-      fill: false,
-      backgroundColor: "rgba(75,192,192,0.2)",
-      borderColor: "rgba(75,192,192,1)",
-    },
-  ],
-};
-
 const options = {
   scales: {
     y: {
@@ -123,38 +114,57 @@ const options = {
 const DataStatistics: React.FC = () => {
   const [isACOn, setIsACOn] = useState(false);
   const [currentTemp, setCurrentTemp] = useState(25);
+  const [data, setData] = useState({
+    labels: ["4 hours ago", "2 hours ago", "Now"],
+    datasets: [
+      {
+        label: "Temperature",
+        data: [15, 25, 22],
+        fill: false,
+        backgroundColor: "rgba(75,192,192,0.2)",
+        borderColor: "rgba(75,192,192,1)",
+      },
+    ],
+  });
+  const [temp, setTemp] = useState(25);
+  const [humid, setHumid] = useState(50);
+  const [co2, setCo2] = useState(400);
+
+  const fetchData = () => {
+    // Simulating fetching data from a server
+    const newTemp = Math.random() * (30 - 18) + 18;
+    const newHumid = Math.random() * (70 - 30) + 30;
+    const newCo2 = Math.random() * (500 - 300) + 300;
+    setTemp(newTemp);
+    setHumid(newHumid);
+    setCo2(newCo2);
+
+    setData(prevData => ({
+      ...prevData,
+      datasets: [
+        {
+          ...prevData.datasets[0],
+          data: [...prevData.datasets[0].data.slice(1), newTemp],
+        },
+      ],
+    }));
+  };
+
+  useEffect(() => {
+    const interval = setInterval(fetchData, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <Container>
+      
       <Content>
-        <ContentHeader>Humidity | Temperature | Nutrition</ContentHeader>
-
+        <ContentHeader>Humidity | Temperature | CO2</ContentHeader>
         <TopContainer>
-          <GraphContainer>
-            <Line data={data} options={options} />
-          </GraphContainer>
-          <RangeContainer>
-            <RangeBar>
-              <RangeIndicator bottom={((currentTemp - 18) / (32 - 18)) * 100}>
-                {currentTemp}°C (Now)
-              </RangeIndicator>
-            </RangeBar>
-          </RangeContainer>
+          <Graph></Graph>
+          <Range></Range>
         </TopContainer>
-
-        <AirConditionerContainer>
-          <AirConditionerControl>
-            <AirConditionerButton isOn={isACOn} onClick={() => setIsACOn(!isACOn)}>
-              {isACOn ? "ON" : "OFF"}
-            </AirConditionerButton>
-            <AirConditionerSlider
-              min={10}
-              max={30}
-              value={currentTemp}
-              onChange={e => setCurrentTemp(Number(e.target.value))}
-            />
-          </AirConditionerControl>
-        </AirConditionerContainer>
+        <AirConditioner></AirConditioner>
       </Content>
     </Container>
   );

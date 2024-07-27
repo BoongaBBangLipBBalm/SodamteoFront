@@ -45,10 +45,10 @@ const Button = styled.button`
 `;
 
 const LinkText = styled.div`
+  align-self: flex-end;
   margin: 20px 10px 0 0;
   font-size: 14px; 
   color: #5A5A5A;
-  align-self: flex-end;
 `;
 
 const Signup: React.FC = () => {
@@ -69,7 +69,7 @@ const Signup: React.FC = () => {
         <Input type="email" placeholder="이메일" required />
         <Button type="submit">회원가입</Button>
         <LinkText>
-          <Link href="/login">로그인</Link>
+          <Link href="/profile">로그인</Link>
         </LinkText>
       </Form>
     </Container>
