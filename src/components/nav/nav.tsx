@@ -1,6 +1,8 @@
 "use client";
 
 import styled from "styled-components";
+import NavButton from "./button";
+import ButtonList from "./buttonList";
 
 const variables = {
     navContainer: {
@@ -20,7 +22,9 @@ const NavContainer = styled.div`
 
 const Nav = () => {
   return (
-    <NavContainer></NavContainer>
+    <NavContainer>
+      <ButtonList></ButtonList>
+    </NavContainer>
   );
 };
 
