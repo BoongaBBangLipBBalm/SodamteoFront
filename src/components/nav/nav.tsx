@@ -5,25 +5,27 @@ import ButtonList from "./buttonList";
 import Logo from "./logo";
 import SettingButton from "./setting";
 
-
-
 const variables = {
     navContainer: {
-        width: "274px",
+        width: "20%",
         height: "100vh",
-        background_color: "#0E4642"
+        backgroundColor: "#274c4b",
     },
 };
 
 const NavContainer = styled.div`
-    
     width: ${variables.navContainer.width};
     height: ${variables.navContainer.height};
-    background-color: ${variables.navContainer.background_color};
+    background-color: ${variables.navContainer.backgroundColor};
+    color: white;
     display: flex;
-    align-items: center;
     flex-direction: column;
+    padding: 20px;
+`;
 
+const NavItem = styled.li`
+    list-style: none;
+    margin: 10px 0;
 `;
 
 const Nav = () => {
