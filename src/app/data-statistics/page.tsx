@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import { Line } from "react-chartjs-2";
+import Header from "./components/Header";
 import Graph from "./components/Graph";
 import Range from "./components/Range";
 import AirConditioner from "./components/AirConditioner";
@@ -29,7 +29,6 @@ ChartJS.register(
 );
 
 const Container = styled.div`
-  display: flex;
   height: 100vh;
   background-color: #f4f4f4;
   width: 100%;
@@ -40,76 +39,11 @@ const Content = styled.div`
   padding: 20px;
 `;
 
-const ContentHeader = styled.h2`
-  margin-bottom: 20px;
-  font-weight: normal;
-`;
-
 const TopContainer = styled.div`
   display: flex;
   justify-content: space-between;
 `;
 
-const GraphContainer = styled.div`
-  width: 60%;
-  margin-right: 20px;
-`;
-
-const RangeContainer = styled.div`
-  width: 35%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`;
-
-const RangeBar = styled.div`
-  height: 200px;
-  width: 30px;
-  background: linear-gradient(to top, blue 0%, blue 33%, green 33%, green 66%, red 66%, red 100%);
-  position: relative;
-  margin-top: 20px;
-`;
-
-const RangeIndicator = styled.div`
-  position: absolute;
-  left: 35px;
-  bottom: ${props => props.bottom}%;
-  transform: translateY(50%);
-  background-color: white;
-  padding: 2px 5px;
-  border-radius: 3px;
-`;
-
-const AirConditionerContainer = styled.div`
-  margin-top: 20px;
-`;
-
-const AirConditionerControl = styled.div`
-  display: flex;
-  align-items: center;
-`;
-
-const AirConditionerButton = styled.button`
-  margin-right: 20px;
-  padding: 10px 20px;
-  background-color: ${props => (props.isOn ? "green" : "red")};
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-`;
-
-const AirConditionerSlider = styled.input.attrs({ type: 'range' })`
-  flex-grow: 1;
-`;
-
-const options = {
-  scales: {
-    y: {
-      beginAtZero: true,
-    },
-  },
-};
 
 const DataStatistics: React.FC = () => {
   const [isACOn, setIsACOn] = useState(false);
@@ -157,9 +91,8 @@ const DataStatistics: React.FC = () => {
 
   return (
     <Container>
-      
+      <Header></Header>
       <Content>
-        <ContentHeader>Humidity | Temperature | CO2</ContentHeader>
         <TopContainer>
           <Graph></Graph>
           <Range></Range>
