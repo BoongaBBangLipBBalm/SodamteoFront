@@ -1,7 +1,9 @@
 "use client";
 
 import styled from "styled-components";
-import Link from "next/link";
+import ButtonList from "./buttonList";
+import Logo from "./logo";
+import SettingButton from "./setting";
 
 const variables = {
     navContainer: {
@@ -27,17 +29,12 @@ const NavItem = styled.li`
 `;
 
 const Nav = () => {
-    return (
-        <NavContainer>
-            <Link href="/DataStatics">
-                <NavItem>Data Statistics</NavItem>
-            </Link>
-            <NavItem>Control Hardware</NavItem>
-            <NavItem>Edit Values</NavItem>
-            <NavItem>Back to Profile</NavItem>
-            <NavItem>Setting</NavItem>
-        </NavContainer>
-    );
+  return (
+    <NavContainer>
+      <Logo url="./img/nav/logo.svg"></Logo>
+      <ButtonList></ButtonList>
+    </NavContainer>
+  );
 };
 
 export default Nav;

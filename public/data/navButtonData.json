@@ -1,0 +1,32 @@
+[
+    {
+        "id": 0,
+        "name": "데이터 통계",
+        "imageURL": "/img/nav/data_statistics.svg",
+        "toURL": "/data_statistics"
+    },
+    {
+        "id": 1,
+        "name": "하드웨어 조작",
+        "imageURL": "/img/nav/control_hardware.svg",
+        "toURL": "/control_hardware"
+    },
+    {
+        "id": 2,
+        "name": "프로필 변경",
+        "imageURL": "/img/nav/change_profile.svg",
+        "toURL": "/change_profile"
+    },
+    {
+        "id": 3,
+        "name": "환경 설정",
+        "imageURL": "/img/nav/setting.svg",
+        "toURL": "/setting"
+    },
+    {
+        "id": 4,
+        "name": "프로필",
+        "imageURL": "/img/nav/profile.svg",
+        "toURL": "/profile"
+    }
+]

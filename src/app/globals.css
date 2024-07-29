@@ -100,3 +100,9 @@ a {
     color-scheme: dark;
   }
 }
+
+@font-face {
+  font-family: "Pretendard_Bold";
+  font-weight: bold;
+  src: url("/fonts/Pretendard_Bold.otf") format("opentype");
+}

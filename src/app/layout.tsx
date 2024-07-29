@@ -13,12 +13,8 @@ export const metadata: Metadata = {
 		icon: "/img/favicon.svg",
 	},
 };
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
 
+const RootLayout = ({ children }: Readonly<{ children: React.ReactNode; }>) => {
   return (
     <html lang="en">
       <body className={inter.className}>
@@ -30,3 +26,5 @@ export default function RootLayout({
     </html>
   );
 }
+
+export default RootLayout;
