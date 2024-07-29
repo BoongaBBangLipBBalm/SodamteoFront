@@ -29,7 +29,7 @@ const page_data: IPageData[] = [
     {name: "test2", URL_names: [], buttons_id: [2,3]},
 ];
 
-const DEFAULT_PAGE = "profile";
+const DEFAULT_PAGE = "data";
 
 const GetPageData = (page_name: string): IPageData => {
     for(var i = 1 ; i < page_data.length ; i++) {

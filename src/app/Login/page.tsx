@@ -49,7 +49,6 @@ const LinkText = styled.div`
   margin: 20px 10px 0 0;
   font-size: 14px; 
   color: #5A5A5A;
-  }
 `;
 
 const Login: React.FC = () => {

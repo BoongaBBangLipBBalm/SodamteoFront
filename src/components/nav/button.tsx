@@ -25,7 +25,7 @@ const ButtonContainer = styled.div<{ $isSetting: boolean }>`
     justify-content: center;
     align-items: center;
     /* padding-left: 0.938rem; */
-    padding-left: 2.725rem;
+    padding-left: 2.025rem;
 
 `;
 

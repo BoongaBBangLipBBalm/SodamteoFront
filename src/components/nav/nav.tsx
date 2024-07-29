@@ -31,7 +31,7 @@ const NavItem = styled.li`
 const Nav = () => {
   return (
     <NavContainer>
-      <Logo url="./img/nav/logo.svg"></Logo>
+      <Logo url="./img/text_logo_white.svg"></Logo>
       <ButtonList></ButtonList>
     </NavContainer>
   );
