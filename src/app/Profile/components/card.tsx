@@ -3,7 +3,7 @@ import SimpleStatus from "./simpleStatus";
 import ProfileSelectButton from "./button_select";
 import ProfileEditButton from "./button_edit";
 
-interface ICardProps {
+export interface ICardProps {
     imageURL: string;
     profileName: string;
     type: string;
@@ -31,6 +31,7 @@ const CardContainer = styled.div<{$isSelected: boolean}>`
     padding: ${(props) => props.$isSelected ? NumToRem(card_config.selected.width * 0.1) : NumToRem(card_config.unselected.width * 0.1)};
     display: flex;
     flex-direction: column;
+    margin: 2rem;
 `;
 
 function NumToRem(value: number) {

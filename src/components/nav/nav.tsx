@@ -13,7 +13,7 @@ const variables = {
     },
 };
 
-const NavContainer = styled.div`
+export const NavContainer = styled.div`
     width: ${variables.navContainer.width};
     height: ${variables.navContainer.height};
     background-color: ${variables.navContainer.backgroundColor};
@@ -27,6 +27,10 @@ const NavItem = styled.li`
     list-style: none;
     margin: 10px 0;
 `;
+
+export function GetLayoutWidthRatio(): number {
+  return Number(variables.navContainer.width.slice(0, variables.navContainer.width.length-1)) * 0.01;
+}
 
 const Nav = () => {
   return (

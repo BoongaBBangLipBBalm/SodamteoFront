@@ -6,13 +6,14 @@ import styled from "styled-components";
 import CardViewer from "./components/cardViewer";
 import ProfileMoveButton from "./components/ProfileMoveButton";
 import AddProfileButton from "./components/addProfile";
+import SwiperTest from "./components/cardSwiper";
 
 const Container = styled.div`
     width: 100%;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin: 0 1.688rem;
+    //margin: 0 1.688rem;
 `;
 
 const ProfileSelection: React.FC = () => {
@@ -26,9 +27,7 @@ const ProfileSelection: React.FC = () => {
 
     return (
         <Container>
-            <ProfileMoveButton isToNext={false} imgURL="/img/profile/move_previous.svg"></ProfileMoveButton>
-            <CardViewer></CardViewer>
-            <ProfileMoveButton isToNext={true} imgURL="/img/profile/move_next.svg"></ProfileMoveButton>
+            <SwiperTest></SwiperTest>
             <AddProfileButton></AddProfileButton>
         </Container>
     )
