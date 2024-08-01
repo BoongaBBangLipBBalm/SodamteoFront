@@ -64,11 +64,11 @@ const Login: React.FC = () => {
     <Container>
       <Form onSubmit={handleSubmit}>
         <Image src="/img/text-logo-green.svg" alt='logo image' width={230} height={100}/>
-        <Input type="email" placeholder="아매일" required />
+        <Input type="email" placeholder="이메일" required />
         <Input type="password" placeholder="비밀번호" required />
         <Button type="submit">로그인</Button>
         <LinkText>
-          <Link href="/signUp">회원가입</Link>
+          <Link href="/sign-up">회원가입</Link>
         </LinkText>
       </Form>
     </Container>

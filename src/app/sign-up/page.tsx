@@ -63,13 +63,12 @@ const Signup: React.FC = () => {
     <Container>
       <Form onSubmit={handleSubmit}>
         <Image src="/img/text-logo-green.svg" alt='logo image' width={230} height={100}/>
-        <Input type="text" placeholder="아이디" required />
-        <Input type="password" placeholder="비밀번호" required />
-        <Input type="text" placeholder="이름" required />
         <Input type="email" placeholder="이메일" required />
+        <Input type="text" placeholder="이름" required />
+        <Input type="password" placeholder="비밀번호" required />
         <Button type="submit">회원가입</Button>
         <LinkText>
-          <Link href="/profile">로그인</Link>
+          <Link href="/login">로그인</Link>
         </LinkText>
       </Form>
     </Container>
