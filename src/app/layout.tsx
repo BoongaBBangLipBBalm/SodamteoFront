@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Nav from "@components/nav/nav";
 import LayoutStyle from "@/styles/layout.module.css";
+import StyledComponentsRegistry from "@/utils/registry";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,10 +19,12 @@ const RootLayout = ({ children }: Readonly<{ children: React.ReactNode; }>) => {
   return (
     <html lang="en">
       <body className={inter.className}>
+        <StyledComponentsRegistry>
           <div className={LayoutStyle.layoutWrapper}>
             <Nav></Nav>
             {children}
           </div>
+        </StyledComponentsRegistry> 
       </body>
     </html>
   );
