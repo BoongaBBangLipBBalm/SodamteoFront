@@ -1,22 +1,37 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import React from "react";
+import React, { useEffect } from "react";
 import styled from "styled-components";
-import CardViewer from "./components/cardViewer";
-import ProfileMoveButton from "./components/ProfileMoveButton";
+import CardViewer from "./cardViewer";
 import AddProfileButton from "./components/addProfile";
-import SwiperTest from "./components/cardSwiper";
+import { GetPageWidth } from "@/utils/getPageInfo";
+import { ICardDataProps } from "./cardViewer";
+import { ICardProps } from "./components/card";
 
 const Container = styled.div`
-    width: 100%;
+    width: ${String(GetPageWidth()) + "px"};
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
-    //margin: 0 1.688rem;
 `;
 
+const testData: ICardDataProps = {
+    cardDatas: [
+        {imageURL:"/img/profile/grains/rice.svg", profileName:"AAA", type:"Orange"},
+        {imageURL:"/img/profile/grains/rice.svg", profileName:"BBB", type:"Orange"},
+        {imageURL:"/img/profile/grains/rice.svg", profileName:"CCC", type:"Orange"},
+        {imageURL:"/img/profile/grains/rice.svg", profileName:"DDD", type:"Orange"},
+        {imageURL:"/img/profile/grains/rice.svg", profileName:"EEE", type:"Orange"},
+        {imageURL:"/img/profile/grains/rice.svg", profileName:"FFF", type:"Orange"}
+    ]
+}
+
 const ProfileSelection: React.FC = () => {
+
+    useEffect(() => {
+
+    }, [window.innerWidth]);
 
     const router = useRouter();
 
@@ -27,7 +42,7 @@ const ProfileSelection: React.FC = () => {
 
     return (
         <Container>
-            <SwiperTest></SwiperTest>
+            <CardViewer cardDatas={testData.cardDatas}></CardViewer>
             <AddProfileButton></AddProfileButton>
         </Container>
     )

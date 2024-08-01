@@ -7,31 +7,30 @@ export interface ICardProps {
     imageURL: string;
     profileName: string;
     type: string;
+}
+
+interface ICardSeleced {
+    data: ICardProps;
     isSelected: boolean;
 }
 
 const card_config = { // value: rem
-    selected: {
-        width: 18.813,
-        height: 30
-    },
-    unselected: {
-        width: 12.438,
-        height: 19.813
-    }
+    sizeRatio: 0.627,
+    selectedCard_height: 27,
+    unselectedCard_height: 15
 }
 
 const CardContainer = styled.div<{$isSelected: boolean}>`
-    width: ${(props) => props.$isSelected ? NumToRem(card_config.selected.width) : NumToRem(card_config.unselected.width)};
-    height: ${(props) => props.$isSelected ? NumToRem(card_config.selected.height) : NumToRem(card_config.unselected.height)};
+    width: ${(props) => props.$isSelected ? NumToRem(card_config.selectedCard_height * card_config.sizeRatio) : NumToRem(card_config.unselectedCard_height * card_config.sizeRatio)};
+    height: ${(props) => props.$isSelected ? NumToRem(card_config.selectedCard_height) : NumToRem(card_config.unselectedCard_height)};
     background-color: #F8F7F7;
     margin: 0 1.063rem;
     filter: drop-shadow(0px 4px 8px rgba(0,0,0,0.15));
     border-radius: 20px;
-    padding: ${(props) => props.$isSelected ? NumToRem(card_config.selected.width * 0.1) : NumToRem(card_config.unselected.width * 0.1)};
+    padding: ${(props) => props.$isSelected ? NumToRem(card_config.selectedCard_height * card_config.sizeRatio * 0.1) : NumToRem(card_config.unselectedCard_height * card_config.sizeRatio * 0.1)};
     display: flex;
     flex-direction: column;
-    margin: 2rem;
+    margin: 2rem auto;
 `;
 
 function NumToRem(value: number) {
@@ -101,15 +100,15 @@ const ButtonContainer = styled.div`
 `;
 
 
-const Card = (props: ICardProps) => {
+const Card = (props: ICardSeleced) => {
     return (
         <CardContainer $isSelected={props.isSelected}>
             <ImageContainer>
-                <Image src={props.imageURL}></Image>
+                <Image src={props.data.imageURL}></Image>
             </ImageContainer>
             <TextConatiner>
-                <ProfileName $isSelected={props.isSelected}>{props.profileName}</ProfileName>
-                <TypeName $isSelected={props.isSelected}>{props.type}</TypeName>
+                <ProfileName $isSelected={props.isSelected}>{props.data.profileName}</ProfileName>
+                <TypeName $isSelected={props.isSelected}>{props.data.type}</TypeName>
             </TextConatiner>
             {
                 props.isSelected

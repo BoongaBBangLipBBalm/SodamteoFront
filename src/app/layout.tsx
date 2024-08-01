@@ -4,6 +4,7 @@ import "./globals.css";
 import Nav from "@components/nav/nav";
 import LayoutStyle from "@/styles/layout.module.css";
 
+
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {

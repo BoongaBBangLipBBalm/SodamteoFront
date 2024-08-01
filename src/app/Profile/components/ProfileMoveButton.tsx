@@ -30,7 +30,7 @@ const Image = styled.img`
 
 const ProfileMoveButton = (props: IButtonPorps) => {
     return (
-        <Container>
+        <Container type="button">
             <Image src={props.imgURL}></Image>
         </Container>
     )
