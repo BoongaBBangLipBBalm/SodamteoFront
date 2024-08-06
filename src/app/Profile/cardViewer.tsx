@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import Card from "./components/card";
 import ProfileMoveButton from "./components/ProfileMoveButton";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
@@ -36,16 +36,14 @@ const Wrapper = styled.div`
 
 const CardViewer = (props: ICardDataProps) => {
 
-    const [currentIndex, setIndex] = useState(0);
+    const [currentIndex, setCurrentIndex] = useState(0);
 
     const MovePrev = () => {
-        setIndex((currentIndex-1)%props.cardDatas.length);
-        console.log("test1");
+        setCurrentIndex((currentIndex-1)%props.cardDatas.length);
     }
 
     const MoveNext = () => {
-        setIndex((currentIndex+1)%props.cardDatas.length);
-        console.log("test2");
+        setCurrentIndex((currentIndex+1)%props.cardDatas.length);
     }
 
     useEffect(() => {
@@ -62,7 +60,10 @@ const CardViewer = (props: ICardDataProps) => {
         centerMode:true,
         centerPadding:"0",
         prevArrow:<button><div className={styles.divEffect}><img onClick={MovePrev} src="img/profile/move_previous.svg" alt="" className={styles.imgSize}/></div></button>,
-        nextArrow:<button><div className={styles.divEffect}><img onClick={MoveNext} src="img/profile/move_next.svg" alt="" className={styles.imgSize}/></div></button>
+        nextArrow:<button><div className={styles.divEffect}><img onClick={MoveNext} src="img/profile/move_next.svg" alt="" className={styles.imgSize}/></div></button>,
+        afterChange: (newIndex: number) => {
+            setCurrentIndex(newIndex);
+        }
     }
 
     return (
@@ -73,7 +74,7 @@ const CardViewer = (props: ICardDataProps) => {
                         <div key={index}>
                             {
                                 currentIndex === index
-                                ? <Card data={data} isSelected={true} ></Card>
+                                ? <Card data={data} isSelected={true}></Card>
                                 : <Card data={data} isSelected={false} ></Card>
                             }
                         </div>
