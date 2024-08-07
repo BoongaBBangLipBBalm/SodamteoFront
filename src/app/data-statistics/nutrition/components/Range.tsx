@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 
 const Container = styled.div`
-  width: 30%;
+  width: 25%;
   height: 100%;    
   display: flex; 
   justify-content: center;
@@ -12,7 +12,7 @@ const Container = styled.div`
 `;
 
 const RangeContainer = styled.div`
-  width: 100%;
+  width: 80%;
   height: 60vh;
   border: 1px solid #ddd;
   background-color: #F8F7F6;
@@ -22,15 +22,31 @@ const RangeContainer = styled.div`
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);  
 `;
 
-const Header = styled.h2`
+const HeaderContainer = styled.div`
+  display: flex;
+  align-items: center;
   margin-bottom: 20px;
+  width: 100%;
+`;
+
+const Header = styled.h2`
   font-weight: 500;
-  align-self: flex-start;
+  margin: 0;
+`;
+
+const Select = styled.select`
+  margin-left: auto;
+  padding: 5px;
+  font-size: 16px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #fff;
+  color: #333;
 `;
 
 const RangeBar = styled.div`
   position: relative;
-  width: 90%;
+  width: 80%;
   height: 90%;
   background: linear-gradient(to bottom, #D36667 0%, #5B807F 50%, #4C5BEC 100%);
 `;
@@ -55,44 +71,79 @@ const Tick = styled.div`
   background: #ddd;
 `;
 
-const labels = [
-  { label: '54°C', bottom: '100%' },
-  { label: '36°C', bottom: '67%' },
-  { label: '25°C (Goal)', bottom: '50%' },
-  { label: '18°C', bottom: '33%' },
-  { label: '0°C', bottom: '0%' }
-];
+const labels = {
+  N: [
+    { label: '50', bottom: '100%' },
+    { label: '40', bottom: '75%' },
+    { label: '30 (Goal)', bottom: '50%' },
+    { label: '20', bottom: '25%' },
+    { label: '10', bottom: '0%' }
+  ],
+  P: [
+    { label: '45', bottom: '100%' },
+    { label: '35', bottom: '75%' },
+    { label: '25 (Goal)', bottom: '50%' },
+    { label: '15', bottom: '25%' },
+    { label: '5', bottom: '0%' }
+  ],
+  K: [
+    { label: '60', bottom: '100%' },
+    { label: '45', bottom: '75%' },
+    { label: '30 (Goal)', bottom: '50%' },
+    { label: '20', bottom: '25%' },
+    { label: '10', bottom: '0%' }
+  ],
+  pH: [
+    { label: '8.0', bottom: '100%' },
+    { label: '7.0', bottom: '75%' },
+    { label: '6.0 (Goal)', bottom: '50%' },
+    { label: '5.0', bottom: '25%' },
+    { label: '4.0', bottom: '0%' }
+  ]
+};
 
 const Range = () => {
-  const [currentTemp, setCurrentTemp] = useState(25);
+  const [currentValue, setCurrentValue] = useState(30);
+  const [selectedType, setSelectedType] = useState('N');
 
   useEffect(() => {
-    // Simulating real-time temperature updates
     const interval = setInterval(() => {
-      setCurrentTemp(Math.floor(Math.random() * (32 - 18 + 1)) + 18);
+      const min = selectedType === 'pH' ? 4 : 10;
+      const max = selectedType === 'pH' ? 8 : 60;
+      setCurrentValue(Math.random() * (max - min) + min);
     }, 5000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [selectedType]);
 
-  const getBottomPercentage = (temp) => {
-    return ((temp - 18) / (32 - 18)) * 100;
+  const getBottomPercentage = (value) => {
+    const min = selectedType === 'pH' ? 4 : 10;
+    const max = selectedType === 'pH' ? 8 : 60;
+    return ((value - min) / (max - min)) * 100;
   };
 
   return (
     <Container>
       <RangeContainer>
-        <Header>Range</Header>
+        <HeaderContainer>
+          <Header>Range</Header>
+          <Select onChange={(e) => setSelectedType(e.target.value)} value={selectedType}>
+            <option value="N">N</option>
+            <option value="P">P</option>
+            <option value="K">K</option>
+            <option value="pH">pH</option>
+          </Select>
+        </HeaderContainer>
         <RangeBar>
-          {labels.map((label) => (
+          {labels[selectedType].map((label) => (
             <Indicator key={label.label} style={{ bottom: label.bottom }}>
               {label.label}
             </Indicator>
           ))}
-          <Indicator style={{ bottom: `${getBottomPercentage(currentTemp)}%` }}>
-            {currentTemp}°C (Now)
+          <Indicator style={{ bottom: `${getBottomPercentage(currentValue)}%` }}>
+            {selectedType === 'pH' ? currentValue.toFixed(1) : currentValue.toFixed(0)} ({selectedType === 'pH' ? 'pH' : 'Now'})
           </Indicator>
-          {labels.map((label) => (
+          {labels[selectedType].map((label) => (
             <Tick key={label.label} style={{ bottom: label.bottom }} />
           ))}
         </RangeBar>
