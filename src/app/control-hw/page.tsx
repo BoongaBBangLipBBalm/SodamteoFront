@@ -3,6 +3,8 @@ import styled from "styled-components";
 import AirConditioner from "./components/Airconditioner";
 import Humidifier from "./components/Humidifier";
 import SunLight from "./components/Sunlight";
+import Fertilizer from "./components/Fertilizer";
+
 
 const Wrapper = styled.div`
   width: 100%;
@@ -31,6 +33,7 @@ const controlHW = () => {
         <AirConditioner />
         <Humidifier />
         <SunLight />
+        <Fertilizer/>
       </Container>
     </Wrapper>
    
