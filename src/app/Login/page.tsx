@@ -56,7 +56,7 @@ const Login: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    router.push('/data-statistics');
+    router.push('/data-statistics/temperature');
   };
 
   return (
