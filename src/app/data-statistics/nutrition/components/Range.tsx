@@ -12,12 +12,12 @@ const Container = styled.div`
 `;
 
 const RangeContainer = styled.div`
-  width: 80%;
+  width: 100%;
   height: 60vh;
   border: 1px solid #ddd;
   background-color: #F8F7F6;
   border-radius: 20px;
-  padding: 30px 50px;
+  padding: 10px 30px;
   margin: 20px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);  
 `;
@@ -30,24 +30,111 @@ const HeaderContainer = styled.div`
 `;
 
 const Header = styled.h2`
+  width: 100%;
   font-weight: 500;
   margin: 0;
 `;
 
-const Select = styled.select`
-  margin-left: auto;
-  padding: 5px;
-  font-size: 16px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  background-color: #fff;
-  color: #333;
+interface SelectButtonProps {
+  $show: boolean;
+}
+
+const SelectButton = styled.button<SelectButtonProps>`
+  width: 60px;
+  padding: 10px 20px 10px 10px;
+  margin: 10px;
+  font-size: 15px;
+  line-height: 14px;
+  background-color: white;
+  border: 1px solid #274C4B;
+  box-sizing: border-box;
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: left;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  color: black;
+  position: relative; /* relative positioning for the arrow */
+  transition: border-color 0.3s, outline 0.3s; /* Smooth transition for border and outline */
+
+  &:hover,
+  &:focus {
+    border: 1px solid #274C4B;
+    outline: 2px solid #749F73; /* Changed outline color */
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-40%) rotate(0deg);
+    border: 5px solid transparent;
+    border-top-color: #274C4B; 
+    transition: transform 0.3s; 
+  }
+
+  /* Rotate the triangle when the options are shown */
+  ${({ $show }) => $show && `
+    &::after {
+      transform: translateY(-80%) rotate(180deg);
+    }
+  `}
+`;
+
+interface SelectListProps {
+  $show: boolean;
+}
+
+const SelectList = styled.ul<SelectListProps>`
+  list-style-type: none;
+  display: ${(props) => (props.$show ? 'block' : 'none')};
+  position: absolute;
+  width: 80px;
+  top: 47px;
+  left: 0;
+  margin-left: 10px;
+  padding: 0;
+  border: 1px solid #274C4B; /* Changed border color */
+  box-sizing: border-box;
+  box-shadow: 4px 4px 14px rgba(0, 0, 0, 0.15);
+  border-radius: 10px;
+  background-color: white;
+  z-index: 1000;
+`;
+
+const OptionButton = styled.button`
+  width: 100%;
+  padding: 7px 10px;
+  border: none;
+  background-color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  font-size: 15px;
+  color: black;
+
+  &:hover,
+  &:focus {
+    background-color: #F8F7F6;
+  }
+`;
+
+const OptionList = styled.li`
+  padding: 3px 5px;
+  margin: 0 3px;
+  color: black;
+
 `;
 
 const RangeBar = styled.div`
   position: relative;
-  width: 80%;
-  height: 90%;
+  width: 60%;
+  height: 80%;
   background: linear-gradient(to bottom, #D36667 0%, #5B807F 50%, #4C5BEC 100%);
 `;
 
@@ -105,6 +192,8 @@ const labels = {
 const Range = () => {
   const [currentValue, setCurrentValue] = useState(30);
   const [selectedType, setSelectedType] = useState('N');
+  const [showOptions, setShowOptions] = useState(false);
+  const [selectedOption, setSelectedOption] = useState('N');
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -122,17 +211,33 @@ const Range = () => {
     return ((value - min) / (max - min)) * 100;
   };
 
+  const handleSelectClick = () => {
+    setShowOptions((prevShowOptions) => !prevShowOptions);
+  };
+
+  const handleOptionClick = (option) => {
+    setSelectedOption(option);
+    setShowOptions(false);
+    setSelectedType(option);
+  };
+
   return (
     <Container>
       <RangeContainer>
         <HeaderContainer>
           <Header>Range</Header>
-          <Select onChange={(e) => setSelectedType(e.target.value)} value={selectedType}>
-            <option value="N">N</option>
-            <option value="P">P</option>
-            <option value="K">K</option>
-            <option value="pH">pH</option>
-          </Select>
+          <div style={{ marginLeft: 'auto', position: 'relative' }}>
+            <SelectButton className="btn-select" onClick={handleSelectClick} $show={showOptions}>
+              {selectedOption}
+            </SelectButton>
+            <SelectList className="list-member" $show={showOptions}>
+              {Object.keys(labels).map((label) => (
+                <OptionList key={label}>
+                  <OptionButton onClick={() => handleOptionClick(label)}>{label}</OptionButton>
+                </OptionList>
+              ))}
+            </SelectList>
+          </div>
         </HeaderContainer>
         <RangeBar>
           {labels[selectedType].map((label) => (

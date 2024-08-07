@@ -45,25 +45,62 @@ const RotatingContainer = styled.div`
   height: 10px;
 `;
 
-const ButtonContainer = styled.div`
+const RadioContainer = styled.div`
   width: 1000px;
   display: flex;
   gap: 10px;
   justify-content: flex-end;
+
 `;
 
-const Button = styled.button`
-  padding: 5px 10px;
-  font-size: 16px;
+const Label = styled.label`
+  font-size: 18px;
+  line-height: 2rem;
+  padding: 0.2em 0.4em;
+  display: flex;
+  align-items: center;
   cursor: pointer;
-  border: none;
-  border-radius: 10px;
-  background-color: #274C4B;
-  color: white;
+  user-select: none;
+  
+  span {
+    margin-left: 8px;
+  }
+`;
+
+const RadioInput = styled.input.attrs({ type: "radio" })`
+  appearance: none;
+  border: max(2px, 0.1em) solid gray;
+  border-radius: 50%;
+  width: 1.25em;
+  height: 1.25em;
+  transition: border 0.5s ease-in-out;
+  vertical-align: middle;
+
+  &:checked {
+    border: 0.4em solid #274C4B;
+  }
+
+  &:focus-visible {
+    outline-offset: max(2px, 0.1em);
+    outline: max(2px, 0.1em) dotted #274C4B;
+  }
+
+  &:hover {
+    box-shadow: 0 0 0 max(4px, 0.2em) lightgray;
+    cursor: pointer;
+  }
+
+  &:disabled {
+    background-color: lightgray;
+    box-shadow: none;
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
 `;
 
 const Header = () => {
   const [activeIndex, setActiveIndex] = useState(1);
+  const [selectedTempType, setSelectedTempType] = useState("soil");
   const router = useRouter();
   const names = ["Humidity", "Temperature", "Nutrition"];
 
@@ -74,7 +111,8 @@ const Header = () => {
     }
   };
 
-  const handleSubButtonClick = (type) => {
+  const handleRadioChange = (type) => {
+    setSelectedTempType(type);
     router.push(`/data-statistics/temperature/${type}`);
   };
 
@@ -100,10 +138,26 @@ const Header = () => {
           ))}
         </NameContainer>
         {activeIndex === 1 && (
-          <ButtonContainer>
-            <Button onClick={() => handleSubButtonClick('soil')}>토양 온도</Button>
-            <Button onClick={() => handleSubButtonClick('air')}>기온</Button>
-          </ButtonContainer>
+          <RadioContainer>
+            <Label>
+              <RadioInput
+                name="temperatureType"
+                value="soil"
+                checked={selectedTempType === "soil"}
+                onChange={() => handleRadioChange("soil")}
+              />
+              <span>토양 온도</span>
+            </Label>
+            <Label>
+              <RadioInput
+                name="temperatureType"
+                value="air"
+                checked={selectedTempType === "air"}
+                onChange={() => handleRadioChange("air")}
+              />
+              <span>기온</span>
+            </Label>
+          </RadioContainer>
         )}
       </RotatingContainer>
     </Container>

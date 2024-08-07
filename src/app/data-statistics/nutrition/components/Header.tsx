@@ -39,13 +39,12 @@ const RotatingContainer = styled.div`
 `;
 
 const Header = () => {
-  const [activeIndex, setActiveIndex] = useState(1);
+  const [activeIndex, setActiveIndex] = useState(2);
   const router = useRouter();
   const names = ["Humidity", "Temperature", "Nutrition"];
 
   const handleNameClick = (index) => {
     setActiveIndex(index);
-    // 해당 페이지로 라우팅
     router.push(`/data-statistics/${names[index].toLowerCase()}`);
   };
 

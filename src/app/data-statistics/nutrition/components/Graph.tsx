@@ -13,8 +13,6 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import { start } from "repl";
-import { color } from "chart.js/helpers";
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
@@ -22,7 +20,7 @@ const Container = styled.div`
   width: 100%; 
   height: 60vh; 
   display: flex;
-  background-color: #F8F7F6;
+  background-color: #f8f7f6;
   border-radius: 20px;
   padding: 10px;
   margin: 20px;
@@ -54,11 +52,9 @@ const options = {
       },
     },
     y: {
-      min: 10,
-      max: 40,
       title: {
         display: false,
-        text: 'Temperature (°C)',
+        text: 'Values',
       },
     },
   },
@@ -66,7 +62,7 @@ const options = {
     tooltip: {
       callbacks: {
         label: function (context) {
-          return `${context.raw}°C`;
+          return `${context.dataset.label}: ${context.raw}`;
         },
       },
     },
@@ -74,21 +70,42 @@ const options = {
   elements: {
     point: {
       radius: 8,
-      hitRadius: 10
+      hitRadius: 10,
     },
   },
 };
 
 const Graph: React.FC = () => {
   const [data, setData] = useState({
-    labels: ["6 hour ago", "4 hour ago", "2 hour ago", "Now", ""],
+    labels: ["6 hours ago", "4 hours ago", "2 hours ago", "Now"],
     datasets: [
       {
-        label: "Temperature",
-        data: [20, 28, 25, 29],
-        fill: true,
+        label: "N",
+        data: [20, 21, 19, 22],
+        fill: false,
         backgroundColor: "rgba(75,192,192,0.2)",
-        borderColor: "gray",
+        borderColor: "rgba(75,192,192,1)",
+      },
+      {
+        label: "P",
+        data: [15, 14, 16, 13],
+        fill: false,
+        backgroundColor: "rgba(192,75,75,0.2)",
+        borderColor: "rgba(192,75,75,1)",
+      },
+      {
+        label: "K",
+        data: [10, 12, 9, 11],
+        fill: false,
+        backgroundColor: "rgba(75,75,192,0.2)",
+        borderColor: "rgba(75,75,192,1)",
+      },
+      {
+        label: "pH",
+        data: [7, 6.8, 7.2, 6.9],
+        fill: false,
+        backgroundColor: "rgba(75,192,75,0.2)",
+        borderColor: "rgba(75,192,75,1)",
       },
     ],
   });
