@@ -3,13 +3,13 @@
         "id": 0,
         "name": "데이터 통계",
         "imageURL": "/img/nav/data_statistics.svg",
-        "toURL": "/data_statistics"
+        "toURL": "/data-statistics"
     },
     {
         "id": 1,
         "name": "하드웨어 조작",
         "imageURL": "/img/nav/control_hardware.svg",
-        "toURL": "/control_hardware"
+        "toURL": "/control-hw"
     },
     {
         "id": 2,
@@ -21,12 +21,12 @@
         "id": 3,
         "name": "환경 설정",
         "imageURL": "/img/nav/setting.svg",
-        "toURL": "/setting"
+        "toURL": "/Setting"
     },
     {
         "id": 4,
         "name": "프로필",
         "imageURL": "/img/nav/profile.svg",
-        "toURL": "/profile"
+        "toURL": "/Profile"
     }
 ]
