@@ -56,13 +56,13 @@ const Login: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    router.push('/data-statistics');
+    router.push('/data-statistics/temperature');
   };
 
   return (
     <Container>
       <Form onSubmit={handleSubmit}>
-        <Image src="/img/text-logo-green.svg" alt='logo image' width={230} height={100}/>
+        <Image src="/img/text_logo_green.svg" alt='logo image' width={230} height={100}/>
         <Input type="email" placeholder="이메일" required />
         <Input type="password" placeholder="비밀번호" required />
         <Button type="submit">로그인</Button>
