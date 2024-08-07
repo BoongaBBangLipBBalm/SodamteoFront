@@ -5,6 +5,7 @@ import Nav from "@components/nav/nav";
 import LayoutStyle from "@/styles/layout.module.css";
 import StyledComponentsRegistry from "@/utils/registry";
 
+
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
