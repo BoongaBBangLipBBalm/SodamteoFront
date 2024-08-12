@@ -14,6 +14,20 @@ const Container = styled.div`
   background-color: #f4f4f4;
 `;
 
+const Title = styled.div`
+  font-size: 24px;
+  font-weight: 600;
+  padding-bottom: 30px;
+`;
+
+const FormTitle = styled.span`
+  align-self: flex-start;
+  padding: 5px;
+  font-size: 15px;
+  color: #333;
+`;
+
+
 const Form = styled.form`
   width: 40%;
   display: flex;
@@ -62,8 +76,10 @@ const Login: React.FC = () => {
   return (
     <Container>
       <Form onSubmit={handleSubmit}>
-        <Image src="/img/text_logo_green.svg" alt='logo image' width={230} height={100}/>
+       <Title>로그인</Title>
+        <FormTitle>이메일</FormTitle>
         <Input type="email" placeholder="이메일" required />
+        <FormTitle>비밀번호</FormTitle>
         <Input type="password" placeholder="비밀번호" required />
         <Button type="submit">로그인</Button>
         <LinkText>
