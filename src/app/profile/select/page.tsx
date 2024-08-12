@@ -5,12 +5,12 @@ import React, { useEffect } from "react";
 import styled from "styled-components";
 import CardViewer from "./cardViewer";
 import AddProfileButton from "./components/addProfile";
-import { GetPageWidth } from "@/utils/getPageInfo";
 import { ICardDataProps } from "./cardViewer";
 import { ICardProps } from "./components/card";
+import { GetLayoutWidthRatio } from "@/components/nav/nav";
 
 const Container = styled.div`
-    width: ${String(GetPageWidth()) + "px"};
+    width: ${(1 - GetLayoutWidthRatio()) * 100 + "%"};
     display: flex;
     justify-content: center;
     align-items: center;
@@ -29,15 +29,11 @@ const testData: ICardDataProps = {
 
 const ProfileSelection: React.FC = () => {
 
-    useEffect(() => {
-
-    }, [window.innerWidth]);
-
     const router = useRouter();
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        router.push('/Profile');
+        router.push('/select');
     };
 
     return (

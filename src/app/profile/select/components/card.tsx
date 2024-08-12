@@ -16,8 +16,8 @@ interface ICardSeleced {
 
 const card_config = { // value: rem
     sizeRatio: 0.627,
-    selectedCard_height: 27,
-    unselectedCard_height: 15
+    selectedCard_height: 30,
+    unselectedCard_height: 13
 }
 
 const CardContainer = styled.div<{$isSelected: boolean}>`

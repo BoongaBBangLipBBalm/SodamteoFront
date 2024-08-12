@@ -10,6 +10,9 @@ const Button = styled.button`
     color: white;
     vertical-align: middle;
     border: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
     &:hover {
         background-color: #153130;
@@ -22,7 +25,7 @@ function OnClick() {
 
 const ProfileSelectButton = () => {
     return (
-        <Button onClick={() => OnClick()}>Select</Button>
+        <Button as="a" href="/data-statistics/temperature" onClick={() => OnClick()}>Select</Button>
     )
 };
 

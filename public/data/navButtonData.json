@@ -3,7 +3,7 @@
         "id": 0,
         "name": "데이터 통계",
         "imageURL": "/img/nav/data_statistics.svg",
-        "toURL": "/data-statistics"
+        "toURL": "/data-statistics/temperature"
     },
     {
         "id": 1,
@@ -15,18 +15,30 @@
         "id": 2,
         "name": "프로필 변경",
         "imageURL": "/img/nav/change_profile.svg",
-        "toURL": "/change_profile"
+        "toURL": "/change-profile"
     },
     {
         "id": 3,
         "name": "환경 설정",
         "imageURL": "/img/nav/setting.svg",
-        "toURL": "/Setting"
+        "toURL": "/setting"
     },
     {
         "id": 4,
         "name": "프로필",
         "imageURL": "/img/nav/profile.svg",
-        "toURL": "/Profile"
+        "toURL": "/profile/select"
+    },
+    {
+        "id": 5,
+        "name": "시가/생산량 예측",
+        "imageURL": "/img/nav/forecast.svg",
+        "toURL": "/forecast"
+    },
+    {
+        "id": 6,
+        "name": "질병 관리",
+        "imageURL": "/img/nav/diseaseControl.svg",
+        "toURL": "/disease-control"
     }
 ]
