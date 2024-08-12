@@ -50,17 +50,17 @@ const RadioContainer = styled.div`
   display: flex;
   gap: 10px;
   justify-content: flex-end;
-
 `;
 
 const Label = styled.label`
   font-size: 18px;
   line-height: 2rem;
-  padding: 0.2em 0.4em;
+  padding: 0 0.4em;
   display: flex;
   align-items: center;
   cursor: pointer;
   user-select: none;
+  margin-bottom: 40px;
   
   span {
     margin-left: 8px;

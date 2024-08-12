@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 
 const Container = styled.div`
@@ -68,24 +68,8 @@ const SliderContainer = styled.div`
   position: relative;
   width: 100%;
   height: 12px;
-  background: linear-gradient(to right, #4c5cf2, purple, #d86767);
+  background: linear-gradient(to right, #003333, #99CCCC);
   border-radius: 5px;
-`;
-
-const SliderLabel = styled.div`
-  position: absolute;
-  top: 20px;
-  transform: translateY(-50%);
-  font-size: 12px;
-`;
-
-const Marker = styled.div`
-  position: absolute;
-  top: 100%;
-  transform: translateY(-50%);
-  display: flex;
-  align-items: center;
-  font-size: 12px;
 `;
 
 const Knob = styled.div`
@@ -98,6 +82,15 @@ const Knob = styled.div`
   left: ${props => props.left}%;
   transform: translate(-50%, -50%);
   cursor: pointer;
+`;
+
+const Marker = styled.div`
+  position: absolute;
+  top: 100%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  font-size: 12px;
 `;
 
 const ScaleLabelContainer = styled.div`
@@ -205,48 +198,39 @@ const SelectContainer = styled.div`
   position: relative;
 `;
 
-const AirConditioner = () => {
+const Humidifier = () => {
   const [isOn, setIsOn] = useState(false);
-  const [goalTemp, setGoalTemp] = useState(25);
-  const [showTempOptions, setShowTempOptions] = useState(false);
-  const sliderRef = useRef(null);
+  const [goalHumidity, setGoalHumidity] = useState(50);
+  const [showHumidityOptions, setShowHumidityOptions] = useState(false);
 
-  const calculateLeft = (temp) => ((temp - 16) / 24) * 100;
+  const calculateLeft = (humidity) => ((humidity - 25) / 50) * 100;
 
-  const handleKnobDrag = (e) => {
-    const sliderRect = sliderRef.current.getBoundingClientRect();
-    const offsetX = e.clientX - sliderRect.left;
-    let newTemp = (offsetX / sliderRect.width) * 24 + 16;
-    newTemp = Math.max(16, Math.min(40, newTemp));
-    setGoalTemp(newTemp);
+  const handleHumiditySelectClick = () => {
+    setShowHumidityOptions((prevShowHumidityOptions) => !prevShowHumidityOptions);
   };
 
-  const handleTempSelectClick = () => {
-    setShowTempOptions((prevShowTempOptions) => !prevShowTempOptions);
-  };
-
-  const handleTempOptionClick = (temp) => {
-    setGoalTemp(temp);
-    setShowTempOptions(false);
+  const handleHumidityOptionClick = (humidity) => {
+    setGoalHumidity(humidity);
+    setShowHumidityOptions(false);
   };
 
   return (
     <Container>
       <HeaderContainer>
         <ToggleContainer>
-          <Title>Air Conditioner</Title>
+          <Title>Humidifier</Title>
           <ToggleLabel isOn={isOn} onClick={() => setIsOn(!isOn)} />
           <span>AI</span>
         </ToggleContainer>
         <SelectContainer>
           <div style={{ position: 'relative' }}>
-            <SelectButton onClick={handleTempSelectClick} $show={showTempOptions}>
-              {goalTemp}°C
+            <SelectButton onClick={handleHumiditySelectClick} $show={showHumidityOptions}>
+              {goalHumidity}%
             </SelectButton>
-            <SelectList $show={showTempOptions}>
-              {Array.from({ length: 25 }, (_, i) => 16 + i).map(temp => (
-                <OptionList key={temp}>
-                  <OptionButton onClick={() => handleTempOptionClick(temp)}>{temp}°C</OptionButton>
+            <SelectList $show={showHumidityOptions}>
+              {Array.from({ length: 51 }, (_, i) => 25 + i).map(humidity => (
+                <OptionList key={humidity}>
+                  <OptionButton onClick={() => handleHumidityOptionClick(humidity)}>{humidity}%</OptionButton>
                 </OptionList>
               ))}
             </SelectList>
@@ -254,22 +238,20 @@ const AirConditioner = () => {
         </SelectContainer>
       </HeaderContainer>
       <FlexContainer>
-        <SliderContainer ref={sliderRef}>
-          <Knob ref={sliderRef} left={calculateLeft(goalTemp)} onMouseDown={handleKnobDrag} />
-          <Marker style={{ left: `${calculateLeft(goalTemp)}%` }}>
+        <SliderContainer>
+          <Knob left={calculateLeft(goalHumidity)} />
+          <Marker style={{ left: `${calculateLeft(goalHumidity)}%` }}>
             Goal
           </Marker>
         </SliderContainer>
       </FlexContainer>
       <ScaleLabelContainer>
-        <div>16°C</div>
-        <div>22°C</div>
-        <div>28°C</div>
-        <div>34°C</div>
-        <div>40°C</div>
+        <div>25%</div>
+        <div>50%</div>
+        <div>75%</div>
       </ScaleLabelContainer>
     </Container>
   );
 };
 
-export default AirConditioner;
+export default Humidifier;
