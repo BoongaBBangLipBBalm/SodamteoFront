@@ -5,7 +5,7 @@ import styled from "styled-components";
 import Header from "./components/Header";
 import Graph from "./components/Graph";
 import Range from "./components/Range";
-import AirConditioner from "./components/AirConditioner";
+import Humidifier from "./components/Humidifier";
 
 import {
   Chart as ChartJS,
@@ -97,7 +97,7 @@ const DataStatistics: React.FC = () => {
           <Graph></Graph>
           <Range></Range>
         </TopContainer>
-        <AirConditioner></AirConditioner>
+          <Humidifier></Humidifier>
       </Content>
     </Container>
   );
