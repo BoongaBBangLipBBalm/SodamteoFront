@@ -25,7 +25,7 @@ function OnClick() {
 
 const ProfileEditButton = () => {
     return (
-        <Button as="a" href="profile/edit" onClick={() => OnClick()}>Edit</Button>
+        <Button as="a" href="/profile/edit" onClick={() => OnClick()}>Edit</Button>
     )
 };
 

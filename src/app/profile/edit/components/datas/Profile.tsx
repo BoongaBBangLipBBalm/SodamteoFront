@@ -29,6 +29,10 @@ const StringInput = styled.input`
     border-radius: 1.25rem;
     border: none;
     box-shadow: inset 0 0.125rem 0.5rem rgba(0,0,0,0.15);
+
+    &:disabled {
+        background-color: gray;
+    }
 `;
 
 const SelectWrapper = styled.div`
@@ -51,6 +55,10 @@ const SelectOption = styled.select`
     appearance: none;
     position: relative;
     z-index: 1;
+
+    &:disabled {
+        background-color: gray;
+    }
 `;
 
 const CustomArrow = styled.div`
@@ -78,8 +86,6 @@ interface ProfileProps {
 const Profile: React.FC<ProfileProps> = ({ profileName, setProfileName, selectedType, setSelectedType }) => {
 
     const grains = Object.keys(typeToIdMap);
-    setSelectedType(selectedType);
-    setProfileName(profileName);
 
     const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedType(event.target.value);
@@ -95,12 +101,12 @@ const Profile: React.FC<ProfileProps> = ({ profileName, setProfileName, selected
             dataContainers={[
                 <DataContainer key="1">
                     <DataName>Name</DataName>
-                    <StringInput type="text" value={profileName} onChange={handleTextChange}/>
+                    <StringInput type="text" value={profileName} onChange={handleTextChange} disabled={true}/>
                 </DataContainer>,
                 <DataContainer key="2">
                     <DataName>Type</DataName>
                     <SelectWrapper>
-                        <SelectOption value={selectedType} onChange={handleSelectChange}>
+                        <SelectOption value={selectedType} onChange={handleSelectChange} disabled={true}>
                             {grains.map((key, index) => (
                                     <option value={key} key={index}>{key}</option>
                                 ))

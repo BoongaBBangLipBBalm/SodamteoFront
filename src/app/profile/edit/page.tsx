@@ -62,8 +62,6 @@ const ProfileEdit: React.FC = () => {
   const [sunLightMaxValue, sunLightSetMaxValue] = useState(9000);
   const [sunLightIsEnabled, sunLightSetIsEnabled] = useState(true);
 
-  
-
   const data: IDataProps = {
     tempMinValue: tempMinValue,
     tempMaxValue: tempMaxValue,
