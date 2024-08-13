@@ -18,18 +18,21 @@ interface IButtonListProps {
 
 interface IPageData {
     name: string;
-    URL_names: string[];
+    URLName: string;
     buttons_id: number[];
 }
 
 const page_data: IPageData[] = [
-    {name: "null", URL_names: [], buttons_id: [3]},
-    {name: "profile", URL_names: [], buttons_id: [4,3]},
-    {name: "data", URL_names: [], buttons_id: [0,1,2,3]},
-    {name: "test2", URL_names: [], buttons_id: [2,3]},
+    {name: "null", URLName: "/null", buttons_id: [3]},
+    {name: "profile", URLName: "/profile", buttons_id: [4,3]},
+    {name: "data-statistics", URLName: "/data-statistics", buttons_id: [0,1,5,6,2,3]},
+    {name: "control-hw", URLName: "/control-hw", buttons_id: [0,1,5,6,2,3]},
+    {name: "change-profile", URLName: "/change-profile", buttons_id: [0,1,5,6,2,3]},
+    {name: "forecast", URLName: "/forecast", buttons_id: [0,1,5,6,2,3]},
+    {name: "disease-control", URLName: "/disease-control", buttons_id: [0,1,5,6,2,3]},
+    {name: "setting", URLName: "/setting", buttons_id: [0,1,5,6,2,3]},
+    {name: "test2", URLName: "/test2", buttons_id: [2,3]},
 ];
-
-const DEFAULT_PAGE = "data";
 
 const GetPageData = (page_name: string): IPageData => {
     for(var i = 1 ; i < page_data.length ; i++) {
@@ -40,25 +43,51 @@ const GetPageData = (page_name: string): IPageData => {
     return page_data[0];
 }
 
-const ButtonList = () => {
+const NULL_PAGE_DATA = GetPageData("null");
 
-    let [pageName, setPageName] = useState(DEFAULT_PAGE);
-    let currentPageData: IPageData = GetPageData(pageName);
-    let init_value: number = -1;
+const ButtonList = () => {
+    let pageData: IPageData = NULL_PAGE_DATA;
+    let currentSelectedButtonId: number = -1;
 
     const pathname = usePathname(); 
-    for(var i = 0 ; i < currentPageData.buttons_id.length ; i++) {
-        if(pathname.endsWith(GetButtonData(currentPageData.buttons_id[i]).toURL)) {
-            init_value = currentPageData.buttons_id[i];
-        }
-    }
-    const [clickedButtonId, clickButton] = useState(init_value);
 
+    const GetPage = () => {
+        var tempPageData: IPageData = GetPageData("null");
+        for(var i = 0 ; i < page_data.length ; i++) {
+            if(pathname.startsWith(page_data[i].URLName)) {
+                tempPageData = page_data[i];
+                break;
+            }
+        }
+        pageData = tempPageData;
+    }
+    const GetCurrentActivatedButton = () => {
+        var tempId = -1;
+        for(var i = 0 ; i < pageData.buttons_id.length ; i++) {
+            if(pathname.endsWith(GetButtonData(pageData.buttons_id[i]).toURL)) {
+                tempId = pageData.buttons_id[i];
+                break;
+            }
+        }
+        currentSelectedButtonId = tempId;
+    }
+
+    const ChangePageButtons = () => {
+         
+        GetPage();
+        GetCurrentActivatedButton();
+        
+    }
+    
+    
+    
+    ChangePageButtons();
+    
     return (
         <Buttons>
-            {currentPageData.buttons_id.map((id, index) => (
-                <div key={index} onClick={() => {clickButton(id)}}>
-                    <NavButton key={index} id={id} selected={id == clickedButtonId}></NavButton>
+            {pageData.buttons_id.map((id, index) => (
+                <div key={index}>
+                    <NavButton key={index} id={id} selected={id == currentSelectedButtonId}></NavButton>
                 </div>
             ))}
         </Buttons>

@@ -10,6 +10,9 @@ const Button = styled.button`
     color: white;
     vertical-align: middle;
     border: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
     &:hover {
         background-color: #2e424a;
@@ -22,7 +25,7 @@ function OnClick() {
 
 const ProfileEditButton = () => {
     return (
-        <Button onClick={() => OnClick()}>Edit</Button>
+        <Button as="a" href="/profile/edit" onClick={() => OnClick()}>Edit</Button>
     )
 };
 

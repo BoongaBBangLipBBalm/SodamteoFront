@@ -28,8 +28,8 @@ const Image = styled.img`
 
 const AddProfileButton = () => {
     return (
-        <Container>
-            <Image src="img/profile/add.svg"></Image>
+        <Container as="a" href="/profile/add">
+            <Image src="/img/profile/add.svg"></Image>
         </Container>
     )
 };

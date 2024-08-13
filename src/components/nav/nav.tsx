@@ -35,7 +35,7 @@ export function GetLayoutWidthRatio(): number {
 const Nav = () => {
   return (
     <NavContainer>
-      <Logo url="./img/text_logo_white.svg"></Logo>
+      <Logo url="/img/text_logo_white.svg"></Logo>
       <ButtonList></ButtonList>
     </NavContainer>
   );

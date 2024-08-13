@@ -10,6 +10,7 @@ const LogoContainer = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
+    border: none;
 `;
 
 const LogoImage = styled.img`
@@ -19,7 +20,7 @@ const LogoImage = styled.img`
 
 const Logo = (props: ILogoProps) => {
     return (
-        <LogoContainer>
+        <LogoContainer as="a" href="/profile/select">
             <LogoImage src={props.url}></LogoImage>
         </LogoContainer>
     )
