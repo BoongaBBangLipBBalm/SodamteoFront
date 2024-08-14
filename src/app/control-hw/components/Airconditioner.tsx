@@ -19,6 +19,7 @@ const Title = styled.h2`
   font-size: 18px;
   font-weight: bold;
   margin-bottom: 10px;
+  color: black;
 `;
 
 const FlexContainer = styled.div`
