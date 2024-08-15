@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@types/styled-components": "^5.1.34",
-    "axios": "^1.7.3",
+    "axios": "^1.7.4",
     "chart.js": "^4.4.3",
     "framer-motion": "^11.3.21",
     "local": "^0.3.3",
