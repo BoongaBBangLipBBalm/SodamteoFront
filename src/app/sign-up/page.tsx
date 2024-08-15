@@ -75,6 +75,12 @@ const Signup: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setError(null);
+
+    if (!email || !userName || !password) {
+      setError('모든 정보를 입력해 주세요.');
+      return;
+    }
     setLoading(true);
 
     try {
@@ -85,8 +91,8 @@ const Signup: React.FC = () => {
       });
 
       if (response.status === 200) {
-        router.push('/login');
         alert('회원가입에 성공하였습니다!');
+        router.push('/login');
       } else {
         alert('회원가입에 실패하였습니다.');
       }
