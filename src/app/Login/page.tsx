@@ -1,9 +1,8 @@
-"use client"
+"use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
 const Container = styled.div`
@@ -26,7 +25,6 @@ const FormTitle = styled.span`
   font-size: 15px;
   color: #333;
 `;
-
 
 const Form = styled.form`
   width: 40%;
@@ -65,23 +63,67 @@ const LinkText = styled.div`
   color: #5A5A5A;
 `;
 
+const ErrorText = styled.div`
+  color: red;
+  margin-top: 10px;
+`;
+
 const Login: React.FC = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    router.push('/data-statistics/temperature');
+    setError(''); // 에러 초기화
+
+    try {
+      const response = await fetch('/api/user/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        localStorage.setItem('access_token', data.access_token);
+        localStorage.setItem('refresh_token', data.refresh_token);
+        router.push('/data-statistics/temperature');
+      } else if (response.status === 400) {
+        setError('이메일과 비밀번호를 확인해주세요.');
+      } else {
+        setError('서버 오류가 발생했습니다. 나중에 다시 시도해주세요.');
+      }
+    } catch (error) {
+      setError('네트워크 오류가 발생했습니다. 인터넷 연결을 확인해주세요.');
+    }
   };
 
   return (
     <Container>
       <Form onSubmit={handleSubmit}>
-       <Title>로그인</Title>
+        <Title>로그인</Title>
         <FormTitle>이메일</FormTitle>
-        <Input type="email" placeholder="이메일" required />
+        <Input 
+          type="email" 
+          placeholder="이메일" 
+          required 
+          value={email} 
+          onChange={(e) => setEmail(e.target.value)}
+        />
         <FormTitle>비밀번호</FormTitle>
-        <Input type="password" placeholder="비밀번호" required />
+        <Input 
+          type="password" 
+          placeholder="비밀번호" 
+          required 
+          value={password} 
+          onChange={(e) => setPassword(e.target.value)}
+        />
         <Button type="submit">로그인</Button>
+        {error && <ErrorText>{error}</ErrorText>}
         <LinkText>
           <Link href="/sign-up">회원가입</Link>
         </LinkText>
