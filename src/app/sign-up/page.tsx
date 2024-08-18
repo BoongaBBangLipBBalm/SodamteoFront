@@ -1,10 +1,11 @@
 "use client"
 
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import axios from 'axios'; 
 
 const Container = styled.div`
   width: 100%;
@@ -66,23 +67,74 @@ const LinkText = styled.div`
 
 const Signup: React.FC = () => {
   const router = useRouter();
+  const [email, setEmail] = useState('');
+  const [userName, setUserName] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    router.push('/');
+    setError(null);
+
+    if (!email || !userName || !password) {
+      setError('모든 정보를 입력해 주세요.');
+      return;
+    }
+    setLoading(true);
+
+    try {
+      const response = await axios.post('/api/user/register', {
+        Email: email,
+        userName: userName,
+        password: password,
+      });
+
+      if (response.status === 200) {
+        alert('회원가입에 성공하였습니다!');
+        router.push('/login');
+      } else {
+        alert('회원가입에 실패하였습니다.');
+      }
+    } catch (err) {
+      alert('서버 오류가 발생하였습니다. 관리자에게 문의 바랍니다.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <Container>
       <Form onSubmit={handleSubmit}>
-      <Title>회원가입</Title>
+        <Title>회원가입</Title>
         <FormTitle>이메일</FormTitle>
-        <Input type="email" placeholder="이메일" required />
+        <Input 
+          type="email" 
+          placeholder="이메일" 
+          value={email} 
+          onChange={(e) => setEmail(e.target.value)} 
+          required 
+        />
         <FormTitle>이름</FormTitle>
-        <Input type="text" placeholder="이름" required />
+        <Input 
+          type="text" 
+          placeholder="이름" 
+          value={userName} 
+          onChange={(e) => setUserName(e.target.value)} 
+          required 
+        />
         <FormTitle>비밀번호</FormTitle>
-        <Input type="password" placeholder="비밀번호" required />
-        <Button type="submit">회원가입</Button>
+        <Input 
+          type="password" 
+          placeholder="비밀번호" 
+          value={password} 
+          onChange={(e) => setPassword(e.target.value)} 
+          required 
+        />
+        {error && <p style={{ color: 'red' }}>{error}</p>}
+        <Button type="submit" disabled={loading}>
+          {loading ? '회원가입 중...' : '회원가입'}
+        </Button>
         <LinkText>
           <Link href="/login">로그인</Link>
         </LinkText>
