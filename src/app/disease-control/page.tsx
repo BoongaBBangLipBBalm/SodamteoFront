@@ -1,62 +1,55 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import styled from "styled-components";
-import Chart from "./components/Chart";
-import Navbar from "./components/Navbar";
-import { useState } from "react";
+import React, { useState } from 'react';
+import styled, { ThemeProvider } from 'styled-components';
+import Navigation from './components/Navigation';
+import Album from './components/Album';
+import { GlobalStyle } from './components/globalStyles';
+import { theme } from './components/theme';
+import { GetLayoutWidthRatio } from '@/components/nav/nav';
 
-const sampleData: any = {
-    'Bacterialblight': [
-      { timestamp: Date.now() - 10000000, diseaseName: 'Bacterialblight', confidence: 'High', message: 'Message 1' },
-      { timestamp: Date.now() - 5000000, diseaseName: 'Bacterialblight', confidence: 'Medium', message: 'Message 2' },
-      { timestamp: Date.now(), diseaseName: 'Bacterialblight', confidence: 'High', message: 'Message 3' },
-    ],
-    'Blast': [
-      { timestamp: Date.now() - 10000000, diseaseName: 'Blast', confidence: 'Low', message: 'Message 1' },
-      { timestamp: Date.now() - 5000000, diseaseName: 'Blast', confidence: 'Medium', message: 'Message 2' },
-      { timestamp: Date.now(), diseaseName: 'Blast', confidence: 'High', message: 'Message 3' },
-    ],
-    'Brownspot': [
-      { timestamp: Date.now() - 10000000, diseaseName: 'Brownspot', confidence: 'High', message: 'Message 1' },
-      { timestamp: Date.now() - 5000000, diseaseName: 'Brownspot', confidence: 'High', message: 'Message 2' },
-      { timestamp: Date.now(), diseaseName: 'Brownspot', confidence: 'Medium', message: 'Message 3' },
-    ],
-    'Tungro': [
-      { timestamp: Date.now() - 10000000, diseaseName: 'Tungro', confidence: 'High', message: 'Message 1' },
-      { timestamp: Date.now() - 5000000, diseaseName: 'Tungro', confidence: 'High', message: 'Message 2' },
-      { timestamp: Date.now(), diseaseName: 'Tungro', confidence: 'Low', message: 'Message 3' },
-    ],
-};
-  
 const Container = styled.div`
-    width: 80%;
-    margin: auto;
-    padding: 20px;
+  width: ${String(GetLayoutWidthRatio() * 100) + "%"};
+  height: 100vh;
+  padding: 20px;
 `;
 
-const DiseaseControl = () => {
+const allPhotos: any = {
+  Nature: [
+    { src: './img/grains/rice.svg', title: 'Nature 1', description: 'Beautiful nature 1' },
+    { src: '/nature2.jpg', title: 'Nature 2', description: 'Beautiful nature 2' },
+    { src: '/nature3.jpg', title: 'Nature 3', description: 'Beautiful nature 3' },
+  ],
+  Cities: [
+    { src: '/city1.jpg', title: 'City 1', description: 'Amazing city 1' },
+    { src: '/city2.jpg', title: 'City 2', description: 'Amazing city 2' },
+    { src: '/city3.jpg', title: 'City 3', description: 'Amazing city 3' },
+  ],
+  Animals: [
+    { src: '/animal1.jpg', title: 'Animal 1', description: 'Cute animal 1' },
+    { src: '/animal2.jpg', title: 'Animal 2', description: 'Cute animal 2' },
+    { src: '/animal3.jpg', title: 'Animal 3', description: 'Cute animal 3' },
+  ],
+};
 
-    const router = useRouter();
+const categories = Object.keys(allPhotos);
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        router.push('/disease-control');
-    };
-  
-    const [selectedDisease, setSelectedDisease] = useState<string>('Bacterialblight');
+const HomePage: React.FC = () => {
+  const [selectedCategory, setSelectedCategory] = useState(categories[0]);
 
-    return (
-        <Container>
-        <h1>Disease Dashboard</h1>
-        <Navbar
-            diseases={Object.keys(sampleData)}
-            selectedDisease={selectedDisease}
-            onSelect={setSelectedDisease}
+  return (
+    <ThemeProvider theme={theme}>
+      <GlobalStyle />
+      <Container>
+        <Navigation
+          categories={categories}
+          selectedCategory={selectedCategory}
+          onSelectCategory={setSelectedCategory}
         />
-        <Chart data={sampleData[selectedDisease]} />
-        </Container>
-    );
-}
+        <Album photos={allPhotos[selectedCategory]} />
+      </Container>
+    </ThemeProvider>
+  );
+};
 
-export default DiseaseControl;
+export default HomePage;
