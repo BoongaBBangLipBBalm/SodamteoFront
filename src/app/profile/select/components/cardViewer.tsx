@@ -1,12 +1,12 @@
 import styled from "styled-components";
-import Card from "./components/card";
-import ProfileMoveButton from "./components/ProfileMoveButton";
+import Card from "./card";
+import ProfileMoveButton from "./ProfileMoveButton";
 import React, { useEffect, useRef, useState } from "react";
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import styles from "./cardViewer.module.css";
-import { ICardProps } from "./components/card";
+import { ICardProps } from "./card";
 
 const ViewerConatiner = styled.div`
     

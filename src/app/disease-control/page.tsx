@@ -7,35 +7,103 @@ import Album from './components/Album';
 import { GlobalStyle } from './components/globalStyles';
 import { theme } from './components/theme';
 import { GetLayoutWidthRatio } from '@/components/nav/nav';
+import { IPhoto } from './components/Photo';
 
 const Container = styled.div`
-  width: ${String(GetLayoutWidthRatio() * 100) + "%"};
+  padding: 0 1.25rem; /* 20px */
+  width: ${(1-GetLayoutWidthRatio())*100 + "%"};
   height: 100vh;
-  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 `;
 
-const allPhotos: any = {
-  Nature: [
-    { src: './img/grains/rice.svg', title: 'Nature 1', description: 'Beautiful nature 1' },
-    { src: '/nature2.jpg', title: 'Nature 2', description: 'Beautiful nature 2' },
-    { src: '/nature3.jpg', title: 'Nature 3', description: 'Beautiful nature 3' },
+const ContentWrapper = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-evenly;
+  margin-top: 1.25rem; /* 20px */
+
+  @media (max-width: 768px) {
+    
+  }
+`;
+
+const InfoPanel = styled.div`
+  margin: 0 1.25rem; /* 20px */
+  color: white;
+  border-radius: 0.625rem; /* 10px */
+  width: 50%; /* 300px */
+
+  @media (max-width: 768px) {
+    
+  }
+`;
+
+const TextBox = styled.div`
+  width: 80%;
+  flex-grow: 1;
+  background-color: #F8F7F6;
+  border-radius: 10px;
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.25));
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+`;
+const TitleBox = styled.div`
+  font-family: 'Pretendard-Regular';
+  font-size: 1rem;
+  color: #2e2e2e;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+const ContentBox = styled.div`
+  font-family: 'Pretendard-Regular';
+  font-size: 1rem;
+  color: #000000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+
+const PhotoTimeStamp = styled.h3`
+  margin-top: 0;
+`;
+
+const PhotoConfidence = styled.h4`
+  margin-top: 0;
+`;
+
+const allPhotos: {[type: string]: IPhoto[]} = {
+  All: [
+    { src: '/img/profile/grains/rice.svg', disease: 'Bacterialblight', timestamp: '2024/08/19', confidence: 0.1 },
+    { src:  '/img/profile/grains/rice.svg', disease: 'Bacterialblight', timestamp: '2024/08/19', confidence: 0.1  },
+    { src: '/img/profile/grains/rice.svg', disease: 'Bacterialblight', timestamp: '2024/08/19', confidence: 0.1  },
+    { src: '/img/profile/grains/rice.svg', disease: 'Bacterialblight', timestamp: '2024/08/19', confidence: 0.1  },
   ],
-  Cities: [
-    { src: '/city1.jpg', title: 'City 1', description: 'Amazing city 1' },
-    { src: '/city2.jpg', title: 'City 2', description: 'Amazing city 2' },
-    { src: '/city3.jpg', title: 'City 3', description: 'Amazing city 3' },
+  Diseases: [
+    { src: '/img/profile/grains/rice.svg', disease: 'Bacterialblight', timestamp: '2024/08/19', confidence: 0.1  },
+    { src: '/img/profile/grains/rice.svg', disease: 'Bacterialblight', timestamp: '2024/08/19', confidence: 0.1  },
+    { src: '/img/profile/grains/rice.svg', disease: 'Bacterialblight', timestamp: '2024/08/19', confidence: 0.1  },
   ],
-  Animals: [
-    { src: '/animal1.jpg', title: 'Animal 1', description: 'Cute animal 1' },
-    { src: '/animal2.jpg', title: 'Animal 2', description: 'Cute animal 2' },
-    { src: '/animal3.jpg', title: 'Animal 3', description: 'Cute animal 3' },
+  Normal: [
+    { src: '/img/profile/grains/rice.svg', disease: 'Bacterialblight', timestamp: '2024/08/19', confidence: 0.1  },
+    { src: '/img/profile/grains/rice.svg', disease: 'Bacterialblight', timestamp: '2024/08/19', confidence: 0.1  },
+    { src: '/img/profile/grains/rice.svg', disease: 'Bacterialblight', timestamp: '2024/08/19', confidence: 0.1  },
   ],
 };
 
 const categories = Object.keys(allPhotos);
 
-const HomePage: React.FC = () => {
+const DiseaseControl: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState(categories[0]);
+  const [selectedPhoto, setSelectedPhoto] = useState(allPhotos[selectedCategory][0]);
 
   return (
     <ThemeProvider theme={theme}>
@@ -44,12 +112,31 @@ const HomePage: React.FC = () => {
         <Navigation
           categories={categories}
           selectedCategory={selectedCategory}
-          onSelectCategory={setSelectedCategory}
+          onSelectCategory={(category) => {
+            setSelectedCategory(category);
+            setSelectedPhoto(allPhotos[category][0]); // 카테고리 변경 시 첫 번째 사진 선택
+          }}
         />
-        <Album photos={allPhotos[selectedCategory]} />
+        <ContentWrapper>
+          <Album photos={allPhotos[selectedCategory]} onPhotoSelect={setSelectedPhoto} />
+          <InfoPanel>
+            <TextBox>
+              <TitleBox>Disease</TitleBox>
+              <ContentBox>{selectedPhoto.disease}</ContentBox>
+            </TextBox>
+            <TextBox>
+              <TitleBox>Confidence</TitleBox>
+              <ContentBox>{selectedPhoto.confidence}</ContentBox>
+            </TextBox>
+            <TextBox>
+              <TitleBox>TimeStamp</TitleBox>
+              <ContentBox>{selectedPhoto.timestamp}</ContentBox>
+            </TextBox>
+          </InfoPanel>
+        </ContentWrapper>
       </Container>
     </ThemeProvider>
   );
 };
 
-export default HomePage;
+export default DiseaseControl;

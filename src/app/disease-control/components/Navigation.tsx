@@ -13,11 +13,11 @@ const Nav = styled.nav`
   margin-bottom: 20px;
 `;
 
-const NavItem = styled.button<{ isSelected: boolean }>`
+const NavItem = styled.button<{ $isSelected: boolean }>`
   margin: 0 10px;
   padding: 10px 20px;
   border: none;
-  background-color: ${({ isSelected, theme }) => isSelected ? theme.colors.primary : theme.colors.secondary};
+  background-color: ${({ $isSelected: isSelected, theme }) => isSelected ? theme.colors.primary : theme.colors.secondary};
   color: white;
   cursor: pointer;
   border-radius: 5px;
@@ -33,7 +33,7 @@ const Navigation: React.FC<NavigationProps> = ({ categories, onSelectCategory, s
       {categories.map((category) => (
         <NavItem
           key={category}
-          isSelected={category === selectedCategory}
+          $isSelected={category === selectedCategory}
           onClick={() => onSelectCategory(category)}
         >
           {category}

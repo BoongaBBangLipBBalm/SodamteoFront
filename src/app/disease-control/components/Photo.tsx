@@ -3,47 +3,41 @@ import styled from 'styled-components';
 
 interface PhotoProps {
   src: string;
-  title: string;
-  description: string;
+  timestamp: string;
+}
+
+export interface IPhoto {
+  src: string;
+  disease: string;
+  timestamp: string;
+  confidence: number;
 }
 
 const PhotoWrapper = styled.div`
   position: relative;
+  width: 240px;
+  transform: translate(0, -50%);
 `;
 
 const PhotoImage = styled.img`
   width: 100%;
-  border-radius: 10px;
 `;
-
-const PhotoInfo = styled.div`
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: rgba(0, 0, 0, 0.6);
-  color: white;
-  padding: 10px;
-  opacity: 0;
-  transition: opacity 0.3s ease-in-out;
-  border-radius: 0 0 10px 10px;
-`;
-
 const PhotoContainer = styled.div`
-  &:hover ${PhotoInfo} {
-    opacity: 1;
-  }
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 20px;
+  background-color: #F8F7F6;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.15));
 `;
 
-const Photo: React.FC<PhotoProps> = ({ src, title, description }) => {
+const Photo: React.FC<PhotoProps> = ({ src, timestamp }) => {
   return (
     <PhotoWrapper>
       <PhotoContainer>
-        <PhotoImage src={src} alt={title} />
-        <PhotoInfo>
-          <h4>{title}</h4>
-          <p>{description}</p>
-        </PhotoInfo>
+        <PhotoImage src={src} alt={timestamp} />
       </PhotoContainer>
     </PhotoWrapper>
   );
