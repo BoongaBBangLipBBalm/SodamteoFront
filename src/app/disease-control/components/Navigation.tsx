@@ -8,20 +8,23 @@ interface NavigationProps {
 }
 
 const Nav = styled.nav`
+  width: 100%;
+  padding-top: 1rem;
   display: flex;
-  justify-content: center;
-  margin-bottom: 20px;
+  justify-content: flex-start;
+  align-items: center;
 `;
 
 const NavItem = styled.button<{ $isSelected: boolean }>`
-  margin: 0 10px;
-  padding: 10px 20px;
+font-size: 1rem;
+  margin: 0 0.625rem;
+  padding: 0.625rem 1.25rem;
   border: none;
-  background-color: ${({ $isSelected: isSelected, theme }) => isSelected ? theme.colors.primary : theme.colors.secondary};
-  color: white;
+  background-color: transparent;
+  color: ${({ $isSelected: isSelected, theme }) => isSelected ? theme.colors.primary : theme.colors.secondary};
   cursor: pointer;
-  border-radius: 5px;
-  
+  border-radius: 0.3125rem;
+
   &:hover {
     opacity: 0.8;
   }

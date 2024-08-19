@@ -1,12 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Slider from 'react-slick';
 import styled from 'styled-components';
-import Photo from './Photo';
-import { IPhoto } from './Photo';
+import Photo, { IPhoto } from './Photo';
 
 interface AlbumProps {
+  selectedCategory: string;
   photos: IPhoto[];
   onPhotoSelect: (photo: IPhoto) => void;
+  onDeletePhoto: (index: number) => void;
 }
 
 const AlbumContainer = styled.div`
@@ -14,7 +15,6 @@ const AlbumContainer = styled.div`
   height: 100%;
   display: flex;
   justify-content: center;
-  
 `;
 
 const StyledSlider = styled(Slider)`
@@ -25,7 +25,7 @@ const StyledSlider = styled(Slider)`
   display: flex;
   justify-content: center;
 
-  .slick-list { 
+  .slick-list {
     position: relative;
     top: 50%;
   }
@@ -37,52 +37,76 @@ const StyledSlider = styled(Slider)`
 
   .slick-slide {
     position: relative;
-    height: auto; /* 슬라이드의 높이를 자동으로 설정 */
-  }
+    height: auto;
 
-  @media (max-width: 768px) {
-    
+    &[aria-hidden='true'] {
+      pointer-events: none;
+      opacity: 0.5;
+    }
   }
 `;
-
 
 const SliderPrevButton = styled.button`
-    background-color: transparent;
-    border: none;
-    position: absolute;
-    top: 1rem;
-    z-index: 3;
-    left: 50%;
-    transform: translate(-50%, 0%);
+  background-color: transparent;
+  border: none;
+  position: absolute;
+  top: 1rem;
+  z-index: 3;
+  left: 50%;
+  transform: translate(-50%, 0%);
 `;
+
 const SliderNextButton = styled.button`
-    background-color: transparent;
-    border: none;
-    position: absolute;
-    bottom: 1rem;
-    z-index: 3;
-    left: 50%;
-    transform: translate(-50%, 0%);
+  background-color: transparent;
+  border: none;
+  position: absolute;
+  bottom: 1rem;
+  z-index: 3;
+  left: 50%;
+  transform: translate(-50%, 0%);
 `;
 
 const SliderButtonDiv = styled.div`
-    background-color: rgb(255, 255, 255);
-    filter: drop-shadow(1px 1px 10px rgba(0,0,0,0.25));
-    border-radius: 100%;
-    width: 2.5rem;
-    height: 2.5rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    & > img {
-        width: 1.125rem;
-        height: 1.125rem;
-    }
+  background-color: rgb(255, 255, 255);
+  filter: drop-shadow(0.1rem 0.1rem 1rem rgba(0, 0, 0, 0.25));
+  border-radius: 50%;
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  & > img {
+    width: 1.125rem;
+    height: 1.125rem;
+  }
 `;
 
-const Album: React.FC<AlbumProps> = ({ photos, onPhotoSelect }) => {
+const Album: React.FC<AlbumProps> = ({ selectedCategory, photos, onPhotoSelect, onDeletePhoto }) => {
+  const sliderRef = useRef<Slider | null>(null);
 
-  const [initialSlideIdx, setInitialSlide] = useState<number>(photos.length - 1);
+  let currentSlide: number;
+
+  const goToSlide = (index: number) => {
+    if (sliderRef.current) {
+      sliderRef.current.slickGoTo(index);
+      currentSlide = index;
+    }
+  };
+
+  const updateInertAttributes = (activeIndex: number) => {
+    const slides = document.querySelectorAll('.slick-slide');
+    slides.forEach((slide, index) => {
+      if (index === activeIndex) {
+        slide.removeAttribute('aria-hidden');
+        slide.removeAttribute('inert');
+        slide.setAttribute('tabindex', '0');
+      } else {
+        slide.setAttribute('aria-hidden', 'true');
+        slide.setAttribute('inert', '');
+        slide.setAttribute('tabindex', '-1');
+      }
+    });
+  };
 
   const settings = {
     speed: 300,
@@ -91,26 +115,48 @@ const Album: React.FC<AlbumProps> = ({ photos, onPhotoSelect }) => {
     dots: false,
     infinite: false,
     slidesToScroll: 1,
-    slidesToShow: 1, // 현재 슬라이드를 가운데에 배치하기 위해 홀수로 설정
-    centerPadding: '0px', // centerPadding을 0으로 설정
+    slidesToShow: 1,
+    centerPadding: '0px',
     vertical: true,
     focusOnSelect: true,
     initialSlide: 0,
-    afterChange: (index: number) => onPhotoSelect(photos[index]),
-    prevArrow: (<SliderPrevButton><SliderButtonDiv><img src="/img/profile/move_previous.svg" alt="<" /></SliderButtonDiv></SliderPrevButton>),
-    nextArrow: (<SliderNextButton><SliderButtonDiv><img src="/img/profile/move_next.svg" alt="<" /></SliderButtonDiv></SliderNextButton>),
+    afterChange: (index: number) => {
+      onPhotoSelect(photos[index]);
+      updateInertAttributes(index);
+    },
+    prevArrow: (
+      <SliderPrevButton>
+        <SliderButtonDiv>
+          <img src="/img/diseaseControl/UpArrow.svg" alt="<" />
+        </SliderButtonDiv>
+      </SliderPrevButton>
+    ),
+    nextArrow: (
+      <SliderNextButton>
+        <SliderButtonDiv>
+          <img src="/img/diseaseControl/DownArrow.svg" alt=">" />
+        </SliderButtonDiv>
+      </SliderNextButton>
+    ),
   };
-  
+
   useEffect(() => {
-    setInitialSlide(photos.length - 1);
-  }, [photos])
+    goToSlide(photos.length - 1);
+    updateInertAttributes(photos.length - 1);
+  }, [selectedCategory]);
+
+
 
   return (
     <AlbumContainer>
-      <StyledSlider {...settings}>
+      <StyledSlider {...settings} ref={sliderRef}>
         {photos.map((photo, index) => (
           <div key={index}>
-            <Photo src={photo.src} timestamp={photo.timestamp} />
+            <Photo
+              src={photo.src}
+              timestamp={photo.timestamp}
+              onDelete={() => onDeletePhoto(index)}
+            />
           </div>
         ))}
       </StyledSlider>
