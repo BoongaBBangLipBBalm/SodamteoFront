@@ -16,3 +16,10 @@ export const removeToken = (): void => {
     localStorage.removeItem('access_token');
   }
 };
+
+export const getRefreshToken = (): string | null => {
+  if (typeof window !== 'undefined') {
+    return localStorage.getItem('refresh_token');
+  }
+  return null;
+};
