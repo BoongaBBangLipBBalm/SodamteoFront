@@ -80,11 +80,21 @@ export function GetButtonData(id: number): IButtonData {
 const NavButton = (props: IButtonProps) => {
 
     let data: IButtonData = GetButtonData(props.id);
+
+    const logOutHandler = () => {
+        // 로그아웃 코드 여기에!
+    }
+
+    const buttonOnClick = (id: number): void => {
+        if(id == 9) { // LogOut
+            logOutHandler();
+        }
+    }
     
 
     return(
         <ButtonContainer $isSetting={props.isLast}>
-            <ButtonBox href={data.toURL}>
+            <ButtonBox href={data.toURL} onClick={() => {buttonOnClick(props.id);}}>
                 <ButtonImageBox $isselected={props.selected}>
                     <ButtonImage src={data.imageURL}></ButtonImage>
                 </ButtonImageBox>

@@ -53,7 +53,7 @@ const options = {
       },
     },
     y: {
-      min: 0,  // Adjusted to accommodate humidity range (0 to 100%)
+      min: 30, 
       max: 100,
       title: {
         display: false,
@@ -87,7 +87,7 @@ const HumidityGraph: React.FC = () => {
         data: [60, 65, 70, 75], // Initial humidity values
         fill: true,
         backgroundColor: "rgba(153, 102, 255, 0.2)",  // Adjusted color for humidity
-        borderColor: "purple",  // Border color for humidity graph
+        borderColor: "purple",  
       },
     ],
   });
@@ -109,11 +109,10 @@ const HumidityGraph: React.FC = () => {
 
         // Extract labels and humidity data
         const labels = currentData.map((entry: any, index: number) => `${6 - index * 2} hours ago`);
-        labels[labels.length - 1] = "Now";  // Set the last label as "Now"
+        labels[labels.length - 1] = "Now";  
 
-        const humidities = currentData.map((entry: any) => entry.humidity); // Extract humidity values
+        const humidities = currentData.map((entry: any) => entry.humidity); 
 
-        // Update the graph data with new labels and humidity values
         setData({
           labels: labels,
           datasets: [
@@ -121,7 +120,7 @@ const HumidityGraph: React.FC = () => {
               label: "Humidity",
               data: humidities,
               fill: true,
-              backgroundColor: "rgba(153, 102, 255, 0.2)", // Color for humidity graph
+              backgroundColor: "rgba(153, 102, 255, 0.2)", 
               borderColor: "purple",
             },
           ],
@@ -135,7 +134,7 @@ const HumidityGraph: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchHumidityData(); // Fetch the humidity data when the component mounts
+    fetchHumidityData(); 
   }, []);
 
   return (

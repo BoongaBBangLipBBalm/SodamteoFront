@@ -137,28 +137,6 @@ const Header = () => {
             </Name>
           ))}
         </NameContainer>
-        {activeIndex === 1 && (
-          <RadioContainer>
-            <Label>
-              <RadioInput
-                name="temperatureType"
-                value="soil"
-                checked={selectedTempType === "soil"}
-                onChange={() => handleRadioChange("soil")}
-              />
-              <span>토양 온도</span>
-            </Label>
-            <Label>
-              <RadioInput
-                name="temperatureType"
-                value="air"
-                checked={selectedTempType === "air"}
-                onChange={() => handleRadioChange("air")}
-              />
-              <span>기온</span>
-            </Label>
-          </RadioContainer>
-        )}
       </RotatingContainer>
     </Container>
   );

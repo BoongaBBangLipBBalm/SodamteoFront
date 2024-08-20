@@ -127,8 +127,6 @@ const CardViewer = (props: ICardDataProps) => {
             cardList=[...props.cardDatas, ...props.cardDatas];
         }
 
-        console.log(cardList);
-
         setCards(cardList);
         setCurrentIndex(props.startDataIdx);
         goToSlide(props.startDataIdx);
