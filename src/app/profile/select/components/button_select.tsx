@@ -1,4 +1,7 @@
 import styled from "styled-components";
+import axios from "axios";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 const Button = styled.button`
     width: 7.125rem;
@@ -19,14 +22,43 @@ const Button = styled.button`
     }
 `;
 
-function OnClick() {
-
+interface ProfileSelectButtonProps {
+    farmID: number;
 }
 
-const ProfileSelectButton = () => {
+const ProfileSelectButton: React.FC<ProfileSelectButtonProps> = ({ farmID }) => {
+    const router = useRouter();
+    const [loading, setLoading] = useState(false);
+
+    const handleSelect = async () => {
+        setLoading(true);
+        try {
+            const response = await axios.get(`/farm/getfarm/?farmID=${farmID}`, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`, // Assumes token is stored in localStorage
+                },
+            });
+
+            if (response.status === 200) {
+                // Store the retrieved farm data
+                const farmData = response.data;
+                localStorage.setItem("selectedFarm", JSON.stringify(farmData));
+
+                // Navigate to the temperature statistics page
+                router.push('/data-statistics/temperature');
+            }
+        } catch (error) {
+            console.error("Failed to fetch farm data:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
-        <Button as="a" href="/data-statistics/temperature" onClick={() => OnClick()}>Select</Button>
-    )
+        <Button onClick={handleSelect} disabled={loading}>
+            {loading ? "Loading..." : "Select"}
+        </Button>
+    );
 };
 
 export default ProfileSelectButton;

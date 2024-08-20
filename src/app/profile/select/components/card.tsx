@@ -156,12 +156,12 @@ const Card = (props: ICardSeleced) => {
                 :   null
             }
             {
-                isSelected
-                ?   <ButtonContainer>
-                        <ProfileSelectButton></ProfileSelectButton>
-                        <ProfileEditButton></ProfileEditButton>
+                isSelected && (
+                    <ButtonContainer>
+                        <ProfileSelectButton farmID={data.farmID} />
+                        <ProfileEditButton />
                     </ButtonContainer>
-                :   null
+                )
             }
         </CardContainer>
     )
