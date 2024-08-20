@@ -1,0 +1,29 @@
+{
+    "farm": [
+        {
+            "farmID": 1,
+            "farmName": "팜 이름1",
+            "cropName": "rice",
+            "userID": 1001
+        },
+        {
+            "farmID": 2,
+            "farmName": "팜 이름2",
+            "cropName": "rice",
+            "userID": 1001
+        },
+        {
+            "farmID": 3,
+            "farmName": "팜 이름3",
+            "cropName": "rice",
+            "userID": 1001
+        },
+        {
+            "farmID": 4,
+            "farmName": "팜 이름4",
+            "cropName": "rice",
+            "userID": 1001
+        }
+        
+    ]
+}

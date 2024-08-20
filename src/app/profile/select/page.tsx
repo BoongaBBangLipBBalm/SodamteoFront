@@ -10,6 +10,10 @@ import { ICardDataProps } from "./components/cardViewer";
 import { GetLayoutWidthRatio } from "@/components/nav/nav";
 import Popup from "./components/Popup";
 import { ICardProps } from "./components/card";
+import axios from "axios";
+
+// Test Code //
+//axios.defaults.baseURL = "http://localhost:3001";
 
 const Container = styled.div`
     width: ${(1 - GetLayoutWidthRatio()) * 100 + "%"};
@@ -18,18 +22,63 @@ const Container = styled.div`
     align-items: center;
 `;
 
-const testData: {[index: string]: ICardProps[]} = {
-    'cardDatas': [
-        {imageURL:"/img/profile/grains/rice.svg", profileName:"AAA", type:"Orange"},
-        {imageURL:"/img/profile/grains/rice.svg", profileName:"BBB", type:"Orange"},
-        {imageURL:"/img/profile/grains/rice.svg", profileName:"CCC", type:"Orange"},
-        {imageURL:"/img/profile/grains/rice.svg", profileName:"DDD", type:"Orange"},
-        {imageURL:"/img/profile/grains/rice.svg", profileName:"EEE", type:"Orange"},
-        {imageURL:"/img/profile/grains/rice.svg", profileName:"FFF", type:"Orange"}
-    ]
-};
+const GetCropImgURL = (cropName: string): string => {
+    return "/img/profile/grains/" + cropName + ".svg";
+}
+
+const PushCardDataByAPI = (data: any): {[index: string]: ICardProps[]} => {
+    let cardList: {[index: string]: ICardProps[]} = {'cardDatas':[]};
+    if(data.length == 0) return cardList;
+    for(var i = 0 ; i < data.length ; i++) {
+        let newCardData: ICardProps = {cropName:data[i].cropName, farmID:data[i].farmID, farmName: data[i].farmName, imageURL: GetCropImgURL(data[i].cropName)};
+        cardList.cardDatas.push(newCardData);
+    }
+    return cardList;
+}
 
 const ProfileSelection: React.FC = () => {
+
+    const [cardList, setCardList] = useState<{[index: string]: ICardProps[]}>({"cardDatas":[
+        {
+            "farmID": -1,
+            "farmName": "No Data",
+            "cropName": "No Crop",
+            "imageURL": ""
+        },
+        {
+            "farmID": -1,
+            "farmName": "No Data",
+            "cropName": "No Crop",
+            "imageURL": ""
+        },
+        {
+            "farmID": -1,
+            "farmName": "No Data",
+            "cropName": "No Crop",
+            "imageURL": ""
+        }
+    ]});
+
+    const getdata = async () => {
+        try {
+            const response = await axios.get("/farm/");
+            let tempData = PushCardDataByAPI(response.data);
+            if(tempData.cardDatas.length != 0) {
+                setCardList(tempData);
+            }
+            
+          } catch (error) {
+            alert('조회 에러');
+          }
+    }
+
+    useEffect(() => {
+        getdata();
+    },[])
+
+    useEffect(() => {
+        //console.log(cardList);
+    }, [cardList]);
 
     const router = useRouter();
     const [showPopup, setShowPopup] = useState(false);
@@ -42,7 +91,7 @@ const ProfileSelection: React.FC = () => {
 
     const handleConfirmDelete = () => {
         if (profileToDelete !== null) {
-            testData.cardDatas.splice(profileToDelete, 1);
+            cardList.cardDatas.splice(profileToDelete, 1);
             setShowPopup(false);
             setProfileToDelete(null);
         }
@@ -60,7 +109,7 @@ const ProfileSelection: React.FC = () => {
 
     return (
         <Container>
-            <CardViewer cardDatas={testData.cardDatas} handleDelete={handleDelete}></CardViewer>
+            <CardViewer setCardList={setCardList} cardDatas={cardList.cardDatas} handleDelete={handleDelete} startDataIdx={0}></CardViewer>
             <AddProfileButton></AddProfileButton>
             {showPopup && 
                 <Popup 

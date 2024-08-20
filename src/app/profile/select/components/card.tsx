@@ -3,12 +3,13 @@ import styled from "styled-components";
 import SimpleStatus from "./simpleStatus";
 import ProfileSelectButton from "./button_select";
 import ProfileEditButton from "./button_edit";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export interface ICardProps {
+    farmID: number;
     imageURL: string;
-    profileName: string;
-    type: string;
+    farmName: string;
+    cropName: string;
 }
 
 interface ICardSeleced {
@@ -126,6 +127,10 @@ const ButtonContainer = styled.div`
 const Card = (props: ICardSeleced) => {
     const { isSelected, data, onDelete } = props;
 
+    useEffect(() => {
+        
+    }, [props.data]);
+
     return (
         <CardContainer $isSelected={isSelected}>
             {
@@ -137,8 +142,8 @@ const Card = (props: ICardSeleced) => {
                 <Image src={data.imageURL}></Image>
             </ImageContainer>
             <TextConatiner>
-                <ProfileName $isSelected={isSelected}>{data.profileName}</ProfileName>
-                <TypeName $isSelected={isSelected}>{data.type}</TypeName>
+                <ProfileName $isSelected={isSelected}>{data.farmName}</ProfileName>
+                <TypeName $isSelected={isSelected}>{data.cropName}</TypeName>
             </TextConatiner>
             {
                 isSelected

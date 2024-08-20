@@ -2,7 +2,7 @@
 import styled from "styled-components";
 import Card from "./card";
 import ProfileMoveButton from "./ProfileMoveButton";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
@@ -19,6 +19,8 @@ const ViewerConatiner = styled.div`
 export interface ICardDataProps {
     cardDatas: ICardProps[];
     handleDelete: (index: number)=>void;
+    startDataIdx: number;
+    setCardList: (cardList: {[index: string]: ICardProps[]})=>void;
 }
 
 const Wrapper = styled.div`
@@ -80,8 +82,17 @@ const SliderButtonDiv = styled.div`
 
 const CardViewer = (props: ICardDataProps) => {
 
+    const sliderRef = useRef<Slider | null>(null);
+
+    const goToSlide = (index: number) => {
+        if (sliderRef.current) {
+        sliderRef.current.slickGoTo(index);
+        }
+    };
+
     const [currentIndex, setCurrentIndex] = useState(0);
     const [cards, setCards] = useState(props.cardDatas);
+    
 
     const MovePrev = () => {
         setCurrentIndex((currentIndex-1)%cards.length);
@@ -101,14 +112,36 @@ const CardViewer = (props: ICardDataProps) => {
     useEffect(() => {
     }, [currentIndex]);
 
+    useEffect(() => {
+
+        let cardList: ICardProps[] = [];
+        cardList=props.cardDatas;
+
+        // Hard Coding OMG
+        if(props.cardDatas.length == 1) {
+            for(var i = 0 ; i < 4 ; i++) {
+                cardList.push(...props.cardDatas);
+            }
+        }
+        else if(props.cardDatas.length < 4) {
+            cardList=[...props.cardDatas, ...props.cardDatas];
+        }
+
+        console.log(cardList);
+
+        setCards(cardList);
+        setCurrentIndex(props.startDataIdx);
+        goToSlide(props.startDataIdx);
+    }, [props.cardDatas]);
+
     const Setting = {
         speed: 300,
-        arrows: true,
+        arrows: (cards.length > 1),
         draggable: false,
         dots: false,
         infinite: true,
         slidesToScroll: 1,
-        slidesToShow:3,
+        slidesToShow: (cards.length < 2 ? 1 : 3),
         centerMode:true,
         centerPadding:"0",
         prevArrow:(<SliderPrevButton onClick={MovePrev}><SliderButtonDiv><img src="/img/profile/move_previous.svg" alt="<"></img></SliderButtonDiv></SliderPrevButton>),
@@ -121,7 +154,7 @@ const CardViewer = (props: ICardDataProps) => {
     return (
         <ViewerConatiner>
             <Wrapper>
-                <StyledSlider {...Setting}>
+                <StyledSlider {...Setting} ref={sliderRef}>
                     {cards.map((data, index) => (
                         <div key={index}>
                             {
