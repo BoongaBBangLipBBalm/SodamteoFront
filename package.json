@@ -13,6 +13,7 @@
     "axios": "^1.7.4",
     "chart.js": "^4.4.3",
     "framer-motion": "^11.3.21",
+    "http-proxy-middleware": "^3.0.0",
     "local": "^0.3.3",
     "next": "14.2.5",
     "package": "^1.0.1",

@@ -91,10 +91,10 @@ const AirConditioner = () => {
   const [goalTemp, setGoalTemp] = useState(20);
 
   useEffect(() => {
-    // 컴포넌트가 마운트될 때 에어컨 상태를 조회
+
     const fetchAirConditionerStatus = async () => {
       try {
-        const response = await api.get('/api/hardware/airconditioner', {
+        const response = await api.get('/api/hardware/control', {
           params: { device: 'airconditioner' },
         });
         const { status } = response.data;

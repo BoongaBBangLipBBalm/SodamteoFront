@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
+import api, { getRequest } from "@/utils/api";
 
 const Container = styled.div`
   width: 60%;
@@ -115,7 +116,32 @@ const ScaleLabelContainer = styled.div`
 const SunLight = () => {
   const [isOn, setIsOn] = useState(false);
   const [goalLight, setGoalLight] = useState(50);
+  const [sunlightData, setSunlightData] = useState(null); 
   const circleKnobRef = useRef(null);
+
+  const fetchSunlightData = async (device) => {
+    try {
+      const url = `/api/hardware/blind`;
+      const response = await getRequest(url);
+      return response;
+    } catch (error) {
+      console.error("Failed to fetch sunlight data:", error);
+      return null;
+    }
+  };
+
+  useEffect(() => {
+    const device = "blind";
+    const getSunlight = async () => {
+      const data = await fetchSunlightData(device);
+      if (data) {
+        setSunlightData(data);
+        setGoalLight(data.status); 
+      }
+    };
+    
+    getSunlight();
+  }, []);
 
   const calculateLeft = (light) => ((light / 75) * 100);
 
@@ -167,6 +193,17 @@ const SunLight = () => {
       </FlexContainer>
     </Container>
   );
+};
+
+const fetchSunlightData = async (device) => {
+  try {
+    const url = `/api/hardware/blind?device=${device}`;
+    const response = await getRequest(url);
+    return response;
+  } catch (error) {
+    console.error("Failed to fetch sunlight data:", error);
+    return null;
+  }
 };
 
 export default SunLight;

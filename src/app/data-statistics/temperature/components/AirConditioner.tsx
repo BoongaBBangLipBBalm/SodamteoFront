@@ -216,8 +216,8 @@ const AirConditioner = () => {
     // 컴포넌트가 마운트될 때 에어컨 상태를 조회하는 함수
     const fetchAirConditionerStatus = async () => {
       try {
-        const response = await api.get('/api/hardware/airconditioner', {
-          params: { device: 'airconditioner' }
+        const response = await api.get('/api/hardware/control', {
+          params: { device: 'Airconditioner' }
         });
         const { status } = response.data;
         setIsOn(status > 0);

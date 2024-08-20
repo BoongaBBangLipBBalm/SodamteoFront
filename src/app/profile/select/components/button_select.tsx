@@ -33,13 +33,22 @@ const ProfileSelectButton: React.FC<ProfileSelectButtonProps> = ({ farmID }) => 
     const handleSelect = async () => {
         setLoading(true);
         try {
-            const response = await axios.get(`/farm/getfarm/?farmID=${farmID}`, {
+            const response = await axios.get(`/api/farm/getfarm?farmID=${farmID}`, {
                 headers: {
-                    Authorization: `Bearer ${localStorage.getItem("token")}`, // Assumes token is stored in localStorage
+                    Authorization: `Bearer ${localStorage.getItem("access_token")}`, // Assumes token is stored in localStorage
                 },
             });
 
             if (response.status === 200) {
+                // 새로운 토큰을 응답 헤더에서 가져와 저장
+                const newToken = response.headers['Authorization'];
+                if (newToken) {
+                    localStorage.setItem("access_token", newToken);
+                }
+                
+                console.log(response.headers);
+
+
                 // Store the retrieved farm data
                 const farmData = response.data;
                 localStorage.setItem("selectedFarm", JSON.stringify(farmData));

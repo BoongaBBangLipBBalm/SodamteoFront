@@ -28,11 +28,6 @@ const Forecast = () => {
     <Container>
       <Title>시가 예측</Title>
       <DashboardChart />
-      <StatsContainer>
-        <StatCard title="Users" value="32,984" />
-        <StatCard title="Sales" value="$2,400" />
-        <StatCard title="Items" value="320" />
-      </StatsContainer>
     </Container>
   );
 };

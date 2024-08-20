@@ -1,18 +1,18 @@
 export const getToken = (): string | null => {
   if (typeof window !== 'undefined') {
-    return localStorage.getItem('token');
+    return localStorage.getItem('access_token');
   }
   return null;
 };
 
 export const setToken = (token: string): void => {
   if (typeof window !== 'undefined') {
-    localStorage.setItem('token', token);
+    localStorage.setItem('token', 'access_token');
   }
 };
 
 export const removeToken = (): void => {
   if (typeof window !== 'undefined') {
-    localStorage.removeItem('token');
+    localStorage.removeItem('access_token');
   }
 };

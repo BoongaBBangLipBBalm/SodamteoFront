@@ -13,20 +13,19 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import { start } from "repl";
-import { color } from "chart.js/helpers";
+import { getToken } from "@/utils/localStorage"; // 토큰 가져오는 함수 임포트
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
 const Container = styled.div`
-  width: 100%; 
-  height: 60vh; 
+  width: 100%;
+  height: 60vh;
   display: flex;
   background-color: #F8F7F6;
   border-radius: 20px;
   padding: 10px;
   margin: 20px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);  
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 `;
 
 const Content = styled.div`
@@ -50,7 +49,6 @@ const options = {
     x: {
       title: {
         display: false,
-        text: 'Hour',
       },
     },
     y: {
@@ -58,7 +56,6 @@ const options = {
       max: 40,
       title: {
         display: false,
-        text: 'Temperature (°C)',
       },
     },
   },
@@ -74,24 +71,66 @@ const options = {
   elements: {
     point: {
       radius: 8,
-      hitRadius: 10
+      hitRadius: 10,
     },
   },
 };
 
 const Graph: React.FC = () => {
   const [data, setData] = useState({
-    labels: ["6 hour ago", "4 hour ago", "2 hour ago", "Now", ""],
+    labels: ["6 hours ago", "4 hours ago", "2 hours ago", "Now"],
     datasets: [
       {
         label: "Temperature",
-        data: [20, 28, 25, 29],
+        data: [20, 28, 25, 29], // 초기값
         fill: true,
         backgroundColor: "rgba(75,192,192,0.2)",
         borderColor: "gray",
       },
     ],
   });
+
+  const fetchData = async () => {
+    const token = getToken(); // 토큰 가져오기
+    try {
+      const response = await fetch("/api/environment/current_environment", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const responseData = await response.json();
+        const currentData = responseData.Current;
+        const labels = currentData.map((entry: any, index: number) => `${6 - index * 2} hours ago`);
+        labels[labels.length - 1] = "Now"; // 마지막 레이블을 "Now"로 설정
+
+        const temperatures = currentData.map((entry: any) => entry.temperature);
+
+        setData({
+          labels: labels,
+          datasets: [
+            {
+              label: "Temperature",
+              data: temperatures,
+              fill: true,
+              backgroundColor: "rgba(75,192,192,0.2)",
+              borderColor: "gray",
+            },
+          ],
+        });
+      } else {
+        console.error("Failed to fetch data");
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   return (
     <Container>

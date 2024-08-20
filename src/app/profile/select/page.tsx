@@ -10,10 +10,7 @@ import { ICardDataProps } from "./components/cardViewer";
 import { GetLayoutWidthRatio } from "@/components/nav/nav";
 import Popup from "./components/Popup";
 import { ICardProps } from "./components/card";
-import axios from "axios";
-
-// Test Code //
-//axios.defaults.baseURL = "http://localhost:3001";
+import { getRequest, deleteRequest } from "@/utils/api";
 
 const Container = styled.div`
     width: ${(1 - GetLayoutWidthRatio()) * 100 + "%"};
@@ -28,8 +25,8 @@ const GetCropImgURL = (cropName: string): string => {
 
 const PushCardDataByAPI = (data: any): {[index: string]: ICardProps[]} => {
     let cardList: {[index: string]: ICardProps[]} = {'cardDatas':[]};
-    if(data.length == 0) return cardList;
-    for(var i = 0 ; i < data.length ; i++) {
+    if(data.length === 0) return cardList;
+    for(let i = 0 ; i < data.length ; i++) {
         let newCardData: ICardProps = {cropName:data[i].cropName, farmID:data[i].farmID, farmName: data[i].farmName, imageURL: GetCropImgURL(data[i].cropName)};
         cardList.cardDatas.push(newCardData);
     }
@@ -60,9 +57,9 @@ const ProfileSelection: React.FC = () => {
 
     const getdata = async () => {
         try {
-            const response = await axios.get("/farm/getallfarms/");
-            let tempData = PushCardDataByAPI(response.data);
-            if(tempData.cardDatas.length != 0) {
+            const response = await getRequest("/api/farm/getallfarms");
+            let tempData = PushCardDataByAPI(response);
+            if(tempData.cardDatas.length !== 0) {
                 setCardList(tempData);
             }
         } catch (error) {
@@ -88,9 +85,9 @@ const ProfileSelection: React.FC = () => {
             const farmID = cardList.cardDatas[profileToDelete].farmID;
 
             try {
-                const response = await axios.delete(`/farm/deletefarm`, { data: { farmID } });
+                const response = await deleteRequest(`/farm/deletefarm`, { data: { farmID } });
 
-                if (response.status === 200 && response.data.message === "Deleted Successfully") {
+                if (response.message === "Deleted Successfully") {
                     // Remove the profile from the state after successful deletion
                     const updatedCardList = { ...cardList };
                     updatedCardList.cardDatas.splice(profileToDelete, 1);
