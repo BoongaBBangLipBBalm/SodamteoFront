@@ -21,6 +21,7 @@ export const NavContainer = styled.div`
     display: flex;
     flex-direction: column;
     padding: 20px;
+    z-index: 5;
 `;
 
 const NavItem = styled.li`

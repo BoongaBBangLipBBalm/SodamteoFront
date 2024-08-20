@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
 
 export interface IDoubleRangeProps {
@@ -37,41 +37,50 @@ const RangeSliderContainer = styled.div`
 
 const Slider = styled.input.attrs({ type: 'range' })<{
   thumbColor: string;
-  disabled: boolean;
+  trackColor: string;
+  isEnabled: boolean;
 }>`
   position: absolute;
   width: 100%;
   height: 0.5rem;
-  pointer-events: ${(props) => (props.disabled ? 'none' : 'all')};
+  pointer-events: none; /* Always non-interactive */
   -webkit-appearance: none;
   background: transparent;
   top: 35%; /* Positioned the slider lower to make room for thumb labels */
-  background-color: ${(props) => (props.disabled ? '#ccc' : 'transparent')};
+  
+  &::-webkit-slider-runnable-track {
+    background: ${(props) => (props.isEnabled ? props.trackColor : '#ccc')};
+    height: 0.5rem;
+  }
 
   &::-webkit-slider-thumb {
-    pointer-events: all;
     width: 1.375rem;
     height: 1.375rem;
     border-radius: 50%;
-    background: ${(props) => (props.disabled ? '#888' : props.thumbColor)};
-    cursor: ${(props) => (props.disabled ? 'not-allowed' : 'pointer')};
+    background: ${(props) => (props.isEnabled ? props.thumbColor : '#888')};
+    cursor: ${(props) => (props.isEnabled ? 'pointer' : 'not-allowed')};
     -webkit-appearance: none;
     position: relative;
     z-index: 2; /* Ensure thumb is above the track */
-    top: -25%; /* Thumb position relative to the slider */
+    top: -100%; /* Thumb position relative to the slider */
     filter: drop-shadow(0 0.125rem 0.5rem rgba(0, 0, 0, 0.25));
+
+  }
+
+  &::-moz-range-track {
+    background: ${(props) => (props.isEnabled ? props.trackColor : '#ccc')};
+    height: 0.5rem;
   }
 
   &::-moz-range-thumb {
-    pointer-events: all;
     width: 1.375rem;
     height: 1.375rem;
     border-radius: 50%;
-    background: ${(props) => (props.disabled ? '#888' : props.thumbColor)};
-    cursor: ${(props) => (props.disabled ? 'not-allowed' : 'pointer')};
+    background: ${(props) => (props.isEnabled ? props.thumbColor : '#888')};
+    cursor: ${(props) => (props.isEnabled ? 'pointer' : 'not-allowed')};
     position: relative;
     z-index: 2; /* Ensure thumb is above the track */
-    top: -25%; /* Thumb position relative to the slider */
+    top: -100%; /* Thumb position relative to the slider */
     filter: drop-shadow(0 0.125rem 0.5rem rgba(0, 0, 0, 0.25));
   }
 `;
@@ -208,7 +217,8 @@ const DoubleRangeSlider: React.FC<SliderProps> = ({
         max={max}
         onChange={handleMinChange}
         thumbColor={leftThumbColor}
-        disabled={!isEnabled}
+        trackColor={trackColor}
+        isEnabled={isEnabled}
       />
       <Slider
         value={maxValue}
@@ -216,7 +226,8 @@ const DoubleRangeSlider: React.FC<SliderProps> = ({
         max={max}
         onChange={handleMaxChange}
         thumbColor={rightThumbColor}
-        disabled={!isEnabled}
+        trackColor={trackColor}
+        isEnabled={isEnabled}
       />
       <ThumbValue position={`${((minValue - min) / (max - min)) * 100}%`} disabled={!isEnabled}>
         {minValue}{unit}

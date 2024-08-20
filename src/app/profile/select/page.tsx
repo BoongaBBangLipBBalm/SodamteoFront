@@ -3,9 +3,9 @@
 import { useRouter } from "next/navigation";
 import React, { useEffect } from "react";
 import styled from "styled-components";
-import CardViewer from "./cardViewer";
+import CardViewer from "./components/cardViewer";
 import AddProfileButton from "./components/addProfile";
-import { ICardDataProps } from "./cardViewer";
+import { ICardDataProps } from "./components/cardViewer";
 import { ICardProps } from "./components/card";
 import { GetLayoutWidthRatio } from "@/components/nav/nav";
 
