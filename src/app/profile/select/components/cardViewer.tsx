@@ -1,7 +1,8 @@
+// cardViewer.tsx
 import styled from "styled-components";
 import Card from "./card";
 import ProfileMoveButton from "./ProfileMoveButton";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
@@ -16,7 +17,8 @@ const ViewerConatiner = styled.div`
 `;
 
 export interface ICardDataProps {
-    cardDatas: ICardProps[]
+    cardDatas: ICardProps[];
+    handleDelete: (index: number)=>void;
 }
 
 const Wrapper = styled.div`
@@ -79,13 +81,14 @@ const SliderButtonDiv = styled.div`
 const CardViewer = (props: ICardDataProps) => {
 
     const [currentIndex, setCurrentIndex] = useState(0);
+    const [cards, setCards] = useState(props.cardDatas);
 
     const MovePrev = () => {
-        setCurrentIndex((currentIndex-1)%props.cardDatas.length);
+        setCurrentIndex((currentIndex-1)%cards.length);
     }
 
     const MoveNext = () => {
-        setCurrentIndex((currentIndex+1)%props.cardDatas.length);
+        setCurrentIndex((currentIndex+1)%cards.length);
     }
 
     const PrevArrow = ({ currentSlide, slideCount, ...props }: any) => (
@@ -119,12 +122,12 @@ const CardViewer = (props: ICardDataProps) => {
         <ViewerConatiner>
             <Wrapper>
                 <StyledSlider {...Setting}>
-                    {props.cardDatas.map((data, index) => (
+                    {cards.map((data, index) => (
                         <div key={index}>
                             {
                                 currentIndex === index
-                                ? <Card data={data} isSelected={true}></Card>
-                                : <Card data={data} isSelected={false} ></Card>
+                                ? <Card data={data} isSelected={true} onDelete={() => props.handleDelete(index)}></Card>
+                                : <Card data={data} isSelected={false} onDelete={() => props.handleDelete(index)}></Card>
                             }
                         </div>
                     ))}
