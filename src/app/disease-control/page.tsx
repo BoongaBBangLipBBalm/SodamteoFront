@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled, { ThemeProvider } from 'styled-components';
 import Navigation from './components/Navigation';
 import Album from './components/Album';
@@ -8,6 +8,7 @@ import { GlobalStyle } from './components/globalStyles';
 import { theme } from './components/theme';
 import { GetLayoutWidthRatio } from '@/components/nav/nav';
 import { IPhoto } from './components/Photo';
+import AddPhotoButton from './components/AddPhotoButton';
 
 const Container = styled.div`
   padding: 0 1.25rem; /* 20px */
@@ -176,14 +177,34 @@ const DiseaseControl: React.FC = () => {
     setSelectedCategory(category);
     const updatedPhotos = filterPhotos(category, allPhotos);
     setFilteredPhotos(updatedPhotos);
-    setSelectedPhoto(updatedPhotos[0] || null);
+    //setSelectedPhoto(updatedPhotos[0] || null);
   };
+
+  const handleAddPhoto = () => {
+        const newPhoto: IPhoto = {
+            src: '/img/profile/grains/rice.svg',
+            disease: 'New Disease',
+            timestamp: new Date().toISOString().split('T')[0],
+            confidence: Math.random()
+        };
+
+        const updatedPhotos = [...allPhotos, newPhoto];
+        setAllPhotos(updatedPhotos);
+        setSelectedCategory('Null');
+        setFilteredPhotos(filterPhotos('All', updatedPhotos));
+    };
+
+    useEffect(() => {
+      if(selectedCategory == 'Null') {
+        setSelectedCategory('All');
+      }
+    }, [selectedCategory]);
 
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyle />
       <Container>
-        {isPopupVisible && (
+      {isPopupVisible && (
           <PopupOverlay>
             <PopupContainer>
               <p>이 데이터를 삭제하시겠습니까?</p>
@@ -223,6 +244,7 @@ const DiseaseControl: React.FC = () => {
             </InfoPanel>
           )}
         </ContentWrapper>
+        <AddPhotoButton onAddPhoto={handleAddPhoto} /> {/* Add the button here */}
       </Container>
     </ThemeProvider>
   );

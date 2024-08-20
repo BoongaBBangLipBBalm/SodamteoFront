@@ -1,17 +1,21 @@
+// card.tsx
 import styled from "styled-components";
 import SimpleStatus from "./simpleStatus";
 import ProfileSelectButton from "./button_select";
 import ProfileEditButton from "./button_edit";
+import { useEffect, useState } from "react";
 
 export interface ICardProps {
+    farmID: number;
     imageURL: string;
-    profileName: string;
-    type: string;
+    farmName: string;
+    cropName: string;
 }
 
 interface ICardSeleced {
     data: ICardProps;
     isSelected: boolean;
+    onDelete: () => void;  // 삭제 기능 추가
 }
 
 const card_config = { // value: rem
@@ -21,6 +25,7 @@ const card_config = { // value: rem
 }
 
 const CardContainer = styled.div<{$isSelected: boolean}>`
+    position: relative;
     width: ${(props) => props.$isSelected ? NumToRem(card_config.selectedCard_height * card_config.sizeRatio) : NumToRem(card_config.unselectedCard_height * card_config.sizeRatio)};
     height: ${(props) => props.$isSelected ? NumToRem(card_config.selectedCard_height) : NumToRem(card_config.unselectedCard_height)};
     background-color: #F8F7F7;
@@ -31,11 +36,31 @@ const CardContainer = styled.div<{$isSelected: boolean}>`
     display: flex;
     flex-direction: column;
     margin: 2rem auto;
+    &:hover .delete-button {
+        display: block;
+    }
 `;
 
 function NumToRem(value: number) {
     return String(value) + "rem";
 }
+
+const DeleteButton = styled.button`
+    position: absolute;
+    top: 1.2rem;
+    right: 1.2rem;
+    background-color: #fd7c7c;
+    color: #000000;
+    border: none;
+    border-radius: 50%;
+    width: 1.4rem;
+    height: 1.4rem;
+    display: none; /* 초기에는 숨겨둠 */
+    cursor: pointer;
+    transform: translate(50%, -50%);
+    font-family: 'Pretendard-Bold';
+    font-size: 0.9rem;
+`;
 
 const ImageContainer = styled.div`
 
@@ -99,19 +124,29 @@ const ButtonContainer = styled.div`
     margin-top: auto;
 `;
 
-
 const Card = (props: ICardSeleced) => {
+    const { isSelected, data, onDelete } = props;
+
+    useEffect(() => {
+        
+    }, [props.data]);
+
     return (
-        <CardContainer $isSelected={props.isSelected}>
+        <CardContainer $isSelected={isSelected}>
+            {
+                isSelected
+                ? <DeleteButton className="delete-button" onClick={onDelete}>X</DeleteButton>
+                : null
+            }
             <ImageContainer>
-                <Image src={props.data.imageURL}></Image>
+                <Image src={data.imageURL}></Image>
             </ImageContainer>
             <TextConatiner>
-                <ProfileName $isSelected={props.isSelected}>{props.data.profileName}</ProfileName>
-                <TypeName $isSelected={props.isSelected}>{props.data.type}</TypeName>
+                <ProfileName $isSelected={isSelected}>{data.farmName}</ProfileName>
+                <TypeName $isSelected={isSelected}>{data.cropName}</TypeName>
             </TextConatiner>
             {
-                props.isSelected
+                isSelected
                 ?   <StatusContainer>
                         <SimpleStatus imageURL="/img/profile/temperature.svg" currentValue={0.6} left_color="#625FFF" right_color="#E37F7F"></SimpleStatus>
                         <SimpleStatus imageURL="/img/profile/humidity.svg" currentValue={0.4} left_color="#625FFF" right_color="#E37F7F"></SimpleStatus>
@@ -121,16 +156,14 @@ const Card = (props: ICardSeleced) => {
                 :   null
             }
             {
-                props.isSelected
-                ?   <ButtonContainer>
-                        <ProfileSelectButton></ProfileSelectButton>
-                        <ProfileEditButton></ProfileEditButton>
+                isSelected && (
+                    <ButtonContainer>
+                        <ProfileSelectButton farmID={data.farmID} />
+                        <ProfileEditButton />
                     </ButtonContainer>
-                :   null
+                )
             }
-            
         </CardContainer>
-        
     )
 }
 

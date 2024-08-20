@@ -12,6 +12,7 @@ interface IButtonProps {
     
     id: number;
     selected: boolean;
+    isLast: boolean;
     
 }
 
@@ -82,7 +83,7 @@ const NavButton = (props: IButtonProps) => {
     
 
     return(
-        <ButtonContainer $isSetting={data.id == 3}>
+        <ButtonContainer $isSetting={props.isLast}>
             <ButtonBox href={data.toURL}>
                 <ButtonImageBox $isselected={props.selected}>
                     <ButtonImage src={data.imageURL}></ButtonImage>

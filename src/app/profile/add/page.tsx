@@ -1,3 +1,4 @@
+// page.tsx
 "use client"
 
 import React, { useState } from 'react';
@@ -5,7 +6,7 @@ import styled from 'styled-components';
 import { useRouter } from 'next/navigation';
 import ProfileImage from './components/profileImage';
 import ProfileInfo from './components/profileDatas';
-
+import axios from 'axios';
 
 export interface IDataProps {
   tempMinValue: number;
@@ -33,6 +34,7 @@ export interface IDataProps {
   setProfileName: (value: string) => void;
   
 }
+
 const Container = styled.div`
   width: 100%;
   display: flex;
@@ -44,9 +46,7 @@ const Container = styled.div`
 const ProfileEdit: React.FC = () => {
   const router = useRouter();
 
-  // imgURL을 상태로 관리
   const [imgURL, setImgURL] = useState('');
-
   const [profileName, setProfileName] = useState('Test');
   const [selectedType, setSelectedType] = useState("벼");
 
@@ -62,46 +62,65 @@ const ProfileEdit: React.FC = () => {
   const [sunLightMaxValue, sunLightSetMaxValue] = useState(9000);
   const [sunLightIsEnabled, sunLightSetIsEnabled] = useState(true);
 
-  
-
   const data: IDataProps = {
-    tempMinValue: tempMinValue,
-    tempMaxValue: tempMaxValue,
-    tempSetMinValue: tempSetMinValue,
-    tempSetMaxValue: tempSetMaxValue,
-    tempIsEnabled: tempIsEnabled,
-    tempSetIsEnabled: tempSetIsEnabled,
+    tempMinValue,
+    tempMaxValue,
+    tempSetMinValue,
+    tempSetMaxValue,
+    tempIsEnabled,
+    tempSetIsEnabled,
+    humidMinValue,
+    humidMaxValue,
+    humidSetMinValue,
+    humidSetMaxValue,
+    humidIsEnabled,
+    humidSetIsEnabled,
+    sunLightMinValue,
+    sunLightMaxValue,
+    sunLightSetMinValue,
+    sunLightSetMaxValue,
+    sunLightIsEnabled,
+    sunLightSetIsEnabled,
+    profileName,
+    setProfileName,
+  };
 
-    humidMinValue: humidMinValue,
-    humidMaxValue: humidMaxValue,
-    humidSetMinValue: humidSetMinValue,
-    humidSetMaxValue: humidSetMaxValue,
-    humidIsEnabled: humidIsEnabled,
-    humidSetIsEnabled: humidSetIsEnabled,
-
-    sunLightMinValue: sunLightMinValue,
-    sunLightMaxValue: sunLightMaxValue,
-    sunLightSetMinValue: sunLightSetMinValue,
-    sunLightSetMaxValue: sunLightSetMaxValue,
-    sunLightIsEnabled: sunLightIsEnabled,
-    sunLightSetIsEnabled: sunLightSetIsEnabled,
-
-    profileName: profileName,
-    setProfileName: setProfileName
-  }
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    router.push('/add');
+
+    // Create an array of enabled devices
+    const devices: string[] = [];
+    if (tempIsEnabled) devices.push('Temperature');
+    if (humidIsEnabled) devices.push('Humidity');
+    if (sunLightIsEnabled) devices.push('SunLight');
+
+    const requestPayload = {
+      farmName: profileName,
+      cropName: selectedType,
+      devices,
+    };
+
+    try {
+      await axios.post('/farm/createfarm', requestPayload);
+      router.push('/add');
+    } catch (error) {
+      console.error('Failed to create farm:', error);
+      // Handle error (e.g., show notification or alert)
+    }
   };
 
   return (
     <Container>
-      {/* imgURL 상태를 ProfileImage 컴포넌트에 전달 */}
-      <ProfileImage imgURL={imgURL} />
-
-      {/* setImgURL 함수를 ProfileInfo 컴포넌트에 전달 */}
-      <ProfileInfo selectedType={selectedType} setSelectedType = {setSelectedType} setImgURL={setImgURL} data={data}/>
+      <form onSubmit={handleSubmit}>
+        <ProfileImage imgURL={imgURL} />
+        <ProfileInfo 
+          selectedType={selectedType} 
+          setSelectedType={setSelectedType} 
+          setImgURL={setImgURL} 
+          data={data} 
+        />
+        <button type="submit">Save Farm</button>
+      </form>
     </Container>
   );
 };

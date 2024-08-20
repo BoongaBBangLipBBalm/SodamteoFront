@@ -40,5 +40,23 @@
         "name": "질병 관리",
         "imageURL": "/img/nav/diseaseControl.svg",
         "toURL": "/disease-control"
+    },
+    {
+        "id": 7,
+        "name": "로그인",
+        "imageURL": "/img/nav/profile.svg",
+        "toURL": "/Login"
+    },
+    {
+        "id": 8,
+        "name": "회원 가입",
+        "imageURL": "/img/nav/change_profile.svg",
+        "toURL": "/sign-up"
+    },
+    {
+        "id": 9,
+        "name": "로그아웃",
+        "imageURL": "/img/nav/change_profile.svg",
+        "toURL": "/Login"
     }
 ]
