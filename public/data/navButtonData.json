@@ -19,9 +19,9 @@
     },
     {
         "id": 3,
-        "name": "환경 설정",
+        "name": "로그아웃",
         "imageURL": "/img/nav/setting.svg",
-        "toURL": "/setting"
+        "toURL": "/login"
     },
     {
         "id": 4,

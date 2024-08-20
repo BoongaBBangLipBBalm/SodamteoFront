@@ -96,7 +96,7 @@ const Graph: React.FC = () => {
       const response = await fetch("/api/environment/current_environment", {
         method: "GET",
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `${token}`,
         },
       });
 
