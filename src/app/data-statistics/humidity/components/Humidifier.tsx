@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
+import axios from "axios"; // axios 사용
 
 const Container = styled.div`
   width: 97%;
@@ -203,6 +204,40 @@ const Humidifier = () => {
   const [goalHumidity, setGoalHumidity] = useState(50);
   const [showHumidityOptions, setShowHumidityOptions] = useState(false);
 
+  // 가습기 상태 조회
+  useEffect(() => {
+    const fetchHumidifierStatus = async () => {
+      try {
+        const response = await axios.get("/api/hardware/humidifier", {
+          params: { device: "humidifier" },
+        });
+        const { status } = response.data;
+        setIsOn(status > 0); // 가습기가 켜져 있는지 여부
+        setGoalHumidity(status); // 목표 습도 설정
+      } catch (error) {
+        console.error("Failed to fetch humidifier status:", error);
+      }
+    };
+
+    fetchHumidifierStatus();
+  }, []);
+
+  // 가습기 상태 업데이트
+  const updateHumidifierStatus = async (newHumidity) => {
+    try {
+      const response = await axios.post("/api/hardware/humidifier", {
+        device: "humidifier",
+        targetValue: newHumidity,
+      });
+
+      const { status } = response.data;
+      setGoalHumidity(status);
+      console.log("Humidifier status updated successfully:", response.data);
+    } catch (error) {
+      console.error("Failed to update humidifier status:", error);
+    }
+  };
+
   const calculateLeft = (humidity) => ((humidity - 25) / 50) * 100;
 
   const handleHumiditySelectClick = () => {
@@ -212,6 +247,7 @@ const Humidifier = () => {
   const handleHumidityOptionClick = (humidity) => {
     setGoalHumidity(humidity);
     setShowHumidityOptions(false);
+    updateHumidifierStatus(humidity); // 서버에 목표 습도 전송
   };
 
   return (
@@ -223,14 +259,16 @@ const Humidifier = () => {
           <span>AI</span>
         </ToggleContainer>
         <SelectContainer>
-          <div style={{ position: 'relative' }}>
+          <div style={{ position: "relative" }}>
             <SelectButton onClick={handleHumiditySelectClick} $show={showHumidityOptions}>
               {goalHumidity}%
             </SelectButton>
             <SelectList $show={showHumidityOptions}>
-              {Array.from({ length: 51 }, (_, i) => 25 + i).map(humidity => (
+              {Array.from({ length: 51 }, (_, i) => 25 + i).map((humidity) => (
                 <OptionList key={humidity}>
-                  <OptionButton onClick={() => handleHumidityOptionClick(humidity)}>{humidity}%</OptionButton>
+                  <OptionButton onClick={() => handleHumidityOptionClick(humidity)}>
+                    {humidity}%
+                  </OptionButton>
                 </OptionList>
               ))}
             </SelectList>
@@ -240,9 +278,7 @@ const Humidifier = () => {
       <FlexContainer>
         <SliderContainer>
           <Knob left={calculateLeft(goalHumidity)} />
-          <Marker style={{ left: `${calculateLeft(goalHumidity)}%` }}>
-            Goal
-          </Marker>
+          <Marker style={{ left: `${calculateLeft(goalHumidity)}%` }}>Goal</Marker>
         </SliderContainer>
       </FlexContainer>
       <ScaleLabelContainer>

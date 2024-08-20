@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import styled from "styled-components";
+import api from "@/utils/api";
 
 const Container = styled.div`
   width: 60%;
@@ -61,7 +62,7 @@ const ToggleLabel = styled.label`
 const SliderContainer = styled.div`
   position: relative;
   width: 12px;
-  height: 50vh;
+  height: 60vh;
   margin: 20px 0;
   background: linear-gradient(to top, ${props => props.gradient});
   border-radius: 5px;
@@ -83,26 +84,6 @@ const Marker = styled.div`
   font-size: 12px;
 `;
 
-const CircleKnob = styled.div`
-  width: 80px;
-  height: 80px;
-  background-color: #04293a;
-  border-radius: 50%;
-  position: relative;
-  cursor: pointer;
-`;
-
-const Knob = styled.div`
-  position: absolute;
-  width: 10px;
-  height: 10px;
-  background-color: #fac57d;
-  border-radius: 50%;
-  top: 50%;
-  left: ${props => props.left}%;
-  transform: translate(-50%, -50%);
-`;
-
 const ScaleLabelContainer = styled.div`
   display: flex;
   justify-content: space-between;
@@ -112,11 +93,53 @@ const ScaleLabelContainer = styled.div`
   margin-top: 5px;
 `;
 
+const SelectBox = styled.select`
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-top: 20px;
+`;
 
 const Humidifier = () => {
   const [isOn, setIsOn] = useState(false);
   const [goalHumidity, setGoalHumidity] = useState(50);
   const circleKnobRef = useRef(null);
+
+  // 가습기 상태 조회 함수
+  useEffect(() => {
+    const fetchHumidifierStatus = async () => {
+      try {
+        const response = await api.get('/api/hardware/humidifier', {
+          params: { device: 'humidifier' }
+        });
+        const { status } = response.data;
+        setIsOn(status > 0);  // 가습기가 켜져 있는지 확인
+        setGoalHumidity(status);  // 목표 습도 설정
+      } catch (error) {
+        console.error("Failed to fetch humidifier status:", error);
+      }
+    };
+
+    fetchHumidifierStatus(); // 컴포넌트 마운트 시 가습기 상태 조회
+  }, []);
+
+  // 목표 습도를 서버에 POST 요청하는 함수
+  const updateHumidifierStatus = async (newHumidity) => {
+    try {
+      const response = await api.post('/api/hardware/humidifier', {
+        device: 'humidifier',
+        targetValue: newHumidity
+      });
+
+      // 성공적으로 업데이트된 경우 상태 반영
+      const { status } = response.data;
+      setGoalHumidity(status);
+      console.log("Humidifier status updated successfully:", response.data);
+    } catch (error) {
+      console.error("Failed to update humidifier status:", error);
+    }
+  };
 
   const calculateLeft = (humidity) => ((humidity / 75) * 100);
 
@@ -126,6 +149,17 @@ const Humidifier = () => {
     let newHumidity = (offsetX / circleRect.width) * 75;
     newHumidity = Math.max(25, Math.min(75, newHumidity));
     setGoalHumidity(newHumidity);
+
+    // POST 요청으로 새로운 목표 습도를 서버에 전송
+    updateHumidifierStatus(newHumidity);
+  };
+
+  const handleSelectChange = (e) => {
+    const newHumidity = Number(e.target.value);
+    setGoalHumidity(newHumidity);
+
+    // 서버로 목표 습도를 전송하는 요청
+    updateHumidifierStatus(newHumidity);
   };
 
   return (
@@ -141,26 +175,19 @@ const Humidifier = () => {
             Goal
           </Marker>
         </SliderContainer>
-        <CircleKnob
-          ref={circleKnobRef}
-          onMouseDown={(e) => {
-            e.preventDefault();
-            const handleMouseMove = (e) => handleKnobDrag(e);
-            const handleMouseUp = () => {
-              document.removeEventListener('mousemove', handleMouseMove);
-              document.removeEventListener('mouseup', handleMouseUp);
-            };
-            document.addEventListener('mousemove', handleMouseMove);
-            document.addEventListener('mouseup', handleMouseUp, { once: true });
-          }}
-        >
-          <Knob left={calculateLeft(goalHumidity)} />
-        </CircleKnob>
-        <ScaleLabelContainer>
-          <div>25</div>
-          <div>50</div>
-          <div>75</div>
-        </ScaleLabelContainer>
+        <SelectBox value={goalHumidity} onChange={handleSelectChange}>
+          <option value={25}>25%</option>
+          <option value={30}>30%</option>
+          <option value={35}>35%</option>
+          <option value={40}>40%</option>
+          <option value={45}>45%</option>
+          <option value={50}>50%</option>
+          <option value={55}>55%</option>
+          <option value={60}>60%</option>
+          <option value={65}>65%</option>
+          <option value={70}>70%</option>
+          <option value={75}>75%</option>
+        </SelectBox>
         <ToggleContainer>
           AI
           <ToggleLabel isOn={isOn} onClick={() => setIsOn(!isOn)} />
