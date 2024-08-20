@@ -24,15 +24,15 @@ interface IPageData {
 
 const page_data: IPageData[] = [
     {name: "null", URLName: "/null", buttons_id: [3]},
-    {name: "profile", URLName: "/profile", buttons_id: [4,3]},
+    {name: "profile", URLName: "/profile", buttons_id: [4,9]},
     {name: "data-statistics", URLName: "/data-statistics", buttons_id: [0,1,5,6,2,3]},
     {name: "control-hw", URLName: "/control-hw", buttons_id: [0,1,5,6,2,3]},
     {name: "change-profile", URLName: "/change-profile", buttons_id: [0,1,5,6,2,3]},
     {name: "forecast", URLName: "/forecast", buttons_id: [0,1,5,6,2,3]},
     {name: "disease-control", URLName: "/disease-control", buttons_id: [0,1,5,6,2,3]},
     {name: "setting", URLName: "/setting", buttons_id: [0,1,5,6,2,3]},
-    {name: "login", URLName: "/Login", buttons_id: [7,8,9]},
-    {name: "register", URLName: "/sign-up", buttons_id: [7,8,9]},
+    {name: "login", URLName: "/Login", buttons_id: [7,8]},
+    {name: "register", URLName: "/sign-up", buttons_id: [7,8]},
     {name: "test2", URLName: "/test2", buttons_id: [2,3]},
 ];
 
@@ -89,7 +89,7 @@ const ButtonList = () => {
         <Buttons>
             {pageData.buttons_id.map((id, index) => (
                 <div key={index}>
-                    <NavButton key={index} id={id} selected={id == currentSelectedButtonId} isLast={index+1==pageData.buttons_id.length}></NavButton>
+                    <NavButton key={index} id={id} selected={id == currentSelectedButtonId} isLast={id == 3 || id == 9}></NavButton>
                 </div>
             ))}
         </Buttons>
