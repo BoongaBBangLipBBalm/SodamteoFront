@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import styled from "styled-components";
+import api from "@/utils/api";
 
 const Container = styled.div`
   width: 97%;
@@ -211,7 +212,23 @@ const AirConditioner = () => {
   const [showTempOptions, setShowTempOptions] = useState(false);
   const sliderRef = useRef(null);
 
-  const calculateLeft = (temp) => ((temp - 16) / 24) * 100;
+  useEffect(() => {
+    // 컴포넌트가 마운트될 때 에어컨 상태를 조회하는 함수
+    const fetchAirConditionerStatus = async () => {
+      try {
+        const response = await api.get('/api/hardware/airconditioner', {
+          params: { device: 'airconditioner' }
+        });
+        const { status } = response.data;
+        setIsOn(status > 0);
+        setGoalTemp(status); // 서버에서 받은 목표 온도 설정
+      } catch (error) {
+        console.error("Failed to fetch air conditioner status:", error);
+      }
+    };
+
+    fetchAirConditionerStatus(); // 마운트 시 조회
+  }, []);
 
   const handleKnobDrag = (e) => {
     const sliderRect = sliderRef.current.getBoundingClientRect();
@@ -225,10 +242,23 @@ const AirConditioner = () => {
     setShowTempOptions((prevShowTempOptions) => !prevShowTempOptions);
   };
 
-  const handleTempOptionClick = (temp) => {
+  const handleTempOptionClick = async (temp) => {
     setGoalTemp(temp);
     setShowTempOptions(false);
+
+    // 서버로 목표 온도 전송하는 API 호출
+    try {
+      const response = await api.post('/api/hardware/airconditioner', {
+        device: 'airconditioner',
+        targetValue: temp,
+      });
+      console.log("Temperature update success:", response.data);
+    } catch (error) {
+      console.error("Failed to update temperature:", error);
+    }
   };
+
+  const calculateLeft = (temp) => ((temp - 16) / 24) * 100;
 
   return (
     <Container>
@@ -255,7 +285,7 @@ const AirConditioner = () => {
       </HeaderContainer>
       <FlexContainer>
         <SliderContainer ref={sliderRef}>
-          <Knob ref={sliderRef} left={calculateLeft(goalTemp)} onMouseDown={handleKnobDrag} />
+          <Knob left={calculateLeft(goalTemp)} onMouseDown={handleKnobDrag} />
           <Marker style={{ left: `${calculateLeft(goalTemp)}%` }}>
             Goal
           </Marker>

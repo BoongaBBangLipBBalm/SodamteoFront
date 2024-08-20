@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import styled from "styled-components";
+import api from "@/utils/api";
 
 const Container = styled.div`
   width: 60%;
@@ -62,7 +63,7 @@ const ToggleLabel = styled.label`
 const SliderContainer = styled.div`
   position: relative;
   width: 12px;
-  height: 50vh;
+  height: 60vh;
   margin: 20px 0;
   background: linear-gradient(to top, ${props => props.gradient});
   border-radius: 5px;
@@ -84,48 +85,41 @@ const Marker = styled.div`
   font-size: 12px;
 `;
 
-const CircleKnob = styled.div`
-  width: 80px;
-  height: 80px;
-  background-color: #04293a;
-  border-radius: 50%;
-  position: relative;
-  cursor: pointer;
-`;
-
-const Knob = styled.div`
-  position: absolute;
-  width: 10px;
-  height: 10px;
-  background-color: #fac57d;
-  border-radius: 50%;
-  top: 50%;
-  left: ${props => props.left}%;
-  transform: translate(-50%, -50%);
-`;
-
-const ScaleLabelContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  width: 80px;
-  font-size: 12px;
-  color: #333;
-  margin-top: 5px;
-`;
 
 const AirConditioner = () => {
   const [isOn, setIsOn] = useState(false);
   const [goalTemp, setGoalTemp] = useState(20);
-  const circleKnobRef = useRef(null);
 
-  const calculateLeft = (temp) => ((temp / 30) * 100);
+  useEffect(() => {
+    // 컴포넌트가 마운트될 때 에어컨 상태를 조회
+    const fetchAirConditionerStatus = async () => {
+      try {
+        const response = await api.get('/api/hardware/airconditioner', {
+          params: { device: 'airconditioner' },
+        });
+        const { status } = response.data;
+        setIsOn(status > 0);
+        setGoalTemp(status); // 목표 온도 설정
+      } catch (error) {
+        console.error("Failed to fetch air conditioner status:", error);
+      }
+    };
 
-  const handleKnobDrag = (e) => {
-    const circleRect = circleKnobRef.current.getBoundingClientRect();
-    const offsetX = e.clientX - circleRect.left;
-    let newTemp = (offsetX / circleRect.width) * 30;
-    newTemp = Math.max(10, Math.min(30, newTemp));
+    fetchAirConditionerStatus();
+  }, []);
+
+  const handleTemperatureChange = async (event) => {
+    const newTemp = parseFloat(event.target.value);
     setGoalTemp(newTemp);
+    try {
+      const response = await api.post('/api/hardware/airconditioner', {
+        device: 'airconditioner',
+        targetValue: newTemp,
+      });
+      console.log("Temperature update success:", response.data);
+    } catch (error) {
+      console.error("Failed to update temperature:", error);
+    }
   };
 
   return (
@@ -136,31 +130,16 @@ const AirConditioner = () => {
           <SliderLabel style={{ top: '0%' }}>30°C</SliderLabel>
           <SliderLabel style={{ top: '50%' }}>20°C</SliderLabel>
           <SliderLabel style={{ top: '100%' }}>10°C</SliderLabel>
-          <Marker style={{ top: `${100 - calculateLeft(goalTemp)}%` }}>
+          <Marker style={{ top: `${100 - ((goalTemp - 10) / 20) * 100}%` }}>
             <div style={{ backgroundColor: 'orange', width: '10px', height: '10px', borderRadius: '50%' }} />
             Goal
           </Marker>
         </SliderContainer>
-        <CircleKnob
-          ref={circleKnobRef}
-          onMouseDown={(e) => {
-            e.preventDefault();
-            const handleMouseMove = (e) => handleKnobDrag(e);
-            const handleMouseUp = () => {
-              document.removeEventListener('mousemove', handleMouseMove);
-              document.removeEventListener('mouseup', handleMouseUp);
-            };
-            document.addEventListener('mousemove', handleMouseMove);
-            document.addEventListener('mouseup', handleMouseUp, { once: true });
-          }}
-        >
-          <Knob left={calculateLeft(goalTemp)} />
-        </CircleKnob>
-        <ScaleLabelContainer>
-          <div>10</div>
-          <div>20</div>
-          <div>30</div>
-        </ScaleLabelContainer>
+        <select value={goalTemp} onChange={handleTemperatureChange} style={{ padding: '10px', fontSize: '16px', marginTop: '20px' }}>
+          {[...Array(21).keys()].map(i => (
+            <option key={i} value={i + 10}>{i + 10}°C</option>
+          ))}
+        </select>
         <ToggleContainer>
           AI
           <ToggleLabel isOn={isOn} onClick={() => setIsOn(!isOn)} />
