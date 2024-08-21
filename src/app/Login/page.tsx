@@ -79,7 +79,7 @@ const Login: React.FC = () => {
     setError(''); // 에러 초기화
 
     try {
-      const response = await fetch('/api/user/login', {
+      const response = await fetch('/api/users/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -91,7 +91,7 @@ const Login: React.FC = () => {
         const data = await response.json();
         localStorage.setItem('access_token', data.access_token);
         localStorage.setItem('refresh_token', data.refresh_token);
-        router.push('/data-statistics/temperature');
+        router.push('/profile/select');
       } else if (response.status === 400) {
         setError('이메일과 비밀번호를 확인해주세요.');
       } else {

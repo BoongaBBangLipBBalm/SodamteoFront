@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import styled from "styled-components";
-import api from "@/utils/api";
+import api from "@/utils/originapi";
 
 const Container = styled.div`
   width: 97%;
@@ -213,21 +213,20 @@ const AirConditioner = () => {
   const sliderRef = useRef(null);
 
   useEffect(() => {
-    // 컴포넌트가 마운트될 때 에어컨 상태를 조회하는 함수
     const fetchAirConditionerStatus = async () => {
       try {
-        const response = await api.get('/api/hardware/airconditioner', {
-          params: { device: 'airconditioner' }
+        const response = await api.get('/api/hardware/control', {
+          params: { device: 'Airconditioner' }
         });
         const { status } = response.data;
         setIsOn(status > 0);
-        setGoalTemp(status); // 서버에서 받은 목표 온도 설정
+        setGoalTemp(status);
       } catch (error) {
         console.error("Failed to fetch air conditioner status:", error);
       }
     };
 
-    fetchAirConditionerStatus(); // 마운트 시 조회
+    fetchAirConditionerStatus(); 
   }, []);
 
   const handleKnobDrag = (e) => {
@@ -248,8 +247,8 @@ const AirConditioner = () => {
 
     // 서버로 목표 온도 전송하는 API 호출
     try {
-      const response = await api.post('/api/hardware/airconditioner', {
-        device: 'airconditioner',
+      const response = await api.post('/api/hardware/control', {
+        device: 'Airconditioner',
         targetValue: temp,
       });
       console.log("Temperature update success:", response.data);

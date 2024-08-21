@@ -13,8 +13,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import { start } from "repl";
-import { color } from "chart.js/helpers";
+import { getToken } from "@/utils/localStorage"; // Import token fetching utility
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
@@ -54,11 +53,11 @@ const options = {
       },
     },
     y: {
-      min: 10,
-      max: 40,
+      min: 30, 
+      max: 100,
       title: {
         display: false,
-        text: 'Temperature (°C)',
+        text: 'Humidity (%)',
       },
     },
   },
@@ -66,7 +65,7 @@ const options = {
     tooltip: {
       callbacks: {
         label: function (context) {
-          return `${context.raw}°C`;
+          return `${context.raw}%`;
         },
       },
     },
@@ -74,29 +73,74 @@ const options = {
   elements: {
     point: {
       radius: 8,
-      hitRadius: 10
+      hitRadius: 10,
     },
   },
 };
 
-const Graph: React.FC = () => {
+const HumidityGraph: React.FC = () => {
   const [data, setData] = useState({
-    labels: ["6 hour ago", "4 hour ago", "2 hour ago", "Now", ""],
+    labels: ["6 hour ago", "4 hour ago", "2 hour ago", "Now"],
     datasets: [
       {
-        label: "Temperature",
-        data: [20, 28, 25, 29],
+        label: "Humidity",
+        data: [60, 65, 70, 75], // Initial humidity values
         fill: true,
-        backgroundColor: "rgba(75,192,192,0.2)",
-        borderColor: "gray",
+        backgroundColor: "rgba(153, 102, 255, 0.2)",  // Adjusted color for humidity
+        borderColor: "purple",  
       },
     ],
   });
 
+  const fetchHumidityData = async () => {
+    const token = getToken(); // Fetch the token
+
+    try {
+      const response = await fetch("/api/environment/current_environment", {
+        method: "GET",
+        headers: {
+          Authorization: `${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const responseData = await response.json();
+        const currentData = responseData.Current;
+
+        // Extract labels and humidity data
+        const labels = currentData.map((entry: any, index: number) => `${6 - index * 2} hours ago`);
+        labels[labels.length - 1] = "Now";  
+
+        const humidities = currentData.map((entry: any) => entry.humidity); 
+
+        setData({
+          labels: labels,
+          datasets: [
+            {
+              label: "Humidity",
+              data: humidities,
+              fill: true,
+              backgroundColor: "rgba(153, 102, 255, 0.2)", 
+              borderColor: "purple",
+            },
+          ],
+        });
+      } else {
+        console.error("Failed to fetch humidity data");
+      }
+    } catch (error) {
+      console.error("Error fetching humidity data:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchHumidityData(); 
+  }, []);
+
   return (
     <Container>
       <Content>
-        <ContentHeader>Graph</ContentHeader>
+        <ContentHeader>Humidity Graph</ContentHeader>
         <GraphContainer>
           <Line data={data} options={options} />
         </GraphContainer>
@@ -105,4 +149,4 @@ const Graph: React.FC = () => {
   );
 };
 
-export default Graph;
+export default HumidityGraph;

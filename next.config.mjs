@@ -1,5 +1,7 @@
 /** @type {import('next').NextConfig} */
 
+import { createProxyMiddleware } from 'http-proxy-middleware';
+
 const nextConfig = {
   async redirects() {
     return [
@@ -15,11 +17,10 @@ const nextConfig = {
     return [
       {
         source: '/api/:path*',
-        destination: 'https://서버.도메인.넣으면.돼요/:path*',
+        destination: 'https://sodam.store/:path*',
       },
-    ]
+    ];
   },
 };
-
 
 export default nextConfig;

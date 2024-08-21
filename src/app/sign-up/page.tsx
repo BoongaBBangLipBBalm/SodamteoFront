@@ -84,13 +84,13 @@ const Signup: React.FC = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post('/api/user/register', {
-        Email: email,
-        userName: userName,
+      const response = await axios.post('/api/users/register', {
+        email: email,
+        username: userName,
         password: password,
       });
 
-      if (response.status === 200) {
+      if (response.status === 200 || response.status === 201) {
         alert('회원가입에 성공하였습니다!');
         router.push('/login');
       } else {
