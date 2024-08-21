@@ -8,6 +8,7 @@ interface PhotoProps {
 }
 
 export interface IPhoto {
+  diseaseID: number;
   src: string;
   disease: string;
   timestamp: string;

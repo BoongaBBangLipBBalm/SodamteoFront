@@ -12,10 +12,9 @@ export interface ICardProps {
     cropName: string;
 }
 
-interface ICardSeleced {
+interface ICardSelected {
     data: ICardProps;
     isSelected: boolean;
-    onDelete: () => void;  // 삭제 기능 추가
 }
 
 const card_config = { // value: rem
@@ -44,23 +43,6 @@ const CardContainer = styled.div<{$isSelected: boolean}>`
 function NumToRem(value: number) {
     return String(value) + "rem";
 }
-
-const DeleteButton = styled.button`
-    position: absolute;
-    top: 1.2rem;
-    right: 1.2rem;
-    background-color: #fd7c7c;
-    color: #000000;
-    border: none;
-    border-radius: 50%;
-    width: 1.4rem;
-    height: 1.4rem;
-    display: none; /* 초기에는 숨겨둠 */
-    cursor: pointer;
-    transform: translate(50%, -50%);
-    font-family: 'Pretendard-Bold';
-    font-size: 0.9rem;
-`;
 
 const ImageContainer = styled.div`
 
@@ -124,8 +106,8 @@ const ButtonContainer = styled.div`
     margin-top: auto;
 `;
 
-const Card = (props: ICardSeleced) => {
-    const { isSelected, data, onDelete } = props;
+const Card = (props: ICardSelected) => {
+    const { isSelected, data } = props;
 
     useEffect(() => {
         
@@ -133,11 +115,6 @@ const Card = (props: ICardSeleced) => {
 
     return (
         <CardContainer $isSelected={isSelected}>
-            {
-                isSelected
-                ? <DeleteButton className="delete-button" onClick={onDelete}>X</DeleteButton>
-                : null
-            }
             <ImageContainer>
                 <Image src={data.imageURL}></Image>
             </ImageContainer>

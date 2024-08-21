@@ -9,9 +9,12 @@ import { theme } from './components/theme';
 import { GetLayoutWidthRatio } from '@/components/nav/nav';
 import { IPhoto } from './components/Photo';
 import AddPhotoButton from './components/AddPhotoButton';
+import PhotoAddButton from './components/AddPhotoButton';
+import { deleteRequest, getRequest } from '@/utils/api';
+import { getToken } from '@/utils/localStorage';
 
 const Container = styled.div`
-  padding: 0 1.25rem; /* 20px */
+  padding: 0 1.25rem;
   width: ${(1-GetLayoutWidthRatio())*100}%;
   height: 100vh;
   display: flex;
@@ -28,25 +31,19 @@ const ContentWrapper = styled.div`
   flex-direction: row;
   align-items: center;
   justify-content: space-evenly;
-  margin-top: 1.25rem; /* 20px */
-  @media (max-width: 768px) {
-    
-  }
+  margin-top: 1.25rem;
 `;
 
 const InfoPanel = styled.div`
-  margin: 0 1.25rem; /* 20px */
+  margin: 0 1.25rem;
   color: white;
-  border-radius: 0.625rem; /* 10px */
+  border-radius: 0.625rem;
   width: 50%;
   height: 50%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  @media (max-width: 768px) {
-    
-  }
 `;
 
 const TextBox = styled.div`
@@ -78,30 +75,6 @@ const ContentBox = styled.div`
   justify-content: center;
   align-items: center;
 `;
-
-const PhotoTimeStamp = styled.h3`
-  margin-top: 0;
-`;
-
-const PhotoConfidence = styled.h4`
-  margin-top: 0;
-`;
-
-const initialPhotos: IPhoto[] = [
-  { src: '/img/profile/grains/rice.svg', disease: 'Bacterialblight', timestamp: '2024/08/19', confidence: 0.1 },
-  { src: '/img/profile/grains/rice.svg', disease: 'Normal', timestamp: '2024/08/19', confidence: 0.1 },
-  { src: '/img/profile/grains/rice.svg', disease: 'Bacterialblight', timestamp: '2024/08/19', confidence: 0.1 },
-  { src: '/img/profile/grains/rice.svg', disease: 'Normal', timestamp: '2024/08/19', confidence: 0.1 },
-];
-
-const categories = ['All', 'Diseases', 'Normal'];
-
-const filterPhotos = (category: string, photos: IPhoto[]) => {
-  if (category === 'All') return photos;
-  if (category === 'Diseases') return photos.filter(photo => photo.disease !== 'Normal');
-  if (category === 'Normal') return photos.filter(photo => photo.disease === 'Normal');
-  return photos;
-};
 
 const PopupOverlay = styled.div`
   position: fixed;
@@ -142,29 +115,64 @@ const PopupButton = styled.button`
   }
 `;
 
+const categories = ['All', 'Diseases', 'Normal'];
+
+const filterPhotos = (category: string, photos: IPhoto[]) => {
+  if (category === 'All') return photos;
+  if (category === 'Diseases') return photos.filter(photo => photo.disease !== 'Normal');
+  if (category === 'Normal') return photos.filter(photo => photo.disease === 'Normal');
+  return photos;
+};
+
 const DiseaseControl: React.FC = () => {
-  const [allPhotos, setAllPhotos] = useState<IPhoto[]>(initialPhotos);
+  const [allPhotos, setAllPhotos] = useState<IPhoto[]>([]);
   const [selectedCategory, setSelectedCategory] = useState(categories[0]);
-  const [filteredPhotos, setFilteredPhotos] = useState(filterPhotos(categories[0], allPhotos));
-  const [selectedPhoto, setSelectedPhoto] = useState(filteredPhotos[0]);
+  const [filteredPhotos, setFilteredPhotos] = useState<IPhoto[]>([]);
+  const [selectedPhoto, setSelectedPhoto] = useState<IPhoto | null>(null);
   const [isPopupVisible, setIsPopupVisible] = useState(false);
   const [photoIndexToDelete, setPhotoIndexToDelete] = useState<number | null>(null);
+  const [fileInput, setFileInput] = useState<File | null>(null);
+  const token = getToken();
+
+  useEffect(() => {
+    const fetchPhotos = async () => {
+      try {
+        const response = await getRequest('/api/disease/get_farm_disease');
+        setAllPhotos(response.data.diseases);
+        setFilteredPhotos(response.data.diseases);
+        setSelectedPhoto(response.data.diseases[0] || null);
+      } catch (error) {
+        console.error('Error fetching photos:', error);
+      }
+    };
+
+    fetchPhotos();
+  }, []);
 
   const handleDeletePhoto = (index: number) => {
     setIsPopupVisible(true);
     setPhotoIndexToDelete(index);
   };
 
-  const confirmDeletePhoto = () => {
+  const confirmDeletePhoto = async () => {
     if (photoIndexToDelete !== null) {
-      const updatedPhotos = filteredPhotos.filter((_, i) => i !== photoIndexToDelete);
-      const updatedAllPhotos = allPhotos.filter(photo => updatedPhotos.includes(photo));
-      
-      setAllPhotos(updatedAllPhotos);
-      setFilteredPhotos(updatedPhotos);
-      setSelectedPhoto(updatedPhotos[0] || null);
-      setIsPopupVisible(false);
-      setPhotoIndexToDelete(null);
+      try {
+        const photoToDelete = filteredPhotos[photoIndexToDelete];
+        await deleteRequest('/disease/delete_disease_log', {
+          data: { diseaseID: photoToDelete.diseaseID },
+        });
+
+        const updatedPhotos = filteredPhotos.filter((_, i) => i !== photoIndexToDelete);
+        const updatedAllPhotos = allPhotos.filter(photo => updatedPhotos.includes(photo));
+        
+        setAllPhotos(updatedAllPhotos);
+        setFilteredPhotos(updatedPhotos);
+        setSelectedPhoto(updatedPhotos[0] || null);
+        setIsPopupVisible(false);
+        setPhotoIndexToDelete(null);
+      } catch (error) {
+        console.error('Error deleting photo:', error);
+      }
     }
   };
 
@@ -177,34 +185,48 @@ const DiseaseControl: React.FC = () => {
     setSelectedCategory(category);
     const updatedPhotos = filterPhotos(category, allPhotos);
     setFilteredPhotos(updatedPhotos);
-    //setSelectedPhoto(updatedPhotos[0] || null);
+    setSelectedPhoto(updatedPhotos[0] || null);
   };
 
-  const handleAddPhoto = () => {
-        const newPhoto: IPhoto = {
-            src: '/img/profile/grains/rice.svg',
-            disease: 'New Disease',
-            timestamp: new Date().toISOString().split('T')[0],
-            confidence: Math.random()
-        };
+  const handleAddPhoto = async (file: File | null) => {
+    if (file) {
+      try {
+        // 이미지 업로드
+        const formData = new FormData();
+        formData.append('image', file);
+        // POST 요청
+        const response = await fetch('/api/disease/detect_disease', {
+          method: 'POST',
+          body: JSON.stringify({
+            image: file,
+          }),
+        });
 
-        const updatedPhotos = [...allPhotos, newPhoto];
-        setAllPhotos(updatedPhotos);
-        setSelectedCategory('Null');
-        setFilteredPhotos(filterPhotos('All', updatedPhotos));
-    };
+        if (!response.ok) {
+          throw new Error('Failed to upload photo');
+        }
 
-    useEffect(() => {
-      if(selectedCategory == 'Null') {
+        // 업로드 후 최신 사진 데이터를 다시 가져옴
+        const getResponse = await getRequest('/api/disease/get_farm_disease');
+        if (!getResponse.ok) {
+          throw new Error('Failed to fetch photos');
+        }
+
+        const data = await getResponse.json();
+        setAllPhotos(data.diseases);
         setSelectedCategory('All');
+        setFilteredPhotos(data.diseases);
+      } catch (error) {
+        console.error('Error:', error);
       }
-    }, [selectedCategory]);
+    }
+  };
 
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyle />
       <Container>
-      {isPopupVisible && (
+        {isPopupVisible && (
           <PopupOverlay>
             <PopupContainer>
               <p>이 데이터를 삭제하시겠습니까?</p>
@@ -244,7 +266,9 @@ const DiseaseControl: React.FC = () => {
             </InfoPanel>
           )}
         </ContentWrapper>
-        <AddPhotoButton onAddPhoto={handleAddPhoto} /> {/* Add the button here */}
+
+        <PhotoAddButton onAddPhoto={handleAddPhoto} /> {/* Updated to handle file input */}
+
       </Container>
     </ThemeProvider>
   );
