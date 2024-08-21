@@ -8,10 +8,7 @@ import { IDataProps } from '../page';
 
 // selectedType과 id의 매핑 정보
 export const typeToIdMap: { [key: string]: number } = {
-    "벼": 1,
-    "감자": 2,
-    "토마토": 3,
-    "사과": 4
+    "Rice": 1
 };
 
 const getDataComponent = (id: number, data: IDataProps) => {
@@ -149,7 +146,7 @@ const ProfileInfo: React.FC<{ setImgURL: (url: string) => void, setSelectedType:
             </ScrollContainer>
             <ButtonContainer>
                 <Button color="#43545B" as="a" href="/profile/select">Cancel</Button>
-                <Button color="#274C4B">Done</Button>
+                <Button color="#274C4B" type='submit'>Done</Button>
             </ButtonContainer>
         </Container>
     );

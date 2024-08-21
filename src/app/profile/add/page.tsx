@@ -43,12 +43,19 @@ const Container = styled.div`
   background-color: #f4f4f4;
 `;
 
+const CustomForm = styled.form`
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: start;
+`;
+
 const ProfileEdit: React.FC = () => {
   const router = useRouter();
 
   const [imgURL, setImgURL] = useState('');
   const [profileName, setProfileName] = useState('Test');
-  const [selectedType, setSelectedType] = useState("벼");
+  const [selectedType, setSelectedType] = useState("Rice");
 
   const [tempMinValue, tempSetMinValue] = useState(10);
   const [tempMaxValue, tempSetMaxValue] = useState(20);
@@ -94,24 +101,27 @@ const ProfileEdit: React.FC = () => {
     if (humidIsEnabled) devices.push('Humidity');
     if (sunLightIsEnabled) devices.push('SunLight');
 
-    const requestPayload = {
-      farmName: profileName,
-      cropName: selectedType,
-      devices,
-    };
-
     try {
-      await axios.post('/farm/createfarm', requestPayload);
-      router.push('/add');
+      const response = await fetch('/api/farm/createfarm', {
+        method: 'POST',
+        body: JSON.stringify({
+          farmName: profileName,
+          cropName: selectedType,
+          devices,
+        }),
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to upload photo');
+      }
     } catch (error) {
       console.error('Failed to create farm:', error);
-      // Handle error (e.g., show notification or alert)
     }
   };
 
   return (
     <Container>
-      <form onSubmit={handleSubmit}>
+      <CustomForm onSubmit={handleSubmit}>
         <ProfileImage imgURL={imgURL} />
         <ProfileInfo 
           selectedType={selectedType} 
@@ -119,8 +129,7 @@ const ProfileEdit: React.FC = () => {
           setImgURL={setImgURL} 
           data={data} 
         />
-        <button type="submit">Save Farm</button>
-      </form>
+      </CustomForm>
     </Container>
   );
 };

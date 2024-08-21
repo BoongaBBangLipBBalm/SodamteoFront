@@ -1,10 +1,10 @@
 import styled from "styled-components";
-import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { getRequest } from "@/utils/api";
 
 const Button = styled.button`
-    width: 7.125rem;
+    width: 100%;
     height: 2.325rem;
     border-radius: 0.625rem;
     background-color: #274C4B;
@@ -33,7 +33,7 @@ const ProfileSelectButton: React.FC<ProfileSelectButtonProps> = ({ farmID }) => 
     const handleSelect = async () => {
         setLoading(true);
         try {
-            const response = await axios.get(`/api/farm/getfarm?farmID=${farmID}`, {
+            const response = await getRequest(`/api/farm/getfarm?farmID=${farmID}`, {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem("access_token")}`, // 토큰이 localStorage에 저장되어 있다고 가정
                 },
@@ -46,6 +46,7 @@ const ProfileSelectButton: React.FC<ProfileSelectButtonProps> = ({ farmID }) => 
                 if (newToken) {
                     console.log(newToken);
                     localStorage.setItem("access_token", newToken);
+                    localStorage.setItem("farmID", String(farmID));
                 }
 
                 // 온도 통계 페이지로 이동
