@@ -5,7 +5,7 @@ import AirConditioner from "./components/Airconditioner";
 import Humidifier from "./components/Humidifier";
 import SunLight from "./components/Sunlight";
 import Fertilizer from "./components/Fertilizer";
-
+import AddProfileButton from "./components/AddButton";
 
 const Wrapper = styled.div`
   width: 100%;
@@ -61,7 +61,7 @@ const controlHW = () => {
     <Wrapper>
       <HeaderContainer>
         <Header>Control Hardware</Header>
-        <AddButton onClick={handleAddHardware}>새로운 하드웨어 추가</AddButton>
+        <AddProfileButton></AddProfileButton>
       </HeaderContainer>
       <Container>
         {hardwareList.map((hardware, index) => {
