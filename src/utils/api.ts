@@ -5,7 +5,7 @@ export const getRequest = async (url: string, headers: object = {}) => {
     const response = await fetch(url, {
         method: 'GET',
         headers: {
-            'Authorization': token ? `Bearer ${token}` : '',
+            'Authorization': token ? `Bearer ${token}` : '', // 이거 Bearer 2번 뜨던데 체크해주세용 ("Bearer Bearer 머시기")
             ...headers,
         },
     });

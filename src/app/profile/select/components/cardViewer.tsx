@@ -18,7 +18,6 @@ const ViewerConatiner = styled.div`
 
 export interface ICardDataProps {
     cardDatas: ICardProps[];
-    handleDelete: (index: number)=>void;
     startDataIdx: number;
     setCardList: (cardList: {[index: string]: ICardProps[]})=>void;
 }
@@ -157,8 +156,8 @@ const CardViewer = (props: ICardDataProps) => {
                         <div key={index}>
                             {
                                 currentIndex === index
-                                ? <Card data={data} isSelected={true} onDelete={() => props.handleDelete(index)}></Card>
-                                : <Card data={data} isSelected={false} onDelete={() => props.handleDelete(index)}></Card>
+                                ? <Card data={data} isSelected={true}></Card>
+                                : <Card data={data} isSelected={false}></Card>
                             }
                         </div>
                     ))}

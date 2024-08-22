@@ -75,35 +75,6 @@ const ProfileSelection: React.FC = () => {
     const [showPopup, setShowPopup] = useState(false);
     const [profileToDelete, setProfileToDelete] = useState<number | null>(null);
 
-    const handleDelete = (index: number) => {
-        setProfileToDelete(index);
-        setShowPopup(true);
-    };
-
-    const handleConfirmDelete = async () => {
-        if (profileToDelete !== null) {
-            const farmID = cardList.cardDatas[profileToDelete].farmID;
-
-            try {
-                const response = await deleteRequest(`/farm/deletefarm`, { data: { farmID } });
-
-                if (response.message === "Deleted Successfully") {
-                    // Remove the profile from the state after successful deletion
-                    const updatedCardList = { ...cardList };
-                    updatedCardList.cardDatas.splice(profileToDelete, 1);
-                    setCardList(updatedCardList);
-                } else {
-                    alert("삭제 실패");
-                }
-            } catch (error) {
-                console.error("Error deleting farm profile:", error);
-                alert("삭제 에러");
-            } finally {
-                setShowPopup(false);
-                setProfileToDelete(null);
-            }
-        }
-    };
 
     const handleCancelDelete = () => {
         setShowPopup(false);
@@ -120,17 +91,9 @@ const ProfileSelection: React.FC = () => {
             <CardViewer 
                 setCardList={setCardList} 
                 cardDatas={cardList.cardDatas} 
-                handleDelete={handleDelete} 
                 startDataIdx={0} 
             />
             <AddProfileButton />
-            {showPopup && 
-                <Popup 
-                    message="정말 이 프로필을 삭제하시겠습니까?" 
-                    onConfirm={handleConfirmDelete} 
-                    onCancel={handleCancelDelete} 
-                />
-            }
         </Container>
     );
 }

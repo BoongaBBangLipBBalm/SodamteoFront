@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 
 interface PhotoAddButtonProps {
-    onAddPhoto: () => void;
+    onAddPhoto: (file: File) => void;
 }
 
 const ButtonContainer = styled.div`
@@ -15,8 +15,24 @@ const ButtonContainer = styled.div`
     z-index: 10;
 `;
 
-const AddButton = styled.button`
+const Tooltip = styled.div`
+    position: relative;
+    margin: auto 0;
+    opacity: 0;
+    background-color: #333;
+    color: white;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+    white-space: nowrap;
+`;
 
+const HiddenInput = styled.input`
+    display: none;
+`;
+
+const AddButton = styled.label`
     width: 3rem;
     height: 3rem;
     border-radius: 50%;
@@ -38,27 +54,23 @@ const AddButton = styled.button`
     }
 `;
 
-const Tooltip = styled.div`
-    position: relative;
-    margin: auto 0;
-    opacity: 0;
-    background-color: #333;
-    color: white;
-    padding: 0.5rem;
-    border-radius: 0.5rem;
-    font-size: 0.875rem;
-    margin-top: 0.5rem;
-    white-space: nowrap;
-`;
-
 const PhotoAddButton: React.FC<PhotoAddButtonProps> = ({ onAddPhoto }) => {
     return (
         <ButtonContainer>
-            <AddButton onClick={onAddPhoto}>
+            <AddButton htmlFor="photo-upload">
                 <img src="/img/profile/add.svg" alt="Add" />
             </AddButton>
             <Tooltip>현재 식물 상태 업로드</Tooltip>    
-            
+            <HiddenInput 
+                type="file" 
+                accept="image/*" 
+                id="photo-upload" 
+                onChange={(e) => {
+                    if (e.target.files?.[0]) {
+                        onAddPhoto(e.target.files?.[0]); // This triggers the photo upload logic
+                    }
+                }} 
+            />
         </ButtonContainer>
     );
 };
