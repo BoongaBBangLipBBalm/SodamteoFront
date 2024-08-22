@@ -57,7 +57,7 @@ const ScrollContainer = styled.div`
 
 const ButtonContainer = styled.div`
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
     gap: 1rem; /* Spacing between buttons */
     padding: 1rem 0; /* Padding above and below the buttons */
 `;
@@ -81,7 +81,7 @@ const Button = styled.button<{ color: string }>`
     }
 `;
 
-const ProfileInfo: React.FC<{ setImgURL: (url: string) => void, setSelectedType: (url: string) => void, selectedType: string, data: IDataProps, handleDone: ()=>void }> = ({ setImgURL, selectedType, setSelectedType, data, handleDone}) => {
+const ProfileInfo: React.FC<{ setImgURL: (url: string) => void, setSelectedType: (url: string) => void, selectedType: string, data: IDataProps, handleDone: ()=>void, handleDelete: ()=>void }> = ({ setImgURL, selectedType, setSelectedType, data, handleDone, handleDelete}) => {
     useEffect(() => {
         setImgURL(idToImageMap[typeToIdMap[selectedType]]);
     }, [selectedType]);
@@ -95,6 +95,7 @@ const ProfileInfo: React.FC<{ setImgURL: (url: string) => void, setSelectedType:
                 <Profile profileName={data.profileName} setProfileName={data.setProfileName} selectedType={selectedType} setSelectedType={setSelectedType} />
             </ScrollContainer>
             <ButtonContainer>
+                <Button color="#ff4949" onClick={handleDelete}>Delete</Button>
                 <Button color="#274C4B" onClick={handleDone}>Done</Button>
             </ButtonContainer>
         </Container>

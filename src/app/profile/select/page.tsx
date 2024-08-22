@@ -27,7 +27,16 @@ const PushCardDataByAPI = (data: any): {[index: string]: ICardProps[]} => {
     let cardList: {[index: string]: ICardProps[]} = {'cardDatas':[]};
     if(data.length === 0) return cardList;
     for(let i = 0 ; i < data.length ; i++) {
-        let newCardData: ICardProps = {cropName:data[i].cropName, farmID:data[i].farmID, farmName: data[i].farmName, imageURL: GetCropImgURL(data[i].cropName)};
+        let newCardData: ICardProps = {
+            cropName:data[i].cropName, 
+            farmID:data[i].farmID, 
+            farmName: data[i].farmName, 
+            imageURL: GetCropImgURL(data[i].cropName),
+            temperature: data[i].temperature,
+            humidity: data[i].humidity,
+            ph: data[i].ph,
+            rainfall: data[i].rainfall
+        };
         cardList.cardDatas.push(newCardData);
     }
     return cardList;
@@ -39,19 +48,31 @@ const ProfileSelection: React.FC = () => {
             "farmID": -1,
             "farmName": "No Data",
             "cropName": "No Crop",
-            "imageURL": ""
+            "imageURL": "",
+            "temperature": 0.1,
+            "humidity": 0.2,
+            "ph": 0.3,
+            "rainfall": 0.4
         },
         {
             "farmID": -1,
             "farmName": "No Data",
             "cropName": "No Crop",
-            "imageURL": ""
+            "imageURL": "",
+            "temperature": 0.1,
+            "humidity": 0.2,
+            "ph": 0.3,
+            "rainfall": 0.4
         },
         {
             "farmID": -1,
             "farmName": "No Data",
             "cropName": "No Crop",
-            "imageURL": ""
+            "imageURL": "",
+            "temperature": 0.1,
+            "humidity": 0.2,
+            "ph": 0.3,
+            "rainfall": 0.4
         }
     ]});
 

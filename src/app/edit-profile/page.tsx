@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import ProfileImage from './components/profileImage';
 import ProfileInfo from './components/profileDatas';
 import { getRequest } from '@/utils/api';
-import { getRefreshToken } from '@/utils/localStorage';
+import { getRefreshToken, getToken, setToken } from '@/utils/localStorage';
 import axios from 'axios';
 
 
@@ -30,7 +30,7 @@ const ProfileEdit: React.FC = () => {
   // imgURL을 상태로 관리
   const [imgURL, setImgURL] = useState('');
 
-  const [profileName, setProfileName] = useState('Test');
+  const [profileName, setProfileName] = useState('');
   const [selectedType, setSelectedType] = useState("벼");
 
   const [farmName, setFarmName] = useState<string>("No Name");
@@ -53,21 +53,39 @@ const ProfileEdit: React.FC = () => {
   
         // Log the farm update information
         console.log('Farm updated successfully:', { farmID, farmName, cropName, userID });
-
-        const newAccessToken = getRefreshToken();
-        if(newAccessToken !== null) {
-          localStorage.setItem('access_token', newAccessToken);
-          console.log('New access token received and stored.');
-        }
   
         router.push('/data-statistics/temperature'); // Example redirect to a success page
       }
     } catch (error) {
-      console.error('Failed to update farm or receive new token:', error);
+      console.error('Failed to update farm:', error);
   
       // Handle error scenarios, such as displaying an error message to the user
     }
   };
+
+  const handleDelete = async () => {
+    try {
+      const response = await axios.delete('/api/farm/deletefarm', {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },  
+      });
+  
+      if (response.status === 200) {
+        const { message } = response.data;
+  
+        const newAccessToken = response.headers.authorization;
+        if (newAccessToken) {
+          setToken(newAccessToken);
+        }
+  
+        router.push('/profile/select');
+      }
+    } catch (error) {
+      console.error('Failed to delete farm or receive new token:', error);
+    }
+  };
+  
   
   
 
@@ -97,11 +115,9 @@ const ProfileEdit: React.FC = () => {
 
   return (
     <Container>
-      {/* imgURL 상태를 ProfileImage 컴포넌트에 전달 */}
       <ProfileImage imgURL={imgURL} />
 
-      {/* setImgURL 함수를 ProfileInfo 컴포넌트에 전달 */}
-      <ProfileInfo selectedType={selectedType} setSelectedType = {setSelectedType} setImgURL={setImgURL} data={data} handleDone={handleDone}/>
+      <ProfileInfo selectedType={selectedType} setSelectedType = {setSelectedType} setImgURL={setImgURL} data={data} handleDone={handleDone} handleDelete={handleDelete}/>
     </Container>
   );
 };

@@ -43,7 +43,7 @@ const Container = styled.div`
   background-color: #f4f4f4;
 `;
 
-const CustomForm = styled.form`
+const CustomForm = styled.div`
   width: 100%;
   display: flex;
   justify-content: center;
@@ -51,6 +51,7 @@ const CustomForm = styled.form`
 `;
 
 const ProfileEdit: React.FC = () => {
+
   const router = useRouter();
 
   const [imgURL, setImgURL] = useState('');
@@ -68,6 +69,8 @@ const ProfileEdit: React.FC = () => {
   const [sunLightMinValue, sunLightSetMinValue] = useState(700);
   const [sunLightMaxValue, sunLightSetMaxValue] = useState(9000);
   const [sunLightIsEnabled, sunLightSetIsEnabled] = useState(true);
+
+
 
   const data: IDataProps = {
     tempMinValue,
@@ -92,8 +95,7 @@ const ProfileEdit: React.FC = () => {
     setProfileName,
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
 
     // Create an array of enabled devices
     const devices: string[] = [];
@@ -114,6 +116,9 @@ const ProfileEdit: React.FC = () => {
       if (!response.ok) {
         throw new Error('Failed to upload photo');
       }
+
+      router.push('/profile/select');
+
     } catch (error) {
       console.error('Failed to create farm:', error);
     }
@@ -121,15 +126,17 @@ const ProfileEdit: React.FC = () => {
 
   return (
     <Container>
-      <CustomForm onSubmit={handleSubmit}>
+      <CustomForm>
         <ProfileImage imgURL={imgURL} />
         <ProfileInfo 
           selectedType={selectedType} 
           setSelectedType={setSelectedType} 
           setImgURL={setImgURL} 
-          data={data} 
+          data={data}
+          submitFunc={handleSubmit}
         />
       </CustomForm>
+      
     </Container>
   );
 };
