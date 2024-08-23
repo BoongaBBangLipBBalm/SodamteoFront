@@ -129,7 +129,7 @@ const AddDeviceForm = () => {
                     <option value="Airconditioner">Airconditioner</option>
                     <option value="Humidifier">Humidifier</option>
                     <option value="Blind">Blind</option>
-                    <option value="pH">pH</option>
+                    <option value="Fertilizer">Fertilizer</option>
                 </Select>
                 <SubmitButton type="submit">추가하기</SubmitButton>
                 {responseMessage && <p>{responseMessage}</p>}
