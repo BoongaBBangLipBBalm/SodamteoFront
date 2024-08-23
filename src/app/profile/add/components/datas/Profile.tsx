@@ -6,7 +6,7 @@ import CropSelectionPopup from '../CropSelectionPopup';
 
 const DataName = styled.div`
     font-family: 'Pretendard_Regular';
-    font-size: 1.563rem;
+    font-size: 1.25rem;
     color: black;
     width: 5rem;
     margin-right: 1.25rem;

@@ -14,7 +14,8 @@ const PopupContainer = styled.div`
     box-shadow: 0 0.125rem 0.5rem rgba(0,0,0,0.25);
     display: flex;
     flex-direction: column;
-    width: 80%;
+    width: 100%;
+    height: 100%;
     z-index: 1000;
 `;
 
@@ -25,20 +26,68 @@ const InputContainer = styled.div`
 
 const ResultContainer = styled.div`
     flex: 1;
+    padding-top: 1rem;
     padding-left: 2rem;
 `;
 
-const InputField = styled.input`
-    width: 100%;
-    padding: 0.5rem;
+const SliderContainer = styled.div`
     margin-bottom: 1rem;
-    border-radius: 0.625rem;
-    border: 1px solid #ccc;
-    font-size: 1rem;
-    background-color: #F8F7F6;
+`;
+
+const SliderLabel = styled.label`
+    display: block;
+    margin-bottom: 0.5rem;
+`;
+
+const SliderInput = styled.input`
+    width: 100%;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 8px;
+    background: #ddd;
+    outline: none;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+    border-radius: 5px;
+
+    &::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        background: #274C4B;
+        cursor: pointer;
+        border-radius: 50%;
+        transition: background 0.2s;
+    }
+
+    &::-moz-range-thumb {
+        width: 20px;
+        height: 20px;
+        background: #274C4B;
+        cursor: pointer;
+        border-radius: 50%;
+        transition: background 0.2s;
+    }
+
+    &:hover::-webkit-slider-thumb {
+        background: #43545B;
+    }
+
+    &:hover::-moz-range-thumb {
+        background: #43545B;
+    }
+`;
+
+const SliderValue = styled.div`
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
 `;
 
 const SubmitButton = styled.button`
+    font-family: 'Pretendard-regular';
     padding: 0.5rem 1rem;
     background-color: #274C4B;
     color: white;
@@ -50,8 +99,9 @@ const SubmitButton = styled.button`
 `;
 
 const CancelButton = styled.button`
+    font-family: 'Pretendard-regular';
     padding: 0.5rem 1rem;
-    background-color: #ccc;
+    background-color: #43545B;
     color: white;
     border: none;
     border-radius: 0.625rem;
@@ -59,6 +109,7 @@ const CancelButton = styled.button`
     font-size: 1rem;
     margin-top: 1rem;
     margin-left: 1rem;
+    margin-right: 1rem;
 `;
 
 const ButtonContainer = styled.div`
@@ -67,30 +118,70 @@ const ButtonContainer = styled.div`
     margin-top: 1rem;
 `;
 
+const AllContainer = styled.div`
+    overflow-y: scroll;
+    padding: 1rem 1rem 1rem 0;
+    scrollbar-width: thin;
+    scrollbar-color: #43545B #ccc;
+    
+    &::-webkit-scrollbar {
+        width: 12px;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+        background-color: #888;
+        border-radius: 6px;
+    }
+    
+    &::-webkit-scrollbar-track {
+        background-color: #ccc;
+        border-radius: 6px;
+    }
+`;
+
+const Name = styled.h3`
+    padding-bottom: 1rem;
+`;
+
+
 const CropSelectionPopup: React.FC<{ onClose: () => void, onSelectCrop: (crop: string) => void }> = ({ onClose, onSelectCrop }) => {
-    const [n, setN] = useState('');
-    const [p, setP] = useState('');
-    const [k, setK] = useState('');
-    const [temperature, setTemperature] = useState('');
-    const [humidity, setHumidity] = useState('');
-    const [ph, setPh] = useState('');
-    const [rainfall, setRainfall] = useState('');
+    const [n, setN] = useState(0);
+    const [nMin, setNMin] = useState(0);
+    const [nMax, setNMax] = useState(100);
+    const [p, setP] = useState(0);
+    const [pMin, setPMin] = useState(0);
+    const [pMax, setPMax] = useState(100);
+    const [k, setK] = useState(0);
+    const [kMin, setKMin] = useState(0);
+    const [kMax, setKMax] = useState(100);
+    const [temperature, setTemperature] = useState(0);
+    const [temperatureMin, setTemperatureMin] = useState(-10);
+    const [temperatureMax, setTemperatureMax] = useState(50);
+    const [humidity, setHumidity] = useState(0);
+    const [humidityMin, setHumidityMin] = useState(0);
+    const [humidityMax, setHumidityMax] = useState(100);
+    const [ph, setPh] = useState(0);
+    const [phMin, setPhMin] = useState(0);
+    const [phMax, setPhMax] = useState(14);
+    const [rainfall, setRainfall] = useState(0);
+    const [rainfallMin, setRainfallMin] = useState(0);
+    const [rainfallMax, setRainfallMax] = useState(500);
     const [cropSuggestions, setCropSuggestions] = useState<{ [key: string]: number } | null>(null);
     const [selectedCrop, setSelectedCrop] = useState<string | null>(null);
 
     const handleSubmit = async () => {
         try {
             const response = await axios.post('/api/environment/crop_selection', {
-                N: parseFloat(n),
-                P: parseFloat(p),
-                K: parseFloat(k),
-                temperature: parseFloat(temperature),
-                humidity: parseFloat(humidity),
-                ph: parseFloat(ph),
-                rainfall: parseFloat(rainfall),
+                N: n,
+                P: p,
+                K: k,
+                temperature,
+                humidity,
+                ph,
+                rainfall,
             }, {
                 headers: {
-                    'Authorization': `Bearer ${getToken()}` // Assuming you have token from context or props
+                    'Authorization': `Bearer ${getToken()}`
                 }
             });
 
@@ -114,42 +205,153 @@ const CropSelectionPopup: React.FC<{ onClose: () => void, onSelectCrop: (crop: s
         }
     };
 
+    
+
     return (
         <PopupContainer>
-            <InputContainer>
-                <h3>Enter Environmental Data</h3>
-                <InputField type="text" placeholder="N" value={n} onChange={(e) => setN(e.target.value)} />
-                <InputField type="text" placeholder="P" value={p} onChange={(e) => setP(e.target.value)} />
-                <InputField type="text" placeholder="K" value={k} onChange={(e) => setK(e.target.value)} />
-                <InputField type="text" placeholder="Temperature" value={temperature} onChange={(e) => setTemperature(e.target.value)} />
-                <InputField type="text" placeholder="Humidity" value={humidity} onChange={(e) => setHumidity(e.target.value)} />
-                <InputField type="text" placeholder="pH" value={ph} onChange={(e) => setPh(e.target.value)} />
-                <InputField type="text" placeholder="Rainfall" value={rainfall} onChange={(e) => setRainfall(e.target.value)} />
-                <SubmitButton onClick={handleSubmit}>Select Crop</SubmitButton>
-            </InputContainer>
-            <ResultContainer>
-                <h3>Crop Suggestions</h3>
-                {cropSuggestions ? (
-                    Object.entries(cropSuggestions).map(([crop, probability], index) => (
-                        <div key={index}>
-                            <input 
-                                type="radio" 
-                                name="crop" 
-                                value={crop} 
-                                onChange={() => setSelectedCrop(crop)} 
-                                checked={selectedCrop === crop} 
-                            />
-                            <label>{crop}: {probability.toFixed(2)}%</label>
-                        </div>
-                    ))
-                ) : (
-                    <p>No suggestions available.</p>
-                )}
-            </ResultContainer>
+            <AllContainer>
+                <InputContainer>
+                    <Name>Enter Environmental Data</Name>
+
+                    <SliderContainer>
+                        <SliderLabel>Nitrogen (N)</SliderLabel>
+                        <SliderInput 
+                            type="range" 
+                            min={nMin} 
+                            max={nMax} 
+                            value={n} 
+                            onChange={(e) => setN(parseFloat(e.target.value))} 
+                        />
+                        <SliderValue>
+                            <span>{nMin}</span>
+                            <span>{n}</span>
+                            <span>{nMax}</span>
+                        </SliderValue>
+                    </SliderContainer>
+
+                    <SliderContainer>
+                        <SliderLabel>Phosphorus (P)</SliderLabel>
+                        <SliderInput 
+                            type="range" 
+                            min={pMin} 
+                            max={pMax} 
+                            value={p} 
+                            onChange={(e) => setP(parseFloat(e.target.value))} 
+                        />
+                        <SliderValue>
+                            <span>{pMin}</span>
+                            <span>{p}</span>
+                            <span>{pMax}</span>
+                        </SliderValue>
+                    </SliderContainer>
+
+                    <SliderContainer>
+                        <SliderLabel>Potassium (K)</SliderLabel>
+                        <SliderInput 
+                            type="range" 
+                            min={kMin} 
+                            max={kMax} 
+                            value={k} 
+                            onChange={(e) => setK(parseFloat(e.target.value))} 
+                        />
+                        <SliderValue>
+                            <span>{kMin}</span>
+                            <span>{k}</span>
+                            <span>{kMax}</span>
+                        </SliderValue>
+                    </SliderContainer>
+
+                    <SliderContainer>
+                        <SliderLabel>Temperature (&deg;C)</SliderLabel>
+                        <SliderInput 
+                            type="range" 
+                            min={temperatureMin} 
+                            max={temperatureMax} 
+                            value={temperature} 
+                            onChange={(e) => setTemperature(parseFloat(e.target.value))} 
+                        />
+                        <SliderValue>
+                            <span>{temperatureMin}</span>
+                            <span>{temperature}</span>
+                            <span>{temperatureMax}</span>
+                        </SliderValue>
+                    </SliderContainer>
+
+                    <SliderContainer>
+                        <SliderLabel>Humidity (%)</SliderLabel>
+                        <SliderInput 
+                            type="range" 
+                            min={humidityMin} 
+                            max={humidityMax} 
+                            value={humidity} 
+                            onChange={(e) => setHumidity(parseFloat(e.target.value))} 
+                        />
+                        <SliderValue>
+                            <span>{humidityMin}</span>
+                            <span>{humidity}</span>
+                            <span>{humidityMax}</span>
+                        </SliderValue>
+                    </SliderContainer>
+
+                    <SliderContainer>
+                        <SliderLabel>pH</SliderLabel>
+                        <SliderInput 
+                            type="range" 
+                            min={phMin} 
+                            max={phMax} 
+                            value={ph} 
+                            onChange={(e) => setPh(parseFloat(e.target.value))} 
+                        />
+                        <SliderValue>
+                            <span>{phMin}</span>
+                            <span>{ph}</span>
+                            <span>{phMax}</span>
+                        </SliderValue>
+                    </SliderContainer>
+
+                    <SliderContainer>
+                        <SliderLabel>Rainfall (mm)</SliderLabel>
+                        <SliderInput 
+                            type="range" 
+                            min={rainfallMin} 
+                            max={rainfallMax} 
+                            value={rainfall} 
+                            onChange={(e) => setRainfall(parseFloat(e.target.value))} 
+                        />
+                        <SliderValue>
+                            <span>{rainfallMin}</span>
+                            <span>{rainfall}</span>
+                            <span>{rainfallMax}</span>
+                        </SliderValue>
+                    </SliderContainer>
+
+                    <SubmitButton onClick={handleSubmit}>Select Crop</SubmitButton>
+                </InputContainer>
+                <ResultContainer>
+                    <h3>Crop Suggestions</h3>
+                    {cropSuggestions ? (
+                        Object.entries(cropSuggestions).map(([crop, probability], index) => (
+                            <div key={index}>
+                                <input 
+                                    type="radio" 
+                                    name="crop" 
+                                    value={crop} 
+                                    onChange={() => setSelectedCrop(crop)} 
+                                    checked={selectedCrop === crop} 
+                                />
+                                <label>{crop}: {probability.toFixed(2)}%</label>
+                            </div>
+                        ))
+                    ) : (
+                        <p>No suggestions available.</p>
+                    )}
+                </ResultContainer>
+            </AllContainer>
             <ButtonContainer>
                 <CancelButton onClick={onClose}>Cancel</CancelButton>
                 <SubmitButton onClick={handleConfirm} disabled={!selectedCrop}>Confirm</SubmitButton>
             </ButtonContainer>
+            
         </PopupContainer>
     );
 }

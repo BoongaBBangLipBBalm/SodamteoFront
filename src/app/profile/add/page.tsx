@@ -1,4 +1,3 @@
-// page.tsx
 "use client"
 
 import React, { useState } from 'react';
@@ -9,30 +8,20 @@ import ProfileInfo from './components/profileDatas';
 import { getToken } from '@/utils/localStorage';
 
 export interface IDataProps {
-  tempMinValue: number;
-  tempMaxValue: number;
-  tempSetMinValue: (value: number) => void;
-  tempSetMaxValue: (value: number) => void;
-  tempIsEnabled: boolean;
-  tempSetIsEnabled: (value: boolean) => void;
-  
-  humidMinValue: number;
-  humidMaxValue: number;
-  humidSetMinValue: (value: number) => void;
-  humidSetMaxValue: (value: number) => void;
-  humidIsEnabled: boolean;
-  humidSetIsEnabled: (value: boolean) => void;
-
-  sunLightMinValue: number;
-  sunLightMaxValue: number;
-  sunLightSetMinValue: (value: number) => void;
-  sunLightSetMaxValue: (value: number) => void;
-  sunLightIsEnabled: boolean;
-  sunLightSetIsEnabled: (value: boolean) => void;
-
   profileName: string;
   setProfileName: (value: string) => void;
+
+  airconditionerIsEnabled: boolean;
+  setAirconditionerIsEnabled: (value: boolean) => void;
   
+  humidifierIsEnabled: boolean;
+  setHumidifierIsEnabled: (value: boolean) => void;
+  
+  blindIsEnabled: boolean;
+  setBlindIsEnabled: (value: boolean) => void;
+  
+  fertilizerIsEnabled: boolean;
+  setFertilizerIsEnabled: (value: boolean) => void;
 }
 
 const Container = styled.div`
@@ -58,51 +47,32 @@ const ProfileEdit: React.FC = () => {
   const [profileName, setProfileName] = useState('Test');
   const [selectedType, setSelectedType] = useState("Rice");
 
-  const [tempMinValue, tempSetMinValue] = useState(10);
-  const [tempMaxValue, tempSetMaxValue] = useState(20);
-  const [tempIsEnabled, tempSetIsEnabled] = useState(true);
-
-  const [humidMinValue, humidSetMinValue] = useState(40);
-  const [humidMaxValue, humidSetMaxValue] = useState(60);
-  const [humidIsEnabled, humidSetIsEnabled] = useState(true);
-
-  const [sunLightMinValue, sunLightSetMinValue] = useState(700);
-  const [sunLightMaxValue, sunLightSetMaxValue] = useState(9000);
-  const [sunLightIsEnabled, sunLightSetIsEnabled] = useState(true);
-
-
+  const [airconditionerIsEnabled, setAirconditionerIsEnabled] = useState(true);
+  const [humidifierIsEnabled, setHumidifierIsEnabled] = useState(true);
+  const [blindIsEnabled, setBlindIsEnabled] = useState(true);
+  const [fertilizerIsEnabled, setFertilizerIsEnabled] = useState(true);
 
   const data: IDataProps = {
-    tempMinValue,
-    tempMaxValue,
-    tempSetMinValue,
-    tempSetMaxValue,
-    tempIsEnabled,
-    tempSetIsEnabled,
-    humidMinValue,
-    humidMaxValue,
-    humidSetMinValue,
-    humidSetMaxValue,
-    humidIsEnabled,
-    humidSetIsEnabled,
-    sunLightMinValue,
-    sunLightMaxValue,
-    sunLightSetMinValue,
-    sunLightSetMaxValue,
-    sunLightIsEnabled,
-    sunLightSetIsEnabled,
     profileName,
     setProfileName,
+    airconditionerIsEnabled,
+    setAirconditionerIsEnabled,
+    humidifierIsEnabled,
+    setHumidifierIsEnabled,
+    blindIsEnabled,
+    setBlindIsEnabled,
+    fertilizerIsEnabled,
+    setFertilizerIsEnabled,
   };
 
   const handleSubmit = async () => {
 
     // Create an array of enabled devices
     const devices: string[] = [];
-    // TEST CODE //
-    if (tempIsEnabled) devices.push('Airconditioner');
-    if (humidIsEnabled) devices.push('Humidifier');
-    //if (sunLightIsEnabled) devices.push('SunLight');
+    if (airconditionerIsEnabled) devices.push('Airconditioner');
+    if (humidifierIsEnabled) devices.push('Humidifier');
+    if (blindIsEnabled) devices.push('Blind');
+    if (fertilizerIsEnabled) devices.push('Fertilizer');
 
     const sendData = JSON.stringify({
       "farmName": profileName,
@@ -144,7 +114,6 @@ const ProfileEdit: React.FC = () => {
           submitFunc={handleSubmit}
         />
       </CustomForm>
-      
     </Container>
   );
 };
