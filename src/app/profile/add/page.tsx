@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import { useRouter } from 'next/navigation';
 import ProfileImage from './components/profileImage';
 import ProfileInfo from './components/profileDatas';
-import axios from 'axios';
+import { getToken } from '@/utils/localStorage';
 
 export interface IDataProps {
   tempMinValue: number;
@@ -43,12 +43,20 @@ const Container = styled.div`
   background-color: #f4f4f4;
 `;
 
+const CustomForm = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: start;
+`;
+
 const ProfileEdit: React.FC = () => {
+
   const router = useRouter();
 
   const [imgURL, setImgURL] = useState('');
   const [profileName, setProfileName] = useState('Test');
-  const [selectedType, setSelectedType] = useState("벼");
+  const [selectedType, setSelectedType] = useState("Rice");
 
   const [tempMinValue, tempSetMinValue] = useState(10);
   const [tempMaxValue, tempSetMaxValue] = useState(20);
@@ -61,6 +69,8 @@ const ProfileEdit: React.FC = () => {
   const [sunLightMinValue, sunLightSetMinValue] = useState(700);
   const [sunLightMaxValue, sunLightSetMaxValue] = useState(9000);
   const [sunLightIsEnabled, sunLightSetIsEnabled] = useState(true);
+
+
 
   const data: IDataProps = {
     tempMinValue,
@@ -85,42 +95,56 @@ const ProfileEdit: React.FC = () => {
     setProfileName,
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
 
     // Create an array of enabled devices
     const devices: string[] = [];
-    if (tempIsEnabled) devices.push('Temperature');
-    if (humidIsEnabled) devices.push('Humidity');
-    if (sunLightIsEnabled) devices.push('SunLight');
+    // TEST CODE //
+    if (tempIsEnabled) devices.push('Airconditioner');
+    if (humidIsEnabled) devices.push('Humidifier');
+    //if (sunLightIsEnabled) devices.push('SunLight');
 
-    const requestPayload = {
-      farmName: profileName,
-      cropName: selectedType,
-      devices,
-    };
+    const sendData = JSON.stringify({
+      "farmName": profileName,
+      "cropName": selectedType,
+      "devices": devices.join(','),
+    });
 
     try {
-      await axios.post('/farm/createfarm', requestPayload);
-      router.push('/add');
+      
+      const response = await fetch('/api/farm/createfarm', {
+        method: 'POST',
+        headers: {
+          'Authorization': `${getToken()}`, // Assuming you have token from context or props
+          'Content-Type': 'application/json',
+        },
+        body: sendData,
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to create farm.');
+      }
+
+      router.push('/profile/select');
+
     } catch (error) {
       console.error('Failed to create farm:', error);
-      // Handle error (e.g., show notification or alert)
     }
   };
 
   return (
     <Container>
-      <form onSubmit={handleSubmit}>
+      <CustomForm>
         <ProfileImage imgURL={imgURL} />
         <ProfileInfo 
           selectedType={selectedType} 
           setSelectedType={setSelectedType} 
           setImgURL={setImgURL} 
-          data={data} 
+          data={data}
+          submitFunc={handleSubmit}
         />
-        <button type="submit">Save Farm</button>
-      </form>
+      </CustomForm>
+      
     </Container>
   );
 };

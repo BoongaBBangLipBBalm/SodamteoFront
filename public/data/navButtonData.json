@@ -15,7 +15,7 @@
         "id": 2,
         "name": "프로필 변경",
         "imageURL": "/img/nav/change_profile.svg",
-        "toURL": "/change-profile"
+        "toURL": "/edit-profile"
     },
     {
         "id": 3,

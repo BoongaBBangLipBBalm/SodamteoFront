@@ -10,6 +10,10 @@ export interface ICardProps {
     imageURL: string;
     farmName: string;
     cropName: string;
+    temperature: number;
+    humidity: number;
+    ph: number;
+    rainfall: number;
 }
 
 interface ICardSelected {
@@ -125,10 +129,10 @@ const Card = (props: ICardSelected) => {
             {
                 isSelected
                 ?   <StatusContainer>
-                        <SimpleStatus imageURL="/img/profile/temperature.svg" currentValue={0.6} left_color="#625FFF" right_color="#E37F7F"></SimpleStatus>
-                        <SimpleStatus imageURL="/img/profile/humidity.svg" currentValue={0.4} left_color="#625FFF" right_color="#E37F7F"></SimpleStatus>
-                        <SimpleStatus imageURL="/img/profile/bug.svg" currentValue={0.14} left_color="#5FFF65" right_color="#E37F7F"></SimpleStatus>
-                        <SimpleStatus imageURL="/img/profile/sunlight.svg" currentValue={0.8} left_color="black" right_color="white"></SimpleStatus>
+                        <SimpleStatus imageURL="/img/profile/temperature.svg" currentValue={props.data.temperature} left_color="#625FFF" right_color="#E37F7F"></SimpleStatus>
+                        <SimpleStatus imageURL="/img/profile/humidity.svg" currentValue={props.data.humidity} left_color="#625FFF" right_color="#E37F7F"></SimpleStatus>
+                        <SimpleStatus imageURL="/img/profile/bug.svg" currentValue={props.data.ph} left_color="#5FFF65" right_color="#E37F7F"></SimpleStatus>
+                        <SimpleStatus imageURL="/img/profile/sunlight.svg" currentValue={props.data.rainfall} left_color="white" right_color="#625FFF"></SimpleStatus>
                     </StatusContainer>
                 :   null
             }
@@ -136,7 +140,6 @@ const Card = (props: ICardSelected) => {
                 isSelected && (
                     <ButtonContainer>
                         <ProfileSelectButton farmID={data.farmID} />
-                        <ProfileEditButton />
                     </ButtonContainer>
                 )
             }

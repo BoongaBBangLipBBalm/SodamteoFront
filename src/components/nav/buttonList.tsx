@@ -27,7 +27,7 @@ const page_data: IPageData[] = [
     {name: "profile", URLName: "/profile", buttons_id: [4,9]},
     {name: "data-statistics", URLName: "/data-statistics", buttons_id: [0,1,5,6,2,3]},
     {name: "control-hw", URLName: "/control-hw", buttons_id: [0,1,5,6,2,3]},
-    {name: "change-profile", URLName: "/change-profile", buttons_id: [0,1,5,6,2,3]},
+    {name: "change-profile", URLName: "/edit-profile", buttons_id: [0,1,5,6,2,3]},
     {name: "forecast", URLName: "/forecast", buttons_id: [0,1,5,6,2,3]},
     {name: "disease-control", URLName: "/disease-control", buttons_id: [0,1,5,6,2,3]},
     {name: "setting", URLName: "/setting", buttons_id: [0,1,5,6,2,3]},

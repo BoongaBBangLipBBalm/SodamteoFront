@@ -243,7 +243,7 @@ const DoubleRangeSlider: React.FC<SliderProps> = ({
           </LabelContainer>
         ))}
       </LabelsContainer>
-      <ToggleButton onClick={() => setIsEnabled(!isEnabled)}>
+      <ToggleButton onClick={() => setIsEnabled(!isEnabled)} disabled={true}>
         {isEnabled ? 'Disable' : 'Enable'}
       </ToggleButton>
     </RangeSliderContainer>
