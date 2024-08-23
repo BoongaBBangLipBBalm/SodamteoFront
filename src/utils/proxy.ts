@@ -14,3 +14,4 @@ export const config = {
     bodyParser: false, // 필수: bodyParser를 사용하지 않도록 설정
   },
 };
+
