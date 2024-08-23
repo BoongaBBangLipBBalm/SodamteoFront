@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import { useRouter } from 'next/navigation';
 import ProfileImage from './components/profileImage';
 import ProfileInfo from './components/profileDatas';
-import axios from 'axios';
+import { getToken } from '@/utils/localStorage';
 
 export interface IDataProps {
   tempMinValue: number;
@@ -99,22 +99,30 @@ const ProfileEdit: React.FC = () => {
 
     // Create an array of enabled devices
     const devices: string[] = [];
-    if (tempIsEnabled) devices.push('Temperature');
-    if (humidIsEnabled) devices.push('Humidity');
-    if (sunLightIsEnabled) devices.push('SunLight');
+    // TEST CODE //
+    if (tempIsEnabled) devices.push('Airconditioner');
+    if (humidIsEnabled) devices.push('Humidifier');
+    //if (sunLightIsEnabled) devices.push('SunLight');
+
+    const sendData = JSON.stringify({
+      "farmName": profileName,
+      "cropName": selectedType,
+      "devices": devices.join(','),
+    });
 
     try {
+      
       const response = await fetch('/api/farm/createfarm', {
         method: 'POST',
-        body: JSON.stringify({
-          farmName: profileName,
-          cropName: selectedType,
-          devices,
-        }),
+        headers: {
+          'Authorization': `${getToken()}`, // Assuming you have token from context or props
+          'Content-Type': 'application/json',
+        },
+        body: sendData,
       });
   
       if (!response.ok) {
-        throw new Error('Failed to upload photo');
+        throw new Error('Failed to create farm.');
       }
 
       router.push('/profile/select');
