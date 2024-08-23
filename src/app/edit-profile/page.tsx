@@ -8,6 +8,7 @@ import ProfileInfo from './components/profileDatas';
 import { getRequest } from '@/utils/api';
 import { getRefreshToken, getToken, setToken } from '@/utils/localStorage';
 import axios from 'axios';
+import { idToImageMap, typeToIdMap } from '../profile/add/components/profileDatas';
 
 
 export interface IDataProps {
@@ -85,14 +86,6 @@ const ProfileEdit: React.FC = () => {
       console.error('Failed to delete farm or receive new token:', error);
     }
   };
-  
-  
-  
-
-  const data: IDataProps = {
-    profileName: profileName,
-    setProfileName: setProfileName
-  }
 
   useEffect(() => {
     const farmID = Number(localStorage.getItem("farmID"));
@@ -103,13 +96,15 @@ const ProfileEdit: React.FC = () => {
                 Authorization: `Bearer ${localStorage.getItem("access_token")}`, // 토큰이 localStorage에 저장되어 있다고 가정
             },
         });
-        setFarmName(response.farmName);
+        setFarmName(response.FarmInfo.farmName);
+        setImgURL(idToImageMap[typeToIdMap[response.FarmInfo.cropName]]);
       } catch (error) {
           console.error("농장 데이터를 가져오는데 실패했습니다:", error);
       }
     }
 
     getFarmData();
+    
 
   }, []);
 
@@ -117,7 +112,7 @@ const ProfileEdit: React.FC = () => {
     <Container>
       <ProfileImage imgURL={imgURL} />
 
-      <ProfileInfo selectedType={selectedType} setSelectedType = {setSelectedType} setImgURL={setImgURL} data={data} handleDone={handleDone} handleDelete={handleDelete}/>
+      <ProfileInfo selectedType={selectedType} setSelectedType = {setSelectedType} setImgURL={setImgURL} farmName={farmName} setFarmName={setFarmName} handleDone={handleDone} handleDelete={handleDelete}/>
     </Container>
   );
 };

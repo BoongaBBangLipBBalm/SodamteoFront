@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import DataPreset from "../DataPreset";
-import { typeToIdMap } from '../profileDatas';
+import { typeToIdMap } from '@/app/profile/add/components/profileDatas';
 
 const DataName = styled.div`
     font-family: 'Pretendard_Regular';
@@ -94,6 +94,10 @@ const Profile: React.FC<ProfileProps> = ({ profileName, setProfileName, selected
     const handleTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setProfileName(event.target.value);
     };
+
+    useEffect(() => {
+        console.log(profileName);
+    }, [])
 
     return (
         <DataPreset

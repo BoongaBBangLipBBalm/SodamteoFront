@@ -1,10 +1,9 @@
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import Profile from './datas/Profile';
-import Temperature from './datas/Temperature';
-import Humidity from './datas/Humidity';
-import SunLight from './datas/SunLight';
+import DeviceToggle from './DeviceToggle';
 import { IDataProps } from '../page';
+import DataPreset from './DataPreset';
 
 // selectedType과 id의 매핑 정보
 export const typeToIdMap: { [key: string]: number } = {
@@ -13,57 +12,7 @@ export const typeToIdMap: { [key: string]: number } = {
     "Grapes": 3
 };
 
-const getDataComponent = (id: number, data: IDataProps) => {
-    switch(id) {
-        case 1: // Temperature
-            return (
-                <Temperature minValue={data.tempMinValue} maxValue={data.tempMaxValue} setMinValue={data.tempSetMinValue} setMaxValue={data.tempSetMaxValue} isEnabled={data.tempIsEnabled} setIsEnabled={data.tempSetIsEnabled}/>
-            )
-        case 2: // Humidity
-            return (
-                <Humidity minValue={data.humidMinValue} maxValue={data.humidMaxValue} setMinValue={data.humidSetMinValue} setMaxValue={data.humidSetMaxValue} isEnabled={data.humidIsEnabled} setIsEnabled={data.humidSetIsEnabled} />
-            )
-        case 3: // Sun Light
-            return (
-                <SunLight minValue={data.sunLightMinValue} maxValue={data.sunLightMaxValue} setMinValue={data.sunLightSetMinValue} setMaxValue={data.sunLightSetMaxValue} isEnabled={data.sunLightIsEnabled} setIsEnabled={data.sunLightSetIsEnabled} />
-            )
-    }
-}
-
-// 컴포넌트를 조건부로 렌더링할 ID와 컴포넌트 매핑
-const renderComponentsById = (id: number, data: IDataProps) => {
-    switch (id) {
-        case 1: // 벼
-            return (
-                <>
-                    {getDataComponent(1, data)}
-                    {getDataComponent(2, data)}
-                    {getDataComponent(3, data)}
-                </>
-            );
-        case 2: // 감자
-        return (
-            <>
-                {getDataComponent(1, data)}
-                {getDataComponent(2, data)}
-                {getDataComponent(3, data)}
-            </>
-        );
-        case 3: // 토마토
-        return (
-            <>
-                {getDataComponent(1, data)}
-                {getDataComponent(2, data)}
-                {getDataComponent(3, data)}
-            </>
-        );
-        case 4: // 사과 (기타)
-        default:
-            return null; // 아무것도 렌더링하지 않음
-    }
-};
-
-const idToImageMap: { [key: number]: string } = {
+export const idToImageMap: { [key: number]: string } = {
     1: '/img/profile/grains/rice.svg',
     2: '/img/profile/grains/potato.svg',
     3: '/img/profile/grains/tomato.svg',
@@ -138,6 +87,14 @@ interface IProfileInfoProps {
     submitFunc: ()=>void;
 }
 
+const DeviceContainer = styled.div`
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+`;
+
 const ProfileInfo: React.FC<IProfileInfoProps> = (props) => {
     useEffect(() => {
         props.setImgURL(idToImageMap[typeToIdMap[props.selectedType]]);
@@ -151,8 +108,20 @@ const ProfileInfo: React.FC<IProfileInfoProps> = (props) => {
             <ScrollContainer>
                 <Profile profileName={props.data.profileName} setProfileName={props.data.setProfileName} selectedType={props.selectedType} setSelectedType={props.setSelectedType} />
 
-                {/* ID에 따른 컴포넌트 렌더링 */}
-                {renderComponentsById(selectedId, props.data)}
+                {/* Device Toggles */}
+                <DataPreset
+                    title={"Devices"}
+                    dataContainers={[
+                        <DeviceContainer>
+                            <DeviceToggle label="Airconditioner" isEnabled={props.data.airconditionerIsEnabled} setIsEnabled={props.data.setAirconditionerIsEnabled} />
+                            <DeviceToggle label="Humidifier" isEnabled={props.data.humidifierIsEnabled} setIsEnabled={props.data.setHumidifierIsEnabled} />
+                            <DeviceToggle label="Blind" isEnabled={props.data.blindIsEnabled} setIsEnabled={props.data.setBlindIsEnabled} />
+                            <DeviceToggle label="Fertilizer" isEnabled={props.data.fertilizerIsEnabled} setIsEnabled={props.data.setFertilizerIsEnabled} />
+                        </DeviceContainer>
+                    ]}
+                />
+                    
+                
             </ScrollContainer>
             <ButtonContainer>
                 <Button color="#43545B" as="a" href="/profile/select">Cancel</Button>

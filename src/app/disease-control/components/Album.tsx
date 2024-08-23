@@ -15,6 +15,7 @@ const AlbumContainer = styled.div`
   height: 100%;
   display: flex;
   justify-content: center;
+  overflow: hidden;
 `;
 
 const StyledSlider = styled(Slider)`
