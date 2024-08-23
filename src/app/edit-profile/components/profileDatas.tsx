@@ -1,25 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import Profile from './datas/Profile';
-import Temperature from './datas/Temperature';
-import Humidity from './datas/Humidity';
-import SunLight from './datas/SunLight';
-import { IDataProps } from '../page';
-
-// selectedType과 id의 매핑 정보
-export const typeToIdMap: { [key: string]: number } = {
-    "벼": 1,
-    "감자": 2,
-    "토마토": 3,
-    "사과": 4
-};
-
-const idToImageMap: { [key: number]: string } = {
-    1: '/img/profile/grains/rice.svg',
-    2: '/img/profile/grains/potato.svg',
-    3: '/img/profile/grains/tomato.svg',
-    4: '/img/profile/grains/apple.svg'
-};
+import ConfirmationModal from './ConfirmationModal';
+import { idToImageMap, typeToIdMap } from '@/app/profile/add/components/profileDatas';
 
 const Container = styled.div`
     padding: 1.313rem;
@@ -81,23 +64,32 @@ const Button = styled.button<{ color: string }>`
     }
 `;
 
-const ProfileInfo: React.FC<{ setImgURL: (url: string) => void, setSelectedType: (url: string) => void, selectedType: string, data: IDataProps, handleDone: ()=>void, handleDelete: ()=>void }> = ({ setImgURL, selectedType, setSelectedType, data, handleDone, handleDelete}) => {
+const ProfileInfo: React.FC<{ setImgURL: (url: string) => void, setSelectedType: (url: string) => void, selectedType: string, farmName: string, setFarmName: (name: string)=>void, handleDone: ()=>void, handleDelete: ()=>void }> = ({ setImgURL, selectedType, setSelectedType, farmName, setFarmName, handleDone, handleDelete}) => {
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
     useEffect(() => {
         setImgURL(idToImageMap[typeToIdMap[selectedType]]);
     }, [selectedType]);
 
-    // 선택된 타입에 해당하는 ID를 가져오기
-    const selectedId = typeToIdMap[selectedType];
+    const openModal = () => setIsModalOpen(true);
+    const closeModal = () => setIsModalOpen(false);
+    const confirmDelete = () => {
+        handleDelete();
+        closeModal();
+    };
 
     return (
         <Container>
             <ScrollContainer>
-                <Profile profileName={data.profileName} setProfileName={data.setProfileName} selectedType={selectedType} setSelectedType={setSelectedType} />
+                <Profile profileName={farmName} setProfileName={setFarmName} selectedType={selectedType} setSelectedType={setSelectedType} />
             </ScrollContainer>
             <ButtonContainer>
-                <Button color="#ff4949" onClick={handleDelete}>Delete</Button>
+                <Button color="#ff4949" onClick={openModal}>Delete</Button>
                 <Button color="#274C4B" onClick={handleDone}>Done</Button>
             </ButtonContainer>
+            {isModalOpen && (
+                <ConfirmationModal onClose={closeModal} onConfirm={confirmDelete} />
+            )}
         </Container>
     );
 };

@@ -59,8 +59,8 @@ const TextBox = styled.div`
 `;
 
 const TitleBox = styled.div`
-  font-family: 'Pretendard-Regular';
-  font-size: 1rem;
+  font-family: 'Pretendard-Bold';
+  font-size: 1.2rem;
   color: #2e2e2e;
   display: flex;
   justify-content: center;
@@ -138,11 +138,40 @@ const DiseaseControl: React.FC = () => {
     const fetchPhotos = async () => {
       try {
         const response = await getRequest('/api/disease/get_farm_disease');
-        setAllPhotos(response.data.diseases);
-        setFilteredPhotos(response.data.diseases);
-        setSelectedPhoto(response.data.diseases[0] || null);
+
+        const tempPhotoData = GetIPhotoDataByGET(response);
+        setAllPhotos(tempPhotoData);
+        setFilteredPhotos(tempPhotoData);
+        setSelectedPhoto(tempPhotoData[0] || null);
+
       } catch (error) {
         console.error('Error fetching photos:', error);
+        const nullPhoto: IPhoto[] = [
+          {
+            confidence: 0, 
+            disease: "No Data",
+            diseaseID: -1,
+            src: "", 
+            timestamp: "No data"
+          },
+          {
+            confidence: 0, 
+            disease: "No Data",
+            diseaseID: -1,
+            src: "", 
+            timestamp: "No data"
+          },
+          {
+            confidence: 0, 
+            disease: "No Data",
+            diseaseID: -1,
+            src: "", 
+            timestamp: "No data"
+          }
+        ];
+        setAllPhotos(nullPhoto);
+        setFilteredPhotos(nullPhoto);
+        setSelectedPhoto(nullPhoto[0] || null);
       }
     };
 
@@ -157,9 +186,15 @@ const DiseaseControl: React.FC = () => {
   const confirmDeletePhoto = async () => {
     if (photoIndexToDelete !== null) {
       try {
+        
         const photoToDelete = filteredPhotos[photoIndexToDelete];
-        await deleteRequest('/disease/delete_disease_log', {
-          data: { diseaseID: photoToDelete.diseaseID },
+        await fetch('/api/disease/delete_disease_log', {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ diseaseID: photoToDelete.diseaseID }),
         });
 
         const updatedPhotos = filteredPhotos.filter((_, i) => i !== photoIndexToDelete);
@@ -188,34 +223,58 @@ const DiseaseControl: React.FC = () => {
     setSelectedPhoto(updatedPhotos[0] || null);
   };
 
+  const GetIPhotoDataByGET = (data: any): IPhoto[] => {
+    let tempPhoto: IPhoto[] = [];
+    for(var i = 0 ; i < data.length ; i++) {
+
+      const newPhoto: IPhoto = {
+        confidence: data[i].confidence, 
+        disease: data[i].disease,
+        diseaseID: data[i].id,
+        src: data[i].image, 
+        timestamp: data[i].timestamp
+      };
+      tempPhoto.push(newPhoto);
+    }
+    console.log(tempPhoto); // test code
+    return tempPhoto;
+    
+  }
+
   const handleAddPhoto = async (file: File | null) => {
     if (file) {
       try {
         // 이미지 업로드
-        const formData = new FormData();
-        formData.append('image', file);
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+
+        reader.onloadend = async () => {
+            const base64Image = reader.result;
+            const postData = JSON.stringify({image: base64Image});
+            const response = await fetch('/api/disease/detect_disease', {
+              method: 'POST',
+              headers: {
+                Authorization: `Bearer ${getToken()}`,
+                'Content-Type': 'application/json',
+              },
+              body: postData,
+            });
+    
+            if (!response.ok) {
+              throw new Error('Failed to upload photo');
+            }
+    
+            // 업로드 후 최신 사진 데이터를 다시 가져옴
+            const getResponse = await getRequest('/api/disease/get_farm_disease');
+
+            const tempData = GetIPhotoDataByGET(getResponse);
+            setSelectedCategory('All');
+            setAllPhotos(tempData);
+            setFilteredPhotos(tempData);
+        }
+
         // POST 요청
-        const response = await fetch('/api/disease/detect_disease', {
-          method: 'POST',
-          body: JSON.stringify({
-            image: file,
-          }),
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to upload photo');
-        }
-
-        // 업로드 후 최신 사진 데이터를 다시 가져옴
-        const getResponse = await getRequest('/api/disease/get_farm_disease');
-        if (!getResponse.ok) {
-          throw new Error('Failed to fetch photos');
-        }
-
-        const data = await getResponse.json();
-        setAllPhotos(data.diseases);
-        setSelectedCategory('All');
-        setFilteredPhotos(data.diseases);
+        
       } catch (error) {
         console.error('Error:', error);
       }
@@ -252,15 +311,15 @@ const DiseaseControl: React.FC = () => {
           {selectedPhoto && (
             <InfoPanel>
               <TextBox>
-                <TitleBox>Disease</TitleBox>
+                <TitleBox>질병 이름</TitleBox>
                 <ContentBox>{selectedPhoto.disease}</ContentBox>
               </TextBox>
               <TextBox>
-                <TitleBox>Confidence</TitleBox>
+                <TitleBox>신뢰도</TitleBox>
                 <ContentBox>{selectedPhoto.confidence}</ContentBox>
               </TextBox>
               <TextBox>
-                <TitleBox>TimeStamp</TitleBox>
+                <TitleBox>시간</TitleBox>
                 <ContentBox>{selectedPhoto.timestamp}</ContentBox>
               </TextBox>
             </InfoPanel>
