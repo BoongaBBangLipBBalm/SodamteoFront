@@ -14,56 +14,6 @@ export const typeToIdMap: { [key: string]: number } = {
     "사과": 4
 };
 
-const getDataComponent = (id: number, data: IDataProps) => {
-    switch(id) {
-        case 1: // Temperature
-            return (
-                <Temperature minValue={data.tempMinValue} maxValue={data.tempMaxValue} setMinValue={data.tempSetMinValue} setMaxValue={data.tempSetMaxValue} isEnabled={data.tempIsEnabled} setIsEnabled={data.tempSetIsEnabled}/>
-            )
-        case 2: // Humidity
-            return (
-                <Humidity minValue={data.humidMinValue} maxValue={data.humidMaxValue} setMinValue={data.humidSetMinValue} setMaxValue={data.humidSetMaxValue} isEnabled={data.humidIsEnabled} setIsEnabled={data.humidSetIsEnabled} />
-            )
-        case 3: // Sun Light
-            return (
-                <SunLight minValue={data.sunLightMinValue} maxValue={data.sunLightMaxValue} setMinValue={data.sunLightSetMinValue} setMaxValue={data.sunLightSetMaxValue} isEnabled={data.sunLightIsEnabled} setIsEnabled={data.sunLightSetIsEnabled} />
-            )
-    }
-}
-
-// 컴포넌트를 조건부로 렌더링할 ID와 컴포넌트 매핑
-const renderComponentsById = (id: number, data: IDataProps) => {
-    switch (id) {
-        case 1: // 벼
-            return (
-                <>
-                    {getDataComponent(1, data)}
-                    {getDataComponent(2, data)}
-                    {getDataComponent(3, data)}
-                </>
-            );
-        case 2: // 감자
-        return (
-            <>
-                {getDataComponent(1, data)}
-                {getDataComponent(2, data)}
-                {getDataComponent(3, data)}
-            </>
-        );
-        case 3: // 토마토
-        return (
-            <>
-                {getDataComponent(1, data)}
-                {getDataComponent(2, data)}
-                {getDataComponent(3, data)}
-            </>
-        );
-        case 4: // 사과 (기타)
-        default:
-            return null; // 아무것도 렌더링하지 않음
-    }
-};
-
 const idToImageMap: { [key: number]: string } = {
     1: '/img/profile/grains/rice.svg',
     2: '/img/profile/grains/potato.svg',
@@ -107,7 +57,7 @@ const ScrollContainer = styled.div`
 
 const ButtonContainer = styled.div`
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
     gap: 1rem; /* Spacing between buttons */
     padding: 1rem 0; /* Padding above and below the buttons */
 `;
@@ -131,7 +81,7 @@ const Button = styled.button<{ color: string }>`
     }
 `;
 
-const ProfileInfo: React.FC<{ setImgURL: (url: string) => void, setSelectedType: (url: string) => void, selectedType: string, data: IDataProps }> = ({ setImgURL, selectedType, setSelectedType, data}) => {
+const ProfileInfo: React.FC<{ setImgURL: (url: string) => void, setSelectedType: (url: string) => void, selectedType: string, data: IDataProps, handleDone: ()=>void, handleDelete: ()=>void }> = ({ setImgURL, selectedType, setSelectedType, data, handleDone, handleDelete}) => {
     useEffect(() => {
         setImgURL(idToImageMap[typeToIdMap[selectedType]]);
     }, [selectedType]);
@@ -143,13 +93,10 @@ const ProfileInfo: React.FC<{ setImgURL: (url: string) => void, setSelectedType:
         <Container>
             <ScrollContainer>
                 <Profile profileName={data.profileName} setProfileName={data.setProfileName} selectedType={selectedType} setSelectedType={setSelectedType} />
-
-                {/* ID에 따른 컴포넌트 렌더링 */}
-                {renderComponentsById(selectedId, data)}
             </ScrollContainer>
             <ButtonContainer>
-                <Button color="#43545B" as="a" href="/profile/select">Cancel</Button>
-                <Button color="#274C4B">Done</Button>
+                <Button color="#ff4949" onClick={handleDelete}>Delete</Button>
+                <Button color="#274C4B" onClick={handleDone}>Done</Button>
             </ButtonContainer>
         </Container>
     );

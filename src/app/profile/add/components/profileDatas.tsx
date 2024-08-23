@@ -8,10 +8,9 @@ import { IDataProps } from '../page';
 
 // selectedType과 id의 매핑 정보
 export const typeToIdMap: { [key: string]: number } = {
-    "벼": 1,
-    "감자": 2,
-    "토마토": 3,
-    "사과": 4
+    "Rice": 1,
+    "Tomato": 2,
+    "Grapes": 3
 };
 
 const getDataComponent = (id: number, data: IDataProps) => {
@@ -131,25 +130,33 @@ const Button = styled.button<{ color: string }>`
     }
 `;
 
-const ProfileInfo: React.FC<{ setImgURL: (url: string) => void, setSelectedType: (url: string) => void, selectedType: string, data: IDataProps }> = ({ setImgURL, selectedType, setSelectedType, data}) => {
+interface IProfileInfoProps {
+    setImgURL: (url: string) => void;
+    setSelectedType: (url: string) => void;
+    selectedType: string;
+    data: IDataProps;
+    submitFunc: ()=>void;
+}
+
+const ProfileInfo: React.FC<IProfileInfoProps> = (props) => {
     useEffect(() => {
-        setImgURL(idToImageMap[typeToIdMap[selectedType]]);
-    }, [selectedType]);
+        props.setImgURL(idToImageMap[typeToIdMap[props.selectedType]]);
+    }, [props.selectedType]);
 
     // 선택된 타입에 해당하는 ID를 가져오기
-    const selectedId = typeToIdMap[selectedType];
+    const selectedId = typeToIdMap[props.selectedType];
 
     return (
         <Container>
             <ScrollContainer>
-                <Profile profileName={data.profileName} setProfileName={data.setProfileName} selectedType={selectedType} setSelectedType={setSelectedType} />
+                <Profile profileName={props.data.profileName} setProfileName={props.data.setProfileName} selectedType={props.selectedType} setSelectedType={props.setSelectedType} />
 
                 {/* ID에 따른 컴포넌트 렌더링 */}
-                {renderComponentsById(selectedId, data)}
+                {renderComponentsById(selectedId, props.data)}
             </ScrollContainer>
             <ButtonContainer>
                 <Button color="#43545B" as="a" href="/profile/select">Cancel</Button>
-                <Button color="#274C4B">Done</Button>
+                <Button color="#274C4B" type='submit' onClick={() => {props.submitFunc()}} >Done</Button>
             </ButtonContainer>
         </Container>
     );

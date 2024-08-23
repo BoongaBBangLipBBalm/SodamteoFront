@@ -101,7 +101,7 @@ const Profile: React.FC<ProfileProps> = ({ profileName, setProfileName, selected
             dataContainers={[
                 <DataContainer key="1">
                     <DataName>Name</DataName>
-                    <StringInput type="text" value={profileName} onChange={handleTextChange} disabled={true}/>
+                    <StringInput type="text" value={profileName} onChange={handleTextChange} disabled={false}/>
                 </DataContainer>,
                 <DataContainer key="2">
                     <DataName>Type</DataName>

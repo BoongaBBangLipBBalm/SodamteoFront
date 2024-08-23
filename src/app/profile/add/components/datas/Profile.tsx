@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import DataPreset from "../DataPreset";
 import { typeToIdMap } from '../profileDatas';
+import CropSelectionPopup from '../CropSelectionPopup';
 
 const DataName = styled.div`
     font-family: 'Pretendard_Regular';
@@ -51,21 +52,21 @@ const SelectOption = styled.select`
     appearance: none;
     position: relative;
     z-index: 1;
+    pointer-events: none;
 `;
 
-const CustomArrow = styled.div`
+const SearchButton = styled.button`
     position: absolute;
     top: 50%;
     right: 1rem;
-    width: 1rem;
-    height: 0.5rem;
     transform: translateY(-50%);
-    background-image: url('/img/profile/add/Expand.svg');
+    background: url('/img/profile/add/search-icon.svg') no-repeat center;
     background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-    pointer-events: none;
-    z-index: 3;
+    width: 1.5rem;
+    height: 1.5rem;
+    border: none;
+    cursor: pointer;
+    z-index: 2;
 `;
 
 interface ProfileProps {
@@ -76,6 +77,8 @@ interface ProfileProps {
 }
 
 const Profile: React.FC<ProfileProps> = ({ profileName, setProfileName, selectedType, setSelectedType }) => {
+
+    const [showPopup, setShowPopup] = useState(false);
 
     const grains = Object.keys(typeToIdMap);
     setSelectedType(selectedType);
@@ -89,28 +92,41 @@ const Profile: React.FC<ProfileProps> = ({ profileName, setProfileName, selected
         setProfileName(event.target.value);
     };
 
+    const handleSearchClick = () => {
+        setShowPopup(true);
+    };
+
+    const handleSelectCrop = (crop: string) => {
+        setSelectedType(crop);
+    };
+
     return (
-        <DataPreset
-            title="Profile"
-            dataContainers={[
-                <DataContainer key="1">
-                    <DataName>Name</DataName>
-                    <StringInput type="text" value={profileName} onChange={handleTextChange}/>
-                </DataContainer>,
-                <DataContainer key="2">
-                    <DataName>Type</DataName>
-                    <SelectWrapper>
-                        <SelectOption value={selectedType} onChange={handleSelectChange}>
-                            {grains.map((key, index) => (
+        <>
+            <DataPreset
+                title="Profile"
+                dataContainers={[
+                    <DataContainer key="1">
+                        <DataName>Name</DataName>
+                        <StringInput type="text" value={profileName} onChange={handleTextChange}/>
+                    </DataContainer>,
+                    <DataContainer key="2">
+                        <DataName>Type</DataName>
+                        <SelectWrapper>
+                            <SelectOption value={selectedType} onChange={handleSelectChange}>
+                                {grains.map((key, index) => (
                                     <option value={key} key={index}>{key}</option>
-                                ))
-                            }
-                        </SelectOption>
-                        <CustomArrow />
-                    </SelectWrapper>
-                </DataContainer>,
-            ]}
-        />
+                                ))}
+                            </SelectOption>
+                            <SearchButton onClick={handleSearchClick} />
+                        </SelectWrapper>
+                    </DataContainer>,
+                ]}
+            />
+
+            {showPopup && (
+                <CropSelectionPopup onClose={() => setShowPopup(false)} onSelectCrop={handleSelectCrop} />
+            )}
+        </>
     );
 }
 
