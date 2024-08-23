@@ -2,7 +2,9 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import styled from "styled-components";
-import api from "@/utils/api";
+import axios from 'axios';
+import { getToken } from "@/utils/localStorage";
+import AIToggleButton from "@/app/data-statistics/humidity/components/AIToggleButton";
 
 const Container = styled.div`
   width: 60%;
@@ -27,36 +29,6 @@ const FlexContainer = styled.div`
   flex-direction: column;
   align-items: center;
   width: 100%;
-`;
-
-const ToggleContainer = styled.div`
-  display: flex;
-  align-items: center;
-  margin: 10px 0;
-`;
-
-const ToggleLabel = styled.label`
-  display: inline-block;
-  width: 50px;
-  height: 25px;
-  background-color: ${props => (props.isOn ? '#274c4b' : '#ccc')};
-  border-radius: 25px;
-  position: relative;
-  margin: 0 10px;
-  cursor: pointer;
-
-  &:after {
-    content: '';
-    position: absolute;
-    width: 20px;
-    height: 20px;
-    background-color: white;
-    border-radius: 50%;
-    top: 50%;
-    left: ${props => (props.isOn ? 'calc(100% - 22px)' : '2px')};
-    transform: translateY(-50%);
-    transition: all 0.3s;
-  }
 `;
 
 const SliderContainer = styled.div`
@@ -101,74 +73,131 @@ const SelectBox = styled.select`
   margin-top: 20px;
 `;
 
+const DeleteButton = styled.button`
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #d9534f;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 20px;
+  &:hover {
+    background-color: #c9302c;
+  }
+`;
+
 const Humidifier = () => {
   const [isOn, setIsOn] = useState(false);
-  const [goalHumidity, setGoalHumidity] = useState(50);
+  const [goalHumidity, setGoalHumidity] = useState(50); // Default value
+  const [deleteMessage, setDeleteMessage] = useState(''); // Message displayed after delete
   const circleKnobRef = useRef(null);
 
-  // 가습기 상태 조회 함수
+  // Fetch humidifier status on component mount
   useEffect(() => {
     const fetchHumidifierStatus = async () => {
+      const token = getToken(); // Assuming getToken fetches the stored token
       try {
-        const response = await api.get('/api/hardware/humidifier', {
-          params: { device: 'humidifier' }
+        const response = await axios.get('/api/hardware/control', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
         });
-        const { status } = response.data;
-        setIsOn(status > 0);  // 가습기가 켜져 있는지 확인
-        setGoalHumidity(status);  // 목표 습도 설정
+
+        const data = response.data;
+        const humidifier = data.find(device => device.device === 'Humidifier');
+        if (humidifier) {
+          const { status, isAuto } = humidifier;
+          setIsOn(isAuto);  // Set the AI mode state
+          setGoalHumidity(status); // Update the goal humidity
+        } else {
+          console.error("Humidifier device not found in the response");
+        }
       } catch (error) {
         console.error("Failed to fetch humidifier status:", error);
       }
     };
 
-    fetchHumidifierStatus(); // 컴포넌트 마운트 시 가습기 상태 조회
+    fetchHumidifierStatus();
   }, []);
 
-  // 목표 습도를 서버에 POST 요청하는 함수
+  // Update the goal humidity on the server
   const updateHumidifierStatus = async (newHumidity) => {
+    const token = getToken();
     try {
-      const response = await api.post('/api/hardware/humidifier', {
-        device: 'humidifier',
-        targetValue: newHumidity
+      const response = await axios.patch('/api/hardware/control', {
+        device: 'Humidifier',
+        targetValue: newHumidity,
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
       });
 
-      // 성공적으로 업데이트된 경우 상태 반영
       const { status } = response.data;
-      setGoalHumidity(status);
+      setGoalHumidity(status); // Update state with new status
       console.log("Humidifier status updated successfully:", response.data);
     } catch (error) {
       console.error("Failed to update humidifier status:", error);
     }
   };
 
-  const calculateLeft = (humidity) => ((humidity / 75) * 100);
-
+  // Handle knob dragging to adjust humidity
   const handleKnobDrag = (e) => {
     const circleRect = circleKnobRef.current.getBoundingClientRect();
     const offsetX = e.clientX - circleRect.left;
-    let newHumidity = (offsetX / circleRect.width) * 75;
-    newHumidity = Math.max(25, Math.min(75, newHumidity));
+    let newHumidity = (offsetX / circleRect.width) * 95; // Updated to max 95
+    newHumidity = Math.max(25, Math.min(95, newHumidity));
     setGoalHumidity(newHumidity);
 
-    // POST 요청으로 새로운 목표 습도를 서버에 전송
+    // Update the humidity on the server
     updateHumidifierStatus(newHumidity);
   };
 
+  // Handle selecting a new humidity value from the dropdown
   const handleSelectChange = (e) => {
     const newHumidity = Number(e.target.value);
     setGoalHumidity(newHumidity);
 
-    // 서버로 목표 습도를 전송하는 요청
+    // Update the humidity on the server
     updateHumidifierStatus(newHumidity);
   };
+
+  // Delete the humidifier device
+  const handleDeleteDevice = async () => {
+    const token = getToken();
+    try {
+      const response = await axios.delete('/api/hardware/control', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        data: {
+          device: 'Humidifier',
+        },
+      });
+
+      setDeleteMessage(response.data.message); // Set success message
+    } catch (error) {
+      if (error.response && error.response.status === 404) {
+        setDeleteMessage("Humidifier device not found");
+      } else {
+        setDeleteMessage("Failed to delete device");
+      }
+      console.error("Failed to delete device:", error);
+    }
+  };
+
+  // Calculate position for the marker based on humidity
+  const calculateLeft = (humidity) => ((humidity - 25) / (95 - 25)) * 100; // Updated to max 95
 
   return (
     <Container>
       <Title>Humidifier</Title>
       <FlexContainer>
         <SliderContainer gradient="#003333, #99CCCC">
-          <SliderLabel style={{ top: '0%' }}>75%</SliderLabel>
-          <SliderLabel style={{ top: '50%' }}>50%</SliderLabel>
+          <SliderLabel style={{ top: '0%' }}>95%</SliderLabel> {/* Updated max label */}
+          <SliderLabel style={{ top: '50%' }}>60%</SliderLabel>
           <SliderLabel style={{ top: '100%' }}>25%</SliderLabel>
           <Marker style={{ top: `${100 - calculateLeft(goalHumidity)}%` }}>
             <div style={{ backgroundColor: 'orange', width: '10px', height: '10px', borderRadius: '50%' }} />
@@ -176,22 +205,14 @@ const Humidifier = () => {
           </Marker>
         </SliderContainer>
         <SelectBox value={goalHumidity} onChange={handleSelectChange}>
-          <option value={25}>25%</option>
-          <option value={30}>30%</option>
-          <option value={35}>35%</option>
-          <option value={40}>40%</option>
-          <option value={45}>45%</option>
-          <option value={50}>50%</option>
-          <option value={55}>55%</option>
-          <option value={60}>60%</option>
-          <option value={65}>65%</option>
-          <option value={70}>70%</option>
-          <option value={75}>75%</option>
+          {[...Array(15).keys()].map(i => (
+            <option key={i} value={25 + i * 5}>{25 + i * 5}%</option> // Updated to max 95
+          ))}
         </SelectBox>
-        <ToggleContainer>
-          AI
-          <ToggleLabel isOn={isOn} onClick={() => setIsOn(!isOn)} />
-        </ToggleContainer>
+        {/* Replace ToggleContainer with AIToggleButton */}
+        <AIToggleButton isAuto={isOn} onToggle={setIsOn} />
+        <DeleteButton onClick={handleDeleteDevice}>Delete Device</DeleteButton>
+        {deleteMessage && <p>{deleteMessage}</p>}
       </FlexContainer>
     </Container>
   );
