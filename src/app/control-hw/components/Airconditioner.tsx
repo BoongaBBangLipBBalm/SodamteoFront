@@ -1,8 +1,10 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import api from "@/utils/api";
+import axios from 'axios';
+import { getToken } from "@/utils/localStorage";
+import AIToggleButton from "@/app/data-statistics/components/AIToggleButton";
 
 const Container = styled.div`
   width: 60%;
@@ -30,36 +32,6 @@ const FlexContainer = styled.div`
   width: 100%;
 `;
 
-const ToggleContainer = styled.div`
-  display: flex;
-  align-items: center;
-  margin: 10px 0;
-`;
-
-const ToggleLabel = styled.label`
-  display: inline-block;
-  width: 50px;
-  height: 25px;
-  background-color: ${props => (props.isOn ? '#274c4b' : '#ccc')};
-  border-radius: 25px;
-  position: relative;
-  margin: 0 10px;
-  cursor: pointer;
-
-  &:after {
-    content: '';
-    position: absolute;
-    width: 20px;
-    height: 20px;
-    background-color: white;
-    border-radius: 50%;
-    top: 50%;
-    left: ${props => (props.isOn ? 'calc(100% - 22px)' : '2px')};
-    transform: translateY(-50%);
-    transition: all 0.3s;
-  }
-`;
-
 const SliderContainer = styled.div`
   position: relative;
   width: 12px;
@@ -85,41 +57,110 @@ const Marker = styled.div`
   font-size: 12px;
 `;
 
+const TemperatureSelect = styled.select`
+  padding: 10px;
+  font-size: 16px;
+  margin-top: 20px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+`;
+
+const DeleteButton = styled.button`
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #d9534f;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 20px;
+  &:hover {
+    background-color: #c9302c;
+  }
+`;
 
 const AirConditioner = () => {
   const [isOn, setIsOn] = useState(false);
-  const [goalTemp, setGoalTemp] = useState(20);
+  const [goalTemp, setGoalTemp] = useState(23.5); // Default value, will be updated from API
+  const [deleteMessage, setDeleteMessage] = useState('');
 
   useEffect(() => {
-
     const fetchAirConditionerStatus = async () => {
+      const token = getToken();
       try {
-        const response = await api.get('/api/hardware/control', {
-          params: { device: 'airconditioner' },
+        const response = await axios.get('/api/hardware/control', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
         });
-        const { status } = response.data;
-        setIsOn(status > 0);
-        setGoalTemp(status); // 목표 온도 설정
+
+        // Extracting data from response
+        const data = response.data;
+        const airConditioner = data.find(device => device.device === 'Airconditioner');
+        if (airConditioner) {
+          const { status, isAuto } = airConditioner;
+          setIsOn(isAuto);  // Set the AI mode state
+          setGoalTemp(status); // Update the goal temperature
+        } else {
+          console.error("Air conditioner device not found in the response");
+        }
       } catch (error) {
         console.error("Failed to fetch air conditioner status:", error);
       }
     };
 
     fetchAirConditionerStatus();
-  }, []);
+  }, []); // Empty dependency array means this runs once on mount
 
   const handleTemperatureChange = async (event) => {
     const newTemp = parseFloat(event.target.value);
     setGoalTemp(newTemp);
+    const token = getToken();
+
     try {
-      const response = await api.post('/api/hardware/airconditioner', {
-        device: 'airconditioner',
+      const response = await axios.patch('/api/hardware/control', {
+        device: 'Airconditioner',
         targetValue: newTemp,
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
       });
+
       console.log("Temperature update success:", response.data);
     } catch (error) {
       console.error("Failed to update temperature:", error);
     }
+  };
+
+  const handleDeleteDevice = async () => {
+    const token = getToken();
+    try {
+      const response = await axios.delete('/api/hardware/control', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        data: {
+          device: 'Airconditioner',
+        },
+      });
+
+      setDeleteMessage(response.data.message); // Set success message
+    } catch (error) {
+      if (error.response && error.response.status === 404) {
+        setDeleteMessage("Air conditioner device not found");
+      } else {
+        setDeleteMessage("Failed to delete device");
+      }
+      console.error("Failed to delete device:", error);
+    }
+  };
+
+  const calculateTop = (temp) => {
+    const minTemp = 10;
+    const maxTemp = 30;
+    return ((maxTemp - temp) / (maxTemp - minTemp)) * 100;
   };
 
   return (
@@ -130,20 +171,20 @@ const AirConditioner = () => {
           <SliderLabel style={{ top: '0%' }}>30°C</SliderLabel>
           <SliderLabel style={{ top: '50%' }}>20°C</SliderLabel>
           <SliderLabel style={{ top: '100%' }}>10°C</SliderLabel>
-          <Marker style={{ top: `${100 - ((goalTemp - 10) / 20) * 100}%` }}>
+          <Marker style={{ top: `${calculateTop(goalTemp)}%` }}>
             <div style={{ backgroundColor: 'orange', width: '10px', height: '10px', borderRadius: '50%' }} />
             Goal
           </Marker>
         </SliderContainer>
-        <select value={goalTemp} onChange={handleTemperatureChange} style={{ padding: '10px', fontSize: '16px', marginTop: '20px' }}>
+        <TemperatureSelect value={goalTemp.toFixed(1)} onChange={handleTemperatureChange}>
           {[...Array(21).keys()].map(i => (
-            <option key={i} value={i + 10}>{i + 10}°C</option>
+            <option key={i} value={(i + 10).toFixed(1)}>{(i + 10).toFixed(1)}°C</option>
           ))}
-        </select>
-        <ToggleContainer>
-          AI
-          <ToggleLabel isOn={isOn} onClick={() => setIsOn(!isOn)} />
-        </ToggleContainer>
+        </TemperatureSelect>
+        {/* Replacing the old toggle with the new AIToggleButton component */}
+        <AIToggleButton isAuto={isOn} onToggle={setIsOn} />
+        <DeleteButton onClick={handleDeleteDevice}>Delete Device</DeleteButton>
+        {deleteMessage && <p>{deleteMessage}</p>}
       </FlexContainer>
     </Container>
   );

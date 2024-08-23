@@ -2,7 +2,9 @@
 
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import axios from "axios"; // axios 사용
+import axios from "axios";
+import { getToken } from "@/utils/localStorage";
+import AIToggleButton from "./AIToggleButton";
 
 const Container = styled.div`
   width: 97%;
@@ -35,36 +37,6 @@ const FlexContainer = styled.div`
   width: 100%;
 `;
 
-const ToggleContainer = styled.div`
-  display: flex;
-  align-items: center;
-  margin: 10px;
-`;
-
-const ToggleLabel = styled.label`
-  display: inline-block;
-  width: 50px;
-  height: 25px;
-  background-color: ${props => (props.isOn ? '#274c4b' : '#ccc')};
-  border-radius: 25px;
-  position: relative;
-  margin: 0 10px;
-  cursor: pointer;
-
-  &:after {
-    content: '';
-    position: absolute;
-    width: 20px;
-    height: 20px;
-    background-color: white;
-    border-radius: 50%;
-    top: 50%;
-    left: ${props => (props.isOn ? 'calc(100% - 22px)' : '2px')};
-    transform: translateY(-50%);
-    transition: all 0.3s;
-  }
-`;
-
 const SliderContainer = styled.div`
   position: relative;
   width: 100%;
@@ -73,14 +45,14 @@ const SliderContainer = styled.div`
   border-radius: 5px;
 `;
 
-const Knob = styled.div`
+const Knob = styled.div<{ left: number }>`
   position: absolute;
   width: 20px;
   height: 20px;
   background-color: #fac57d;
   border-radius: 50%;
   top: 50%;
-  left: ${props => props.left}%;
+  left: ${(props) => props.left}%;
   transform: translate(-50%, -50%);
   cursor: pointer;
 `;
@@ -103,7 +75,7 @@ const ScaleLabelContainer = styled.div`
   margin-top: 5px;
 `;
 
-const SelectButton = styled.button`
+const SelectButton = styled.button<{ $show: boolean }>`
   width: 90px;
   padding: 10px;
   margin: 10px;
@@ -139,16 +111,18 @@ const SelectButton = styled.button`
     transition: transform 0.3s;
   }
 
-  ${({ $show }) => $show && `
+  ${({ $show }) =>
+    $show &&
+    `
     &::after {
       transform: translateY(-80%) rotate(180deg);
     }
   `}
 `;
 
-const SelectList = styled.ul`
+const SelectList = styled.ul<{ $show: boolean }>`
   list-style-type: none;
-  display: ${(props) => (props.$show ? 'block' : 'none')};
+  display: ${(props) => (props.$show ? "block" : "none")};
   position: absolute;
   width: 90px;
   top: 47px;
@@ -199,21 +173,34 @@ const SelectContainer = styled.div`
   position: relative;
 `;
 
-const Humidifier = () => {
+const StatusDisplay = styled.div`
+  font-size: 16px;
+  margin-top: 10px;
+  color: #333;
+`;
+
+const Humidifier: React.FC = () => {
   const [isOn, setIsOn] = useState(false);
   const [goalHumidity, setGoalHumidity] = useState(50);
   const [showHumidityOptions, setShowHumidityOptions] = useState(false);
+  const [humidifierStatus, setHumidifierStatus] = useState<number | null>(null);
 
-  // 가습기 상태 조회
   useEffect(() => {
     const fetchHumidifierStatus = async () => {
       try {
-        const response = await axios.get("/api/hardware/humidifier", {
-          params: { device: "humidifier" },
+        const token = getToken(); // 토큰 가져오기
+        const response = await axios.get("/api/hardware/control", {
+          headers: {
+            Authorization: `Bearer ${token}`, // Authorization 헤더에 토큰 추가
+          },
         });
-        const { status } = response.data;
-        setIsOn(status > 0); // 가습기가 켜져 있는지 여부
-        setGoalHumidity(status); // 목표 습도 설정
+        const data = response.data;
+        const humidifier = data.find((device: any) => device.device === "Humidifier");
+        if (humidifier) {
+          setIsOn(humidifier.isAuto);
+          setGoalHumidity(humidifier.status);
+          setHumidifierStatus(humidifier.status);
+        }
       } catch (error) {
         console.error("Failed to fetch humidifier status:", error);
       }
@@ -222,14 +209,18 @@ const Humidifier = () => {
     fetchHumidifierStatus();
   }, []);
 
-  // 가습기 상태 업데이트
-  const updateHumidifierStatus = async (newHumidity) => {
+  const updateHumidifierStatus = async (newHumidity: number) => {
     try {
-      const response = await axios.post("/api/hardware/humidifier", {
-        device: "humidifier",
-        targetValue: newHumidity,
-      });
-
+      const token = getToken();
+      const response = await axios.patch(
+        "/api/hardware/control",
+        { device: "Humidifier", targetValue: newHumidity },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       const { status } = response.data;
       setGoalHumidity(status);
       console.log("Humidifier status updated successfully:", response.data);
@@ -238,26 +229,29 @@ const Humidifier = () => {
     }
   };
 
-  const calculateLeft = (humidity) => ((humidity - 25) / 50) * 100;
+  const calculateLeft = (humidity: number) => ((humidity - 25) / 50) * 100;
 
   const handleHumiditySelectClick = () => {
     setShowHumidityOptions((prevShowHumidityOptions) => !prevShowHumidityOptions);
   };
 
-  const handleHumidityOptionClick = (humidity) => {
+  const handleHumidityOptionClick = (humidity: number) => {
     setGoalHumidity(humidity);
     setShowHumidityOptions(false);
     updateHumidifierStatus(humidity); // 서버에 목표 습도 전송
   };
 
+  const handleToggle = (newIsOn: boolean) => {
+    setIsOn(newIsOn);
+    // Update the server with the new state if necessary
+    updateHumidifierStatus(goalHumidity);
+  };
+
   return (
     <Container>
       <HeaderContainer>
-        <ToggleContainer>
-          <Title>Humidifier</Title>
-          <ToggleLabel isOn={isOn} onClick={() => setIsOn(!isOn)} />
-          <span>AI</span>
-        </ToggleContainer>
+        <Title>Humidifier</Title>
+        <AIToggleButton isAuto={isOn} onToggle={handleToggle} />
         <SelectContainer>
           <div style={{ position: "relative" }}>
             <SelectButton onClick={handleHumiditySelectClick} $show={showHumidityOptions}>
@@ -286,6 +280,7 @@ const Humidifier = () => {
         <div>50%</div>
         <div>75%</div>
       </ScaleLabelContainer>
+      <StatusDisplay>현재 습도: {humidifierStatus !== null ? `${humidifierStatus.toFixed(1)}%` : "로딩 중..."}</StatusDisplay>
     </Container>
   );
 };

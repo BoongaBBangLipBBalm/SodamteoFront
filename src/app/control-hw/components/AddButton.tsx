@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import styled, { keyframes } from "styled-components";
+import { getToken } from "@/utils/localStorage";
 
 const Container = styled.button`
     position: absolute;
@@ -90,12 +91,17 @@ const AddDeviceForm = () => {
         }
 
         try {
-            const token = "YOUR_AUTH_TOKEN"; // 토큰 수정
-            const response = await fetch("/hardware/control", {
+            const token = getToken(); // 로컬 저장소에서 토큰 가져오기
+            if (!token) {
+                setResponseMessage("No authentication token found.");
+                return;
+            }
+
+            const response = await fetch("/api/hardware/control", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
+                    Authorization: `Bearer ${token}`, // 토큰 추가
                 },
                 body: JSON.stringify({
                     device: selectedDevice,
@@ -123,7 +129,7 @@ const AddDeviceForm = () => {
                     <option value="Airconditioner">Airconditioner</option>
                     <option value="Humidifier">Humidifier</option>
                     <option value="Blind">Blind</option>
-                    <option value="pH">pH</option>
+                    <option value="Fertilizer">Fertilizer</option>
                 </Select>
                 <SubmitButton type="submit">추가하기</SubmitButton>
                 {responseMessage && <p>{responseMessage}</p>}

@@ -1,7 +1,10 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
+import axios from 'axios';
+import { getToken } from "@/utils/localStorage";
+import AIToggleButton from "@/app/data-statistics/components/AIToggleButton"; // AIToggleButton import
 
 const Container = styled.div`
   width: 60%;
@@ -17,7 +20,6 @@ const Container = styled.div`
 
 const HeaderContainer = styled.div`
   display: flex;
-  justify-content: space-between;
   width: 100%;
   align-items: center;
   margin-bottom: 10px;
@@ -33,36 +35,6 @@ const FlexContainer = styled.div`
   flex-direction: column;
   align-items: center;
   width: 100%;
-`;
-
-const ToggleContainer = styled.div`
-  display: flex;
-  align-items: center;
-  margin: 10px 0;
-`;
-
-const ToggleLabel = styled.label`
-  display: inline-block;
-  width: 50px;
-  height: 25px;
-  background-color: ${props => (props.isOn ? '#274c4b' : '#ccc')};
-  border-radius: 25px;
-  position: relative;
-  margin: 0 10px;
-  cursor: pointer;
-
-  &:after {
-    content: '';
-    position: absolute;
-    width: 20px;
-    height: 20px;
-    background-color: white;
-    border-radius: 50%;
-    top: 50%;
-    left: ${props => (props.isOn ? 'calc(100% - 22px)' : '2px')};
-    transform: translateY(-50%);
-    transition: all 0.3s;
-  }
 `;
 
 const SliderContainer = styled.div`
@@ -90,26 +62,6 @@ const Marker = styled.div`
   font-size: 12px;
 `;
 
-const CircleKnob = styled.div`
-  width: 80px;
-  height: 80px;
-  background-color: #04293a;
-  border-radius: 50%;
-  position: relative;
-  cursor: pointer;
-`;
-
-const Knob = styled.div`
-  position: absolute;
-  width: 10px;
-  height: 10px;
-  background-color: #fac57d;
-  border-radius: 50%;
-  top: 50%;
-  left: ${props => props.left}%;
-  transform: translate(-50%, -50%);
-`;
-
 const ScaleLabelContainer = styled.div`
   display: flex;
   justify-content: space-between;
@@ -124,73 +76,133 @@ const SelectBox = styled.select`
   border-radius: 5px;
   border: 1px solid #ccc;
   font-size: 14px;
+  margin: 10px 0;
+`;
+
+const DeleteButton = styled.button`
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #d9534f;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 20px;
+  &:hover {
+    background-color: #c9302c;
+  }
 `;
 
 const Fertilizer = () => {
   const [isOn, setIsOn] = useState(false);
   const [goalTemp, setGoalTemp] = useState(20);
-  const [selectedValue, setSelectedValue] = useState("N");
-  const circleKnobRef = useRef(null);
+  const [selectedValue, setSelectedValue] = useState("20"); // Default value updated to match SelectBox options
+  const [deleteMessage, setDeleteMessage] = useState('');
 
-  const calculateLeft = (temp) => ((temp / 30) * 100);
+  useEffect(() => {
+    const fetchFertilizerData = async () => {
+      const token = getToken();
+      try {
+        const response = await axios.get('/api/hardware/control', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
 
-  const handleKnobDrag = (e) => {
-    const circleRect = circleKnobRef.current.getBoundingClientRect();
-    const offsetX = e.clientX - circleRect.left;
-    let newTemp = (offsetX / circleRect.width) * 30;
-    newTemp = Math.max(10, Math.min(30, newTemp));
-    setGoalTemp(newTemp);
-  };
+        const data = response.data;
+        const fertilizerDevice = data.find(device => device.device === 'Fertilizer');
+        if (fertilizerDevice) {
+          const { status, isAuto } = fertilizerDevice;
+          setIsOn(isAuto);
+          setGoalTemp(status);
+          setSelectedValue(status.toString()); // Update selectedValue to match the goalTemp
+        } else {
+          console.error("Fertilizer device not found in the response");
+        }
+      } catch (error) {
+        console.error("Failed to fetch fertilizer data:", error);
+      }
+    };
 
-  const handleSelectChange = (e) => {
+    fetchFertilizerData();
+  }, []);
+
+  const handleSelectChange = async (e) => {
+    const newTemp = parseInt(e.target.value, 10);
     setSelectedValue(e.target.value);
+    setGoalTemp(newTemp);
+    await handleTempChange(newTemp);
   };
+
+  const handleTempChange = async (newTemp) => {
+    const token = getToken();
+    try {
+      const response = await axios.patch('/api/hardware/control', {
+        device: 'Fertilizer',
+        targetValue: newTemp,
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      console.log("Temperature update success:", response.data);
+    } catch (error) {
+      console.error("Failed to update temperature:", error);
+    }
+  };
+
+  const handleDeleteDevice = async () => {
+    const token = getToken();
+    try {
+      const response = await axios.delete('/api/hardware/control', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        data: {
+          device: 'Fertilizer',
+        },
+      });
+
+      setDeleteMessage(response.data.message); // Set success message
+    } catch (error) {
+      if (error.response && error.response.status === 404) {
+        setDeleteMessage("Fertilizer device not found");
+      } else {
+        setDeleteMessage("Failed to delete device");
+      }
+      console.error("Failed to delete device:", error);
+    }
+  };
+
+  const calculateLeft = (temp) => ((temp / 100) * 100);
 
   return (
     <Container>
       <HeaderContainer>
         <Title>Fertilizer</Title>
-        <SelectBox value={selectedValue} onChange={handleSelectChange}>
-          <option value="N">N</option>
-          <option value="P">P</option>
-          <option value="K">K</option>
-          <option value="pH">pH</option>
-        </SelectBox>
       </HeaderContainer>
       <FlexContainer>
-        <SliderContainer gradient="#8B4513, #F4A460">
-          <SliderLabel style={{ top: '0%' }}>30°C</SliderLabel>
-          <SliderLabel style={{ top: '50%' }}>20°C</SliderLabel>
-          <SliderLabel style={{ top: '100%' }}>10°C</SliderLabel>
+        <SliderContainer>
+          <SliderLabel style={{ top: '0%' }}>100</SliderLabel>
+          <SliderLabel style={{ top: '50%' }}>50</SliderLabel>
+          <SliderLabel style={{ top: '100%' }}>0</SliderLabel>
           <Marker style={{ top: `${100 - calculateLeft(goalTemp)}%` }}>
             <div style={{ backgroundColor: 'orange', width: '10px', height: '10px', borderRadius: '50%' }} />
             Goal
           </Marker>
         </SliderContainer>
-        <CircleKnob
-          ref={circleKnobRef}
-          onMouseDown={(e) => {
-            e.preventDefault();
-            const handleMouseMove = (e) => handleKnobDrag(e);
-            const handleMouseUp = () => {
-              document.removeEventListener('mousemove', handleMouseMove);
-              document.removeEventListener('mouseup', handleMouseUp);
-            };
-            document.addEventListener('mousemove', handleMouseMove);
-            document.addEventListener('mouseup', handleMouseUp, { once: true });
-          }}
-        >
-          <Knob left={calculateLeft(goalTemp)} />
-        </CircleKnob>
-        <ScaleLabelContainer>
-          <div>10</div>
-          <div>20</div>
-          <div>30</div>
-        </ScaleLabelContainer>
-        <ToggleContainer>
-          AI
-          <ToggleLabel isOn={isOn} onClick={() => setIsOn(!isOn)} />
-        </ToggleContainer>
+        <SelectBox value={selectedValue} onChange={handleSelectChange}>
+          <option value="0">0</option>
+          <option value="25">25</option>
+          <option value="50">50</option>
+          <option value="75">75</option>
+          <option value="100">100</option>
+        </SelectBox>
+        <AIToggleButton isAuto={isOn} onToggle={setIsOn} />
+        <DeleteButton onClick={handleDeleteDevice}>Delete Device</DeleteButton>
+        {deleteMessage && <p>{deleteMessage}</p>}
       </FlexContainer>
     </Container>
   );

@@ -91,7 +91,7 @@ const Graph: React.FC = () => {
   });
 
   const fetchData = async () => {
-    const token = getToken(); // 토큰 가져오기
+    const token = getToken(); 
     try {
       const response = await fetch("/api/environment/current_environment", {
         method: "GET",
@@ -104,7 +104,7 @@ const Graph: React.FC = () => {
         const responseData = await response.json();
         const currentData = responseData.Current;
         const labels = currentData.map((entry: any, index: number) => `${6 - index * 2} hours ago`);
-        labels[labels.length - 1] = "Now"; // 마지막 레이블을 "Now"로 설정
+        labels[labels.length - 1] = "Now"; 
 
         const temperatures = currentData.map((entry: any) => entry.temperature);
 

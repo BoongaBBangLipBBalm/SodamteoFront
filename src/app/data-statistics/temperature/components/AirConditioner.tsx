@@ -1,8 +1,7 @@
-"use client";
-
 import React, { useState, useRef, useEffect } from "react";
 import styled from "styled-components";
-import api from "@/utils/originapi";
+import { getToken } from "@/utils/localStorage";
+import AIToggleButton from "../../components/AIToggleButton";
 
 const Container = styled.div`
   width: 97%;
@@ -35,49 +34,12 @@ const FlexContainer = styled.div`
   width: 100%;
 `;
 
-const ToggleContainer = styled.div`
-  display: flex;
-  align-items: center;
-  margin: 10px;
-`;
-
-const ToggleLabel = styled.label`
-  display: inline-block;
-  width: 50px;
-  height: 25px;
-  background-color: ${props => (props.isOn ? '#274c4b' : '#ccc')};
-  border-radius: 25px;
-  position: relative;
-  margin: 0 10px;
-  cursor: pointer;
-
-  &:after {
-    content: '';
-    position: absolute;
-    width: 20px;
-    height: 20px;
-    background-color: white;
-    border-radius: 50%;
-    top: 50%;
-    left: ${props => (props.isOn ? 'calc(100% - 22px)' : '2px')};
-    transform: translateY(-50%);
-    transition: all 0.3s;
-  }
-`;
-
 const SliderContainer = styled.div`
   position: relative;
   width: 100%;
   height: 12px;
   background: linear-gradient(to right, #4c5cf2, purple, #d86767);
   border-radius: 5px;
-`;
-
-const SliderLabel = styled.div`
-  position: absolute;
-  top: 20px;
-  transform: translateY(-50%);
-  font-size: 12px;
 `;
 
 const Marker = styled.div`
@@ -210,24 +172,38 @@ const AirConditioner = () => {
   const [isOn, setIsOn] = useState(false);
   const [goalTemp, setGoalTemp] = useState(25);
   const [showTempOptions, setShowTempOptions] = useState(false);
+  const [isAuto, setIsAuto] = useState(false);  // State for AI mode
   const sliderRef = useRef(null);
 
   useEffect(() => {
     const fetchAirConditionerStatus = async () => {
+      const token = getToken();
       try {
-        const response = await api.get('/api/hardware/control', {
-          params: { device: 'Airconditioner' }
+        const response = await fetch('/api/hardware/control', {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         });
-        const { status } = response.data;
-        setIsOn(status > 0);
-        setGoalTemp(status);
+        if (response.ok) {
+          const data = await response.json();
+          const airConditioner = data.find(device => device.device === 'Airconditioner');
+          if (airConditioner) {
+            const { status, isAuto } = airConditioner;
+            setIsOn(status > 0);
+            setGoalTemp(status);
+            setIsAuto(isAuto);  // Set AI mode state
+          }
+        } else {
+          console.error("Failed to fetch air conditioner status");
+        }
       } catch (error) {
         console.error("Failed to fetch air conditioner status:", error);
       }
     };
 
-    fetchAirConditionerStatus(); 
-  }, []);
+    fetchAirConditionerStatus();
+  }, []); 
 
   const handleKnobDrag = (e) => {
     const sliderRect = sliderRef.current.getBoundingClientRect();
@@ -238,23 +214,40 @@ const AirConditioner = () => {
   };
 
   const handleTempSelectClick = () => {
-    setShowTempOptions((prevShowTempOptions) => !prevShowTempOptions);
+    setShowTempOptions(prevShowTempOptions => !prevShowTempOptions);
   };
 
   const handleTempOptionClick = async (temp) => {
     setGoalTemp(temp);
     setShowTempOptions(false);
 
-    // 서버로 목표 온도 전송하는 API 호출
+    const token = getToken(); 
+
     try {
-      const response = await api.post('/api/hardware/control', {
-        device: 'Airconditioner',
-        targetValue: temp,
+      const response = await fetch('/api/hardware/control', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          device: 'Airconditioner',
+          targetValue: temp,
+        }),
       });
-      console.log("Temperature update success:", response.data);
+
+      if (response.ok) {
+        console.log("Temperature update success:", await response.json());
+      } else {
+        console.error("Failed to update temperature");
+      }
     } catch (error) {
       console.error("Failed to update temperature:", error);
     }
+  };
+
+  const handleAIToggle = (newIsAuto) => {
+    setIsAuto(newIsAuto);
   };
 
   const calculateLeft = (temp) => ((temp - 16) / 24) * 100;
@@ -262,11 +255,8 @@ const AirConditioner = () => {
   return (
     <Container>
       <HeaderContainer>
-        <ToggleContainer>
-          <Title>Air Conditioner</Title>
-          <ToggleLabel isOn={isOn} onClick={() => setIsOn(!isOn)} />
-          <span>AI</span>
-        </ToggleContainer>
+        <h1>Air Conditioner</h1>
+        <AIToggleButton isAuto={isAuto} onToggle={handleAIToggle} />
         <SelectContainer>
           <div style={{ position: 'relative' }}>
             <SelectButton onClick={handleTempSelectClick} $show={showTempOptions}>
