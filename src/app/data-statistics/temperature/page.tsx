@@ -5,7 +5,7 @@ import styled from "styled-components";
 import Header from "./components/Header";
 import Graph from "./components/Graph";
 import Range from "./components/Range";
-import AirConditioner from "./components/AirConditioner";
+import AirConditioner from "./components/Airconditioner";
 
 import {
   Chart as ChartJS,
