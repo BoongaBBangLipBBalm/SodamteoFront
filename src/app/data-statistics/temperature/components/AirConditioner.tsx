@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { getToken } from "@/utils/localStorage";
 import AIToggleButton from "../../components/AIToggleButton";
 
@@ -13,6 +13,7 @@ const Container = styled.div`
   background-color: #f8f7f6;
   border-radius: 20px;
   margin: 20px;
+  position: relative; /* Necessary for overlay */
 `;
 
 const HeaderContainer = styled.div`
@@ -168,6 +169,21 @@ const SelectContainer = styled.div`
   position: relative;
 `;
 
+const Overlay = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(192, 192, 192, 0.6); /* Gray overlay */
+  z-index: 10;
+  border-radius: 20px;
+
+  ${props => !props.isAuto && css`
+    display: none;
+  `}
+`;
+
 const AirConditioner = () => {
   const [isOn, setIsOn] = useState(false);
   const [goalTemp, setGoalTemp] = useState(25);
@@ -254,6 +270,7 @@ const AirConditioner = () => {
 
   return (
     <Container>
+      <Overlay isAuto={isAuto} /> {/* Gray overlay when AI is enabled */}
       <HeaderContainer>
         <h1>Air Conditioner</h1>
         <AIToggleButton isAuto={isAuto} onToggle={handleAIToggle} />
