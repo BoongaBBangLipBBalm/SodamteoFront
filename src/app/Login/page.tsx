@@ -43,6 +43,7 @@ const Input = styled.input`
   padding: 15px;
   border: 1px solid #ddd;
   border-radius: 5px;
+  background: white;
 `;
 
 const Button = styled.button`

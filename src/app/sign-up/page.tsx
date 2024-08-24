@@ -44,6 +44,7 @@ const Input = styled.input`
   margin-bottom: 15px;
   padding: 15px;
   border: 1px solid #ddd;
+  background: white;
   border-radius: 5px;
 `;
 

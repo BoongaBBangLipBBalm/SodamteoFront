@@ -1,7 +1,10 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import styled from "styled-components";
+import axios from "axios";
+import AIToggleButton from "./AIToggleButton";
+import { getToken } from "@/utils/localStorage";
 
 const Container = styled.div`
   width: 97%;
@@ -40,43 +43,12 @@ const ToggleContainer = styled.div`
   margin: 10px;
 `;
 
-const ToggleLabel = styled.label`
-  display: inline-block;
-  width: 50px;
-  height: 25px;
-  background-color: ${props => (props.isOn ? '#274c4b' : '#ccc')};
-  border-radius: 25px;
-  position: relative;
-  margin: 0 10px;
-  cursor: pointer;
-
-  &:after {
-    content: '';
-    position: absolute;
-    width: 20px;
-    height: 20px;
-    background-color: white;
-    border-radius: 50%;
-    top: 50%;
-    left: ${props => (props.isOn ? 'calc(100% - 22px)' : '2px')};
-    transform: translateY(-50%);
-    transition: all 0.3s;
-  }
-`;
-
 const SliderContainer = styled.div`
   position: relative;
   width: 100%;
   height: 12px;
-  background: linear-gradient(to right, #8B4513, #F4A460);
+  background: linear-gradient(to right, #8b4513, #f4a460);
   border-radius: 5px;
-`;
-
-const SliderLabel = styled.div`
-  position: absolute;
-  top: 20px;
-  transform: translateY(-50%);
-  font-size: 12px;
 `;
 
 const Marker = styled.div`
@@ -116,7 +88,7 @@ const SelectButton = styled.button`
   font-size: 15px;
   line-height: 14px;
   background-color: white;
-  border: 1px solid #274C4B;
+  border: 1px solid #274c4b;
   box-sizing: border-box;
   border-radius: 10px;
   cursor: pointer;
@@ -130,8 +102,8 @@ const SelectButton = styled.button`
 
   &:hover,
   &:focus {
-    border: 1px solid #274C4B;
-    outline: 2px solid #749F73;
+    border: 1px solid #274c4b;
+    outline: 2px solid #749f73;
   }
 
   &::after {
@@ -141,7 +113,7 @@ const SelectButton = styled.button`
     top: 50%;
     transform: translateY(-40%) rotate(0deg);
     border: 5px solid transparent;
-    border-top-color: #274C4B;
+    border-top-color: #274c4b;
     transition: transform 0.3s;
   }
 
@@ -161,7 +133,7 @@ const SelectList = styled.ul`
   left: 0;
   margin-left: 10px;
   padding: 0;
-  border: 1px solid #274C4B;
+  border: 1px solid #274c4b;
   box-sizing: border-box;
   box-shadow: 4px 4px 14px rgba(0, 0, 0, 0.15);
   border-radius: 10px;
@@ -187,7 +159,7 @@ const OptionButton = styled.button`
 
   &:hover,
   &:focus {
-    background-color: #F8F7F6;
+    background-color: #f8f7f6;
   }
 `;
 
@@ -205,92 +177,128 @@ const SelectContainer = styled.div`
   position: relative;
 `;
 
+const ValueContainer = styled.div`
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+  font-size: 16px;
+`;
+
+const StatusBar = styled.div`
+  position: relative;
+  width: 100%;
+  height: 20px;
+  background: #e0e0e0;
+  border-radius: 10px;
+  overflow: hidden;
+`;
+
+const StatusFill = styled.div`
+  width: ${props => props.width}%;
+  height: 100%;
+  background: #8b4513;
+  border-radius: 10px;
+  transition: width 0.3s;
+`;
 const Fertilizer = () => {
   const [isOn, setIsOn] = useState(false);
-  const [goalTemp, setGoalTemp] = useState(20);
-  const [selectedValue, setSelectedValue] = useState("N");
+  const [selectedValue, setSelectedValue] = useState("0.0");
   const [showOptions, setShowOptions] = useState(false);
-  const [showTempOptions, setShowTempOptions] = useState(false);
+  const [fertilizerData, setFertilizerData] = useState(null);
   const sliderRef = useRef(null);
 
-  const calculateLeft = (temp) => ((temp - 10) / 20) * 100;
+  const fetchDeviceData = async () => {
+    try {
+      const token = getToken();
+      const response = await axios.get("/api/hardware/control", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-  const handleKnobDrag = (e) => {
-    const sliderRect = sliderRef.current.getBoundingClientRect();
-    const offsetX = e.clientX - sliderRect.left;
-    let newTemp = (offsetX / sliderRect.width) * 20 + 10;
-    newTemp = Math.max(10, Math.min(30, newTemp));
-    setGoalTemp(newTemp);
+      const fertilizer = response.data.find(device => device.device === "Fertilizer");
+      if (fertilizer) {
+        setFertilizerData(fertilizer);
+        setSelectedValue(fertilizer.status.toFixed(1));
+      }
+    } catch (error) {
+      console.error("Error fetching device data:", error);
+    }
   };
+
+  useEffect(() => {
+    fetchDeviceData();
+  }, [selectedValue, isOn]);
 
   const handleSelectClick = () => {
     setShowOptions((prevShowOptions) => !prevShowOptions);
   };
 
-  const handleTempSelectClick = () => {
-    setShowTempOptions((prevShowTempOptions) => !prevShowTempOptions);
-  };
-
-  const handleOptionClick = (option) => {
+  const handleOptionClick = async (option) => {
     setSelectedValue(option);
     setShowOptions(false);
+
+    try {
+      const token = getToken();
+      const response = await axios.patch("/api/hardware/control", {
+        device: "Fertilizer",
+        targetValue: parseFloat(option)
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setFertilizerData(response.data);
+    } catch (error) {
+      console.error("Error updating fertilizer status:", error);
+    }
   };
 
-  const handleTempOptionClick = (temp) => {
-    setGoalTemp(temp);
-    setShowTempOptions(false);
-  };
+  const calculateLeft = (value) => ((parseFloat(value) - 0) / 100) * 100;
 
   return (
     <Container>
       <HeaderContainer>
         <ToggleContainer>
-          <Title>Fertilizer</Title>
-          <ToggleLabel isOn={isOn} onClick={() => setIsOn(!isOn)} />
-          <span>AI</span>
+          <AIToggleButton isAuto={isOn} onToggle={setIsOn} />
         </ToggleContainer>
         <SelectContainer>
-          <div style={{ position: 'relative' }}>
+          <div style={{ position: "relative" }}>
             <SelectButton onClick={handleSelectClick} $show={showOptions}>
               {selectedValue}
             </SelectButton>
             <SelectList $show={showOptions}>
-              {['N', 'P', 'K', 'pH'].map(option => (
+              {Array.from({ length: 201 }, (_, i) => i * 0.5).map((option) => (
                 <OptionList key={option}>
-                  <OptionButton onClick={() => handleOptionClick(option)}>{option}</OptionButton>
-                </OptionList>
-              ))}
-            </SelectList>
-          </div>
-          <div style={{ position: 'relative' }}>
-            <SelectButton onClick={handleTempSelectClick} $show={showTempOptions}>
-              {goalTemp}°C
-            </SelectButton>
-            <SelectList $show={showTempOptions}>
-              {Array.from({ length: 21 }, (_, i) => 10 + i).map(temp => (
-                <OptionList key={temp}>
-                  <OptionButton onClick={() => handleTempOptionClick(temp)}>{temp}°C</OptionButton>
+                  <OptionButton onClick={() => handleOptionClick(option.toFixed(1))}>
+                    {option.toFixed(1)}
+                  </OptionButton>
                 </OptionList>
               ))}
             </SelectList>
           </div>
         </SelectContainer>
       </HeaderContainer>
-      <FlexContainer>
-        <SliderContainer ref={sliderRef} gradient="#8B4513, #F4A460">
-          <Knob ref={sliderRef} left={calculateLeft(goalTemp)} onMouseDown={handleKnobDrag} />
-          <Marker style={{ left: `${calculateLeft(goalTemp)}%` }}>
-            Goal
-          </Marker>
-        </SliderContainer>
-      </FlexContainer>
+
+      {/* 상태 바 */}
+      <SliderContainer ref={sliderRef}>
+        <Knob left={calculateLeft(selectedValue)} onMouseDown={(e) => {
+          e.preventDefault();
+          document.addEventListener('mousemove', handleKnobDrag);
+          document.addEventListener('mouseup', () => {
+            document.removeEventListener('mousemove', handleKnobDrag);
+          }, { once: true });
+        }} />
+        <Marker style={{ left: `${calculateLeft(selectedValue)}%` }}>Status</Marker>
+      </SliderContainer>
       <ScaleLabelContainer>
-        <div>10</div>
-        <div>14</div>
-        <div>18</div>
-        <div>22</div>
-        <div>26</div>
-        <div>30</div>
+        <div>0.0</div>
+        <div>20.0</div>
+        <div>40.0</div>
+        <div>60.0</div>
+        <div>80.0</div>
+        <div>100.0</div>
       </ScaleLabelContainer>
     </Container>
   );
