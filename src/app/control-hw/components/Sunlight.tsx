@@ -34,36 +34,124 @@ const FlexContainer = styled.div`
 
 const SliderContainer = styled.div`
   position: relative;
-  width: 12px;
+  width: 20px;
   height: 50vh;
   margin: 20px 0;
-  background: linear-gradient(to top, #FF0000, #660000); /* Reverted to original gradient */
+  background: linear-gradient(to top, #FF0000, #660000);
   border-radius: 5px;
-  height: 60vh;
+  height: 55vh;
 `;
 
 const SliderLabel = styled.div`
   position: absolute;
-  left: 20px;
+  right: 14px;
   transform: translateX(-50%);
-  font-size: 12px;
+  font-size: 14px;
 `;
 
 const Marker = styled.div`
   position: absolute;
-  left: 100%;
+  left: 120%;
   transform: translateX(-50%);
   display: flex;
   align-items: center;
-  font-size: 12px;
+  font-size: 14px;
 `;
 
-const TemperatureSelect = styled.select`
+const SelectButton = styled.button`
+  width: 90px;
   padding: 10px;
-  font-size: 16px;
-  margin-top: 20px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  margin: 10px;
+  font-size: 15px;
+  line-height: 14px;
+  background-color: white;
+  border: 1px solid #274c4b;
+  box-sizing: border-box;
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: left;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  color: black;
+  position: relative;
+  transition: border-color 0.3s, outline 0.3s;
+
+  &:hover,
+  &:focus {
+    border: 1px solid #274c4b;
+    outline: 2px solid #749f73;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-40%) rotate(0deg);
+    border: 5px solid transparent;
+    border-top-color: #274c4b;
+    transition: transform 0.3s;
+  }
+
+  ${({ $show }) => $show && `
+    &::after {
+      transform: translateY(-80%) rotate(180deg);
+    }
+  `}
+`;
+
+const SelectList = styled.ul`
+  list-style-type: none;
+  display: ${(props) => (props.$show ? 'block' : 'none')};
+  position: absolute;
+  width: 90px;
+  top: 47px;
+  left: 3px;
+  margin-left: 50px;
+  padding: 0;
+  border: 1px solid #274c4b;
+  box-sizing: border-box;
+  box-shadow: 4px 4px 14px rgba(0, 0, 0, 0.15);
+  border-radius: 10px;
+  background-color: white;
+  z-index: 1000;
+  max-height: 100px;
+  overflow-y: auto;
+`;
+
+const OptionButton = styled.button`
+  width: 100%;
+  padding: 7px 10px;
+  border: none;
+  background-color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  font-size: 15px;
+  color: black;
+
+  &:hover,
+  &:focus {
+    background-color: #f8f7f6;
+  }
+`;
+
+const OptionList = styled.li`
+  padding: 3px;
+  margin: 0 3px;
+  color: black;
+`;
+
+const SelectContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  position: relative;
 `;
 
 const DeleteButton = styled.button`
@@ -82,7 +170,8 @@ const DeleteButton = styled.button`
 
 const SunLight = () => {
   const [isOn, setIsOn] = useState(false);
-  const [goalLight, setGoalLight] = useState(20); // default value set to 20°C
+  const [goalLight, setGoalLight] = useState<number>(20);
+  const [showOptions, setShowOptions] = useState(false);
   const [deleteMessage, setDeleteMessage] = useState('');
 
   useEffect(() => {
@@ -94,13 +183,13 @@ const SunLight = () => {
             'Authorization': `Bearer ${token}`,
           },
         });
-
+  
         const data = response.data;
         const sunlightDevice = data.find(device => device.device === 'Blind');
         if (sunlightDevice) {
           const { status, isAuto } = sunlightDevice;
           setIsOn(isAuto);
-          setGoalLight(status);
+          setGoalLight(Number(status)); // status를 숫자로 변환
         } else {
           console.error("Sunlight device not found in the response");
         }
@@ -108,32 +197,39 @@ const SunLight = () => {
         console.error("Failed to fetch sunlight data:", error);
       }
     };
-
+  
     fetchSunlightData();
   }, []);
+  
+  
 
-  const handleLightChange = async (event) => {
-    const newLight = parseFloat(event.target.value);
-    setGoalLight(newLight);
+  const handleSelectClick = () => {
+    setShowOptions((prevShowOptions) => !prevShowOptions);
+  };
 
+  const handleOptionClick = async (option: string) => {
+    const numericOption = parseFloat(option); // 문자열을 숫자로 변환
+    setGoalLight(numericOption); // 숫자로 설정
+    setShowOptions(false);
+  
     const token = getToken();
     try {
       const response = await axios.patch('/api/hardware/control', {
         device: 'Blind',
-        targetValue: newLight,
+        targetValue: numericOption, // 숫자 값을 서버에 전송
       }, {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
       });
-
+  
       console.log("Light level update success:", response.data);
     } catch (error) {
       console.error("Failed to update light level:", error);
     }
   };
-
+  
   const handleDeleteDevice = async () => {
     const token = getToken();
     try {
@@ -161,25 +257,35 @@ const SunLight = () => {
 
   return (
     <Container>
-      <Title>Sun Light</Title>
+      <Title>Blind</Title>
       <FlexContainer>
         <SliderContainer gradient="#FF0000, #660000"> {/* Gradient restored */}
           <SliderLabel style={{ top: '0%' }}>40°C</SliderLabel>
           <SliderLabel style={{ top: '50%' }}>20°C</SliderLabel>
-          <SliderLabel style={{ top: '100%' }}>0°C</SliderLabel>
+          <SliderLabel style={{ top: '95%' }}>0°C</SliderLabel>
           <Marker style={{ top: `${100 - calculateLeft(goalLight)}%` }}>
-            <div style={{ backgroundColor: 'orange', width: '10px', height: '10px', borderRadius: '50%' }} />
-            Goal
+            <div style={{ backgroundColor: 'orange', width: '10px', height: '10px', borderRadius: '50%', margin: '10px'  }} />
+            Now
           </Marker>
         </SliderContainer>
-        <TemperatureSelect value={goalLight.toFixed(1)} onChange={handleLightChange}>
-          {[...Array(9).keys()].map(i => (
-            <option key={i} value={(i * 5).toFixed(1)}>
-              {(i * 5).toFixed(1)}°C
-            </option>
-          ))}
-        </TemperatureSelect>
-        <DeleteButton onClick={handleDeleteDevice}>Delete Device</DeleteButton>
+
+        <SelectContainer>
+        <SelectButton onClick={handleSelectClick} $show={showOptions}>
+          {typeof goalLight === 'number' ? goalLight.toFixed(1) : 'N/A'}
+        </SelectButton>
+
+          <SelectList $show={showOptions}>
+            {[...Array(9).keys()].map(i => (
+              <OptionList key={i}>
+                <OptionButton onClick={() => handleOptionClick((i * 5).toFixed(1))}>
+                  {(i * 5).toFixed(0)}°C
+                </OptionButton>
+              </OptionList>
+            ))}
+          </SelectList>
+        </SelectContainer>
+
+        <DeleteButton onClick={handleDeleteDevice}>Delete</DeleteButton>
         {deleteMessage && <p>{deleteMessage}</p>}
       </FlexContainer>
     </Container>
