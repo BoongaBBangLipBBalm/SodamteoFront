@@ -1,5 +1,3 @@
-// components/StatCard.tsx
-
 import React from 'react';
 
 type StatCardProps = {
