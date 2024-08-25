@@ -59,13 +59,18 @@ const options = {
         display: false,
         text: 'Humidity (%)',
       },
+      ticks: {
+        callback: function (value) {
+          return value.toFixed(1) + "%"; // Format y-axis labels to one decimal place
+        },
+      },
     },
   },
   plugins: {
     tooltip: {
       callbacks: {
         label: function (context) {
-          return `${context.raw}%`;
+          return `${context.raw.toFixed(1)}%`; // Format tooltip values to one decimal place
         },
       },
     },
@@ -99,7 +104,7 @@ const HumidityGraph: React.FC = () => {
       const response = await fetch("/api/environment/current_environment", {
         method: "GET",
         headers: {
-          Authorization: `${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 

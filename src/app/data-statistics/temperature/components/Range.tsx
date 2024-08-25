@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import axios from "axios"; 
+import axios from "axios";
 import { getToken } from "@/utils/localStorage";
 
 const Container = styled.div`
@@ -25,8 +25,9 @@ const RangeContainer = styled.div`
 `;
 
 const Header = styled.h2`
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   font-weight: 500;
+  font-size: 22px;
   align-self: flex-start;
 `;
 
@@ -39,13 +40,11 @@ const RangeBar = styled.div`
 
 const Indicator = styled.div`
   position: absolute;
-  width: 60px;
-  left: ${props => props.left || '100%'};
-  transform: ${props => props.transform || 'translateY(-50%)'};
-  background-color: white;
+  width: 50px;
+  background-color: ${props => props.bgColor || 'white'};
   padding: 5px;
   border-radius: 3px;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
   border: 1px solid #ddd;
   text-align: center;
@@ -58,30 +57,27 @@ const Indicator = styled.div`
     color: #333;
     margin-top: 2px;
   }
-`;
-
-const Tick = styled.div`
-  position: absolute;
-  left: 100%;
-  transform: translateX(-100%);
-  width: 100%;
-  height: 3px;
-  background: #ddd;
+  ${props => props.left && `left: ${props.left};`}
+  ${props => props.right && `right: ${props.right};`}
 `;
 
 const BlackLine = styled.div`
   position: absolute;
   left: 0;
   width: 100%;
-  height: 3px;
+  height: 2px;
   background: white;
   z-index: 5;
 `;
 
-const labels = [
-  { label: 'Min', bottom: '0%' },
-  { label: 'Max', bottom: '100%' }
-];
+const CurrentTemperatureLine = styled.div`
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background-color: #E9B374;
+  z-index: 5;
+`;
 
 const Range = () => {
   const [currentTemp, setCurrentTemp] = useState(25);
@@ -110,8 +106,8 @@ const Range = () => {
         }
 
         setOptTemp({
-          min: optimalTemperature - 5,
-          max: optimalTemperature + 5
+          min: optimalTemperature - 1.8,
+          max: optimalTemperature + 1.8
         });
       } catch (err) {
         setError('Failed to fetch temperature data');
@@ -140,16 +136,32 @@ const Range = () => {
   return (
     <Container>
       <RangeContainer>
-        <Header>Range</Header>
+        <Header>최적 온도</Header>
         <RangeBar>
-          <Indicator style={{ bottom: `${getBottomPercentage(currentTemp)}%`, transform: 'translateY(-50%)'}} label="Now">
-            {formatTemp(currentTemp)}°C
-          </Indicator>
-          <Indicator left="0%" transform="translateX(-100%)" style={{ bottom: `${getBottomPercentage(optTemp.min)}%` }} label="Min">
+          <CurrentTemperatureLine style={{ bottom: `${getBottomPercentage(currentTemp)}%` }} />
+          <Indicator 
+            left="-51px"  // Position min indicator outside left of the bar
+            style={{ bottom: `${getBottomPercentage(optTemp.min)}%` }} 
+            bgColor="white"
+            label="Min"
+          >
             {formatTemp(optTemp.min)}°C
           </Indicator>
-          <Indicator left="0%" transform="translateX(-100%)" style={{ bottom: `${getBottomPercentage(optTemp.max)}%` }} label="Max">
+          <Indicator 
+            left="-51px"  // Position max indicator outside left of the bar
+            style={{ bottom: `${getBottomPercentage(optTemp.max)}%` }} 
+            bgColor="white"
+            label="Max"
+          >
             {formatTemp(optTemp.max)}°C
+          </Indicator>
+          <Indicator 
+            right="-51px"  // Position current temperature indicator outside right of the bar
+            style={{ bottom: `${getBottomPercentage(currentTemp)}%` }} 
+            bgColor="#FBF2BD"
+            label="Now"
+          >
+            {formatTemp(currentTemp)}°C
           </Indicator>
           <BlackLine style={{ bottom: `${getBottomPercentage(optTemp.min)}%` }} />
           <BlackLine style={{ bottom: `${getBottomPercentage(optTemp.max)}%` }} />

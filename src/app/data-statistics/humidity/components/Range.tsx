@@ -27,6 +27,7 @@ const RangeContainer = styled.div`
 const Header = styled.h2`
   margin-bottom: 20px;
   font-weight: 500;
+  font-size: 22px;
   align-self: flex-start;
 `;
 
@@ -40,9 +41,7 @@ const RangeBar = styled.div`
 const Indicator = styled.div`
   position: absolute;
   width: 60px;
-  left: ${props => props.left || '100%'};
-  transform: ${props => props.transform || 'translateY(-50%)'};
-  background-color: white;
+  background-color: ${props => props.bgColor || 'white'};
   padding: 5px;
   border-radius: 3px;
   font-size: 14px;
@@ -51,6 +50,9 @@ const Indicator = styled.div`
   text-align: center;
   line-height: 1.2;
   z-index: 10;
+  ${props => props.left && `left: ${props.left};`}
+  ${props => props.right && `right: ${props.right};`}
+  transform: ${props => props.transform || 'translateY(-50%)'};
   &:after {
     content: '${props => props.label || ''}';
     display: block;
@@ -60,28 +62,23 @@ const Indicator = styled.div`
   }
 `;
 
-const Tick = styled.div`
-  position: absolute;
-  left: 100%;
-  transform: translateX(-100%);
-  width: 100%;
-  height: 3px;
-  background: #ddd;
-`;
-
 const BlackLine = styled.div`
   position: absolute;
   left: 0;
   width: 100%;
-  height: 3px;
+  height: 2px;
   background: white;
   z-index: 5;
 `;
 
-const labels = [
-  { label: 'Min', bottom: '0%' },
-  { label: 'Max', bottom: '100%' }
-];
+const CurrentHumidityLine = styled.div`
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background-color: #E9B374;
+  z-index: 5;
+`;
 
 const Range = () => {
   const [currentHumidity, setCurrentHumidity] = useState(50);
@@ -110,8 +107,8 @@ const Range = () => {
         }
 
         setOptHumidity({
-          min: optimalHumidity - 10,
-          max: optimalHumidity + 10
+          min: optimalHumidity - 5,
+          max: optimalHumidity + 5
         });
       } catch (err) {
         setError('Failed to fetch humidity data');
@@ -140,16 +137,32 @@ const Range = () => {
   return (
     <Container>
       <RangeContainer>
-        <Header>Range</Header>
+        <Header>최적 습도</Header>
         <RangeBar>
-          <Indicator style={{ bottom: `${getBottomPercentage(currentHumidity)}%`, transform: 'translateY(-50%)'}} label="Now">
-            {formatHumidity(currentHumidity)}%
-          </Indicator>
-          <Indicator left="0%" transform="translateX(-100%)" style={{ bottom: `${getBottomPercentage(optHumidity.min)}%` }} label="Min">
+          <CurrentHumidityLine style={{ bottom: `${getBottomPercentage(currentHumidity)}%` }} />
+          <Indicator 
+            left="-60px"  
+            style={{ bottom: `${getBottomPercentage(optHumidity.min)}%`, transform: 'translateY(0%)' }} 
+            bgColor="white"
+            label="Min"
+          >
             {formatHumidity(optHumidity.min)}%
           </Indicator>
-          <Indicator left="0%" transform="translateX(-100%)" style={{ bottom: `${getBottomPercentage(optHumidity.max)}%` }} label="Max">
+          <Indicator 
+            left="-60px"  
+            style={{ bottom: `${getBottomPercentage(optHumidity.max)}%`, transform: 'translateY(0%)' }} 
+            bgColor="white"
+            label="Max"
+          >
             {formatHumidity(optHumidity.max)}%
+          </Indicator>
+          <Indicator 
+            right="-60px"  
+            style={{ bottom: `${getBottomPercentage(currentHumidity)}%`, transform: 'translateY(0%)' }} 
+            bgColor="#FBF2BD"
+            label="Now"
+          >
+            {formatHumidity(currentHumidity)}%
           </Indicator>
           <BlackLine style={{ bottom: `${getBottomPercentage(optHumidity.min)}%` }} />
           <BlackLine style={{ bottom: `${getBottomPercentage(optHumidity.max)}%` }} />

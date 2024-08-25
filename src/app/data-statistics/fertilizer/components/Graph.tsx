@@ -57,13 +57,18 @@ const options = {
         display: false,
         text: 'Values',
       },
+      ticks: {
+        callback: function (value) {
+          return value.toFixed(1); // Format y-axis labels to one decimal place
+        },
+      },
     },
   },
   plugins: {
     tooltip: {
       callbacks: {
         label: function (context) {
-          return `${context.dataset.label}: ${context.raw}`;
+          return `${context.dataset.label}: ${context.raw.toFixed(1)}`; // Format tooltip values to one decimal place
         },
       },
     },
@@ -118,7 +123,7 @@ const Graph: React.FC = () => {
       const response = await fetch("/api/environment/current_environment", {
         method: "GET",
         headers: {
-          Authorization: `${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 

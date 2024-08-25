@@ -44,6 +44,7 @@ const Indicator = styled.div`
   border-radius: 3px;
   font-size: 14px;
   border: 1px solid #ddd;
+  z-index: 2;
 `;
 
 const Tick = styled.div`
@@ -53,6 +54,15 @@ const Tick = styled.div`
   width: 100%;
   height: 1px;
   background: #ddd;
+`;
+
+const CurrentTemperatureLine = styled.div`
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: yellow;
+  z-index: 1;
 `;
 
 const labels = [
@@ -89,6 +99,7 @@ const Range = () => {
               {label.label}
             </Indicator>
           ))}
+          <CurrentTemperatureLine style={{ bottom: `${getBottomPercentage(currentTemp)}%` }} />
           <Indicator style={{ bottom: `${getBottomPercentage(currentTemp)}%` }}>
             {currentTemp}°C (Now)
           </Indicator>
