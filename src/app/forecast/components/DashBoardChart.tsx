@@ -259,7 +259,7 @@ const DashboardChart = () => {
     labels: [...salesLabels, ...forecastLabels],
     datasets: [
       {
-        label: '판매 가격',
+        label: '판매가',
         data: salesData,
         borderColor: 'rgba(75,192,192,1)',
         backgroundColor: 'rgba(75,192,192,0.2)',
@@ -267,13 +267,13 @@ const DashboardChart = () => {
         tension: 0.4,
       },
       {
-        label: '예측 가격',
-        data: Array(salesData.length).fill(null).concat(forecastData), 
+        label: '예측가',
+        data: Array(salesData.length).fill(null).concat(forecastData.map(price => Math.round(price))),
         borderColor: 'rgba(53, 162, 235, 1)',
         backgroundColor: 'rgba(53, 162, 235, 0.2)',
         fill: true,
         tension: 0.4,
-      },
+      },      
     ],
   };
 
@@ -299,8 +299,8 @@ const DashboardChart = () => {
         ticks: {
           callback: (value: number) => `${value.toFixed(0)} 원`,
         },
-        min: Math.min(...salesData) * 0.85,
-        max: Math.max(...forecastData.length > 0 ? forecastData : salesData) * 1.15,
+        min: Math.min(...salesData) * 0.95,
+        max: Math.max(...forecastData.length > 0 ? forecastData : salesData) * 1.2,
       },
     },
   };
@@ -330,7 +330,7 @@ const DashboardChart = () => {
 
       <DataContainer>
         <DataSection>
-          <DataTitle>Recent Sales Data</DataTitle>
+          <DataTitle>판매가</DataTitle>
           <DataList>
             {salesData.map((price, index) => (
               <DataItem key={index}>
@@ -341,13 +341,13 @@ const DashboardChart = () => {
         </DataSection>
         
         <DataSection>
-          <DataTitle>Forecast Data</DataTitle>
+          <DataTitle>예측가</DataTitle>
           <DataList>
-            {forecastData.map((price, index) => (
-              <DataItem key={index}>
-                {forecastLabels[index]}: {price.toLocaleString()} 원
-              </DataItem>
-            ))}
+          {forecastData.map((price, index) => (
+            <DataItem key={index}>
+              {forecastLabels[index]}: {Math.round(price).toLocaleString()} 원
+            </DataItem>
+          ))}
           </DataList>
         </DataSection>
       </DataContainer>
