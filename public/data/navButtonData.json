@@ -31,7 +31,7 @@
     },
     {
         "id": 5,
-        "name": "시가/생산량 예측",
+        "name": "시가 예측",
         "imageURL": "/img/nav/forecast.svg",
         "toURL": "/forecast"
     },
