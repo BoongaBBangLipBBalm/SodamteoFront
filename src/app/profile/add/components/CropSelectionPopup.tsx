@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import styled from 'styled-components';
 import { getToken } from '@/utils/localStorage';
@@ -27,7 +27,6 @@ const InputContainer = styled.div`
 const ResultContainer = styled.div`
     flex: 1;
     padding-top: 1rem;
-    padding-left: 2rem;
 `;
 
 const SliderContainer = styled.div`
@@ -143,6 +142,49 @@ const Name = styled.h3`
     padding-bottom: 1rem;
 `;
 
+const StyledInput = styled.input`
+    margin-right: 0.5rem;
+    accent-color: #274C4B;
+    cursor: pointer;
+    vertical-align: middle;
+    margin-bottom: 0.5rem;
+
+    /* Custom radio button styles */
+    &[type="radio"] {
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        border: 2px solid #43545B;
+        border-radius: 50%;
+        position: relative;
+        outline: none;
+        background-color: white;
+        transition: background-color 0.2s, border-color 0.2s;
+
+        &:checked::before {
+            content: '';
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #274C4B;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        &:hover {
+            border-color: #274C4B;
+        }
+    }
+`;
+
+const Divider = styled.hr`
+    border: 0;
+    height: 1px;
+    background: #ddd;
+    margin: 1rem 0;
+`;
 
 const CropSelectionPopup: React.FC<{ onClose: () => void, onSelectCrop: (crop: string) => void }> = ({ onClose, onSelectCrop }) => {
     const [n, setN] = useState(0);
@@ -185,9 +227,7 @@ const CropSelectionPopup: React.FC<{ onClose: () => void, onSelectCrop: (crop: s
                 }
             });
 
-            if (response.status === 200) {
-                setCropSuggestions(response.data);
-            }
+            setCropSuggestions(response.data);
         } catch (error) {
             console.error('Error selecting crop:', error);
             setCropSuggestions({
@@ -200,18 +240,17 @@ const CropSelectionPopup: React.FC<{ onClose: () => void, onSelectCrop: (crop: s
 
     const handleConfirm = () => {
         if (selectedCrop) {
-            onSelectCrop(selectedCrop);
+            const result = selectedCrop[0].toUpperCase() + selectedCrop.slice(1);
+            onSelectCrop(result);
             onClose();
         }
     };
-
-    
 
     return (
         <PopupContainer>
             <AllContainer>
                 <InputContainer>
-                    <Name>Enter Environmental Data</Name>
+                    <Name>환경 정보 입력</Name>
 
                     <SliderContainer>
                         <SliderLabel>Nitrogen (N)</SliderLabel>
@@ -325,33 +364,33 @@ const CropSelectionPopup: React.FC<{ onClose: () => void, onSelectCrop: (crop: s
                         </SliderValue>
                     </SliderContainer>
 
-                    <SubmitButton onClick={handleSubmit}>Select Crop</SubmitButton>
+                    <SubmitButton onClick={handleSubmit}>작물 추천</SubmitButton>
                 </InputContainer>
+                <Divider />
                 <ResultContainer>
-                    <h3>Crop Suggestions</h3>
+                    <Name>추천 작물</Name>
                     {cropSuggestions ? (
                         Object.entries(cropSuggestions).map(([crop, probability], index) => (
                             <div key={index}>
-                                <input 
+                                <StyledInput 
                                     type="radio" 
                                     name="crop" 
                                     value={crop} 
                                     onChange={() => setSelectedCrop(crop)} 
                                     checked={selectedCrop === crop} 
                                 />
-                                <label>{crop}: {probability.toFixed(2)}%</label>
+                                <label>{crop}: {(probability*100).toFixed(2)}%</label>
                             </div>
                         ))
                     ) : (
-                        <p>No suggestions available.</p>
+                        <p>추천 작물이 없습니다.</p>
                     )}
                 </ResultContainer>
             </AllContainer>
             <ButtonContainer>
-                <CancelButton onClick={onClose}>Cancel</CancelButton>
-                <SubmitButton onClick={handleConfirm} disabled={!selectedCrop}>Confirm</SubmitButton>
+                <CancelButton onClick={onClose}>취소</CancelButton>
+                <SubmitButton onClick={handleConfirm} disabled={!selectedCrop}>완료</SubmitButton>
             </ButtonContainer>
-            
         </PopupContainer>
     );
 }

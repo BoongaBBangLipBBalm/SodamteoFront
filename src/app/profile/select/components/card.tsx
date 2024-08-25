@@ -28,6 +28,7 @@ const card_config = { // value: rem
 }
 
 const CardContainer = styled.div<{$isSelected: boolean}>`
+    opacity: ${(props) => props.$isSelected ? `1` : `0.5`};;
     position: relative;
     width: ${(props) => props.$isSelected ? NumToRem(card_config.selectedCard_height * card_config.sizeRatio) : NumToRem(card_config.unselectedCard_height * card_config.sizeRatio)};
     height: ${(props) => props.$isSelected ? NumToRem(card_config.selectedCard_height) : NumToRem(card_config.unselectedCard_height)};
@@ -41,6 +42,7 @@ const CardContainer = styled.div<{$isSelected: boolean}>`
     &:hover .delete-button {
         display: block;
     }
+    transition: 0.1s opacity;
 `;
 
 

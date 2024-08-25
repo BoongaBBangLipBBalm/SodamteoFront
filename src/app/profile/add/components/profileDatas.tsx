@@ -110,7 +110,7 @@ const ProfileInfo: React.FC<IProfileInfoProps> = (props) => {
 
                 {/* Device Toggles */}
                 <DataPreset
-                    title={"Devices"}
+                    title={"디바이스"}
                     dataContainers={[
                         <DeviceContainer>
                             <DeviceToggle label="Airconditioner" isEnabled={props.data.airconditionerIsEnabled} setIsEnabled={props.data.setAirconditionerIsEnabled} />
@@ -124,8 +124,8 @@ const ProfileInfo: React.FC<IProfileInfoProps> = (props) => {
                 
             </ScrollContainer>
             <ButtonContainer>
-                <Button color="#43545B" as="a" href="/profile/select">Cancel</Button>
-                <Button color="#274C4B" type='submit' onClick={() => {props.submitFunc()}} >Done</Button>
+                <Button color="#43545B" as="a" href="/profile/select">돌아가기</Button>
+                <Button color="#274C4B" type='submit' onClick={() => {props.submitFunc()}} >완료</Button>
             </ButtonContainer>
         </Container>
     );

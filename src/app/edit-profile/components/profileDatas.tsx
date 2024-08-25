@@ -84,8 +84,8 @@ const ProfileInfo: React.FC<{ setImgURL: (url: string) => void, setSelectedType:
                 <Profile profileName={farmName} setProfileName={setFarmName} selectedType={selectedType} setSelectedType={setSelectedType} />
             </ScrollContainer>
             <ButtonContainer>
-                <Button color="#ff4949" onClick={openModal}>Delete</Button>
-                <Button color="#274C4B" onClick={handleDone}>Done</Button>
+                <Button color="#ff4949" onClick={openModal}>팜 삭제</Button>
+                <Button color="#274C4B" onClick={handleDone}>변경</Button>
             </ButtonContainer>
             {isModalOpen && (
                 <ConfirmationModal onClose={closeModal} onConfirm={confirmDelete} />

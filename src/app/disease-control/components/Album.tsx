@@ -15,36 +15,7 @@ const AlbumContainer = styled.div`
   height: 100%;
   display: flex;
   justify-content: center;
-  overflow: hidden;
-`;
-
-const StyledSlider = styled(Slider)`
-  position: relative;
-  width: 100%;
-  height: 100%;
-  overflow-y: hidden;
-  display: flex;
-  justify-content: center;
-
-  .slick-list {
-    position: relative;
-    top: 50%;
-  }
-
-  .slick-track {
-    position: relative;
-    height: 100%;
-  }
-
-  .slick-slide {
-    position: relative;
-    height: auto;
-
-    &[aria-hidden='true'] {
-      pointer-events: none;
-      opacity: 0.5;
-    }
-  }
+  align-items: center; /* Align items vertically in the center */
 `;
 
 const SliderPrevButton = styled.button`
@@ -67,6 +38,41 @@ const SliderNextButton = styled.button`
   transform: translate(-50%, 0%);
 `;
 
+const StyledSlider = styled(Slider)`
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+
+  .slick-list {
+    transform: translate(0, -100%);
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  .slick-track {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+
+  .slick-slide {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: auto;
+
+    &[aria-hidden='true'] {
+      pointer-events: none;
+      opacity: 0.5;
+    }
+  }
+`;
+
 const SliderButtonDiv = styled.div`
   background-color: rgb(255, 255, 255);
   filter: drop-shadow(0.1rem 0.1rem 1rem rgba(0, 0, 0, 0.25));
@@ -76,11 +82,14 @@ const SliderButtonDiv = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+
   & > img {
     width: 1.125rem;
     height: 1.125rem;
   }
 `;
+
+
 
 const Album: React.FC<AlbumProps> = ({ selectedCategory, photos, onPhotoSelect, onDeletePhoto }) => {
   const sliderRef = useRef<Slider | null>(null);
@@ -110,17 +119,13 @@ const Album: React.FC<AlbumProps> = ({ selectedCategory, photos, onPhotoSelect, 
   };
 
   const settings = {
-    speed: 300,
     arrows: true,
-    draggable: false,
-    dots: false,
     infinite: false,
+    dots: false,
     slidesToScroll: 1,
     slidesToShow: 1,
-    centerPadding: '0px',
+    centerPadding: '0', 
     vertical: true,
-    focusOnSelect: true,
-    initialSlide: 0,
     afterChange: (index: number) => {
       onPhotoSelect(photos[index]);
       updateInertAttributes(index);
@@ -144,9 +149,8 @@ const Album: React.FC<AlbumProps> = ({ selectedCategory, photos, onPhotoSelect, 
   useEffect(() => {
     goToSlide(photos.length - 1);
     updateInertAttributes(photos.length - 1);
-  }, [selectedCategory]);
-
-
+    onPhotoSelect(photos[photos.length - 1]);
+  }, [photos]);
 
   return (
     <AlbumContainer>

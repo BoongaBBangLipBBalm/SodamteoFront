@@ -14,7 +14,7 @@ import { deleteRequest, getRequest } from '@/utils/api';
 import { getToken } from '@/utils/localStorage';
 
 const Container = styled.div`
-  padding: 0 1.25rem;
+  
   width: ${(1-GetLayoutWidthRatio())*100}%;
   height: 100vh;
   display: flex;
@@ -22,6 +22,8 @@ const Container = styled.div`
   justify-content: center;
   align-items: center;
   position: relative;
+  overflow-y: hidden;
+  overflow-x: hidden;
 `;
 
 const ContentWrapper = styled.div`
@@ -32,48 +34,6 @@ const ContentWrapper = styled.div`
   align-items: center;
   justify-content: space-evenly;
   margin-top: 1.25rem;
-`;
-
-const InfoPanel = styled.div`
-  margin: 0 1.25rem;
-  color: white;
-  border-radius: 0.625rem;
-  width: 50%;
-  height: 50%;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
-`;
-
-const TextBox = styled.div`
-  width: 20rem;
-  height: 5rem;
-  background-color: #F8F7F6;
-  border-radius: 10px;
-  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.25));
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-`;
-
-const TitleBox = styled.div`
-  font-family: 'Pretendard-Bold';
-  font-size: 1.2rem;
-  color: #2e2e2e;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-
-const ContentBox = styled.div`
-  font-family: 'Pretendard-Regular';
-  font-size: 1rem;
-  color: #000000;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 `;
 
 const PopupOverlay = styled.div`
@@ -115,6 +75,48 @@ const PopupButton = styled.button`
   }
 `;
 
+const InfoPanel = styled.div`
+  margin: 0 1.25rem;
+  color: white;
+  border-radius: 0.625rem;
+  width: 50%;
+  height: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const TextBox = styled.div<{ bgColor?: string }>`
+  width: 20rem;
+  height: 5rem;
+  background-color: ${({ bgColor }) => bgColor || '#F8F7F6'};
+  border-radius: 10px;
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.25));
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+`;
+
+const TitleBox = styled.div`
+  font-family: 'Pretendard-Bold';
+  font-size: 1.2rem;
+  color: #2e2e2e;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+const ContentBox = styled.div`
+  font-family: 'Pretendard-Regular';
+  font-size: 1rem;
+  color: #000000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
 const categories = ['All', 'Diseases', 'Normal'];
 
 const filterPhotos = (category: string, photos: IPhoto[]) => {
@@ -122,6 +124,23 @@ const filterPhotos = (category: string, photos: IPhoto[]) => {
   if (category === 'Diseases') return photos.filter(photo => photo.disease !== 'Normal');
   if (category === 'Normal') return photos.filter(photo => photo.disease === 'Normal');
   return photos;
+};
+
+const formatConfidence = (confidence: number): string => {
+  return `${confidence.toFixed(2)}%`;
+};
+
+const formatTimestamp = (timestamp: string): string => {
+  const date = new Date(timestamp);
+  return date.toISOString().split('T')[0]; // YYYY-MM-DD format
+};
+
+const getDiseaseBoxColor = (disease: string) => {
+  return disease === 'Normal' ? '#a9d3a9' : '#cda3a3'; // Green if disease is "Normal"
+};
+
+const getConfidenceBoxColor = (confidence: number) => {
+  return confidence >= 70 ? '#a9d3a9' : '#cda3a3'; // Green if confidence is 70% or above, red otherwise
 };
 
 const DiseaseControl: React.FC = () => {
@@ -236,7 +255,6 @@ const DiseaseControl: React.FC = () => {
       };
       tempPhoto.push(newPhoto);
     }
-    console.log(tempPhoto); // test code
     return tempPhoto;
     
   }
@@ -310,23 +328,25 @@ const DiseaseControl: React.FC = () => {
           />
           {selectedPhoto && (
             <InfoPanel>
-              <TextBox>
+              <TextBox bgColor={getDiseaseBoxColor(selectedPhoto.disease)}>
                 <TitleBox>질병 이름</TitleBox>
-                <ContentBox>{selectedPhoto.disease}</ContentBox>
+                <ContentBox>
+                  {selectedPhoto.disease === 'Normal' ? '해당 없음' : selectedPhoto.disease}
+                </ContentBox>
               </TextBox>
-              <TextBox>
+              <TextBox bgColor={getConfidenceBoxColor(selectedPhoto.confidence)}>
                 <TitleBox>신뢰도</TitleBox>
-                <ContentBox>{selectedPhoto.confidence}</ContentBox>
+                <ContentBox>{formatConfidence(selectedPhoto.confidence)}</ContentBox>
               </TextBox>
               <TextBox>
                 <TitleBox>시간</TitleBox>
-                <ContentBox>{selectedPhoto.timestamp}</ContentBox>
+                <ContentBox>{formatTimestamp(selectedPhoto.timestamp)}</ContentBox>
               </TextBox>
             </InfoPanel>
           )}
         </ContentWrapper>
 
-        <PhotoAddButton onAddPhoto={handleAddPhoto} /> {/* Updated to handle file input */}
+        <PhotoAddButton onAddPhoto={handleAddPhoto} />
 
       </Container>
     </ThemeProvider>

@@ -38,7 +38,7 @@ const SelectWrapper = styled.div`
     height: 3.188rem;
 `;
 
-const SelectOption = styled.select`
+const SelectOption = styled.input`
     width: 100%;
     height: 100%;
     padding: 0 2rem 0 1rem;
@@ -84,10 +84,6 @@ const Profile: React.FC<ProfileProps> = ({ profileName, setProfileName, selected
     setSelectedType(selectedType);
     setProfileName(profileName);
 
-    const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        setSelectedType(event.target.value);
-    };
-
     const handleTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setProfileName(event.target.value);
     };
@@ -103,19 +99,16 @@ const Profile: React.FC<ProfileProps> = ({ profileName, setProfileName, selected
     return (
         <>
             <DataPreset
-                title="Profile"
+                title="프로필"
                 dataContainers={[
                     <DataContainer key="1">
-                        <DataName>Name</DataName>
+                        <DataName>팜 이름</DataName>
                         <StringInput type="text" value={profileName} onChange={handleTextChange}/>
                     </DataContainer>,
                     <DataContainer key="2">
-                        <DataName>Type</DataName>
+                        <DataName>작물</DataName>
                         <SelectWrapper>
-                            <SelectOption value={selectedType} onChange={handleSelectChange}>
-                                {grains.map((key, index) => (
-                                    <option value={key} key={index}>{key}</option>
-                                ))}
+                            <SelectOption value={selectedType}>
                             </SelectOption>
                             <SearchButton onClick={handleSearchClick} />
                         </SelectWrapper>
