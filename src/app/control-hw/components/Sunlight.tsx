@@ -7,7 +7,7 @@ import { getToken } from "@/utils/localStorage";
 import DeleteButton from "./DeleteButton";
 
 const Container = styled.div`
-  max-width: 230spx;
+  max-width: 230px;
   width: 60%;
   display: flex;
   flex-direction: column;
@@ -108,7 +108,6 @@ const SelectList = styled.ul`
   width: 90px;
   top: 47px;
   left: 3px;
-  margin-left: 50px;
   padding: 0;
   border: 1px solid #274c4b;
   box-sizing: border-box;
@@ -198,7 +197,7 @@ const SunLight = () => {
   
     const token = getToken();
     try {
-      const response = await axios.patch('/api/hardware/control', {
+      await axios.patch('/api/hardware/control', {
         device: 'Blind',
         targetValue: numericOption, 
       }, {
@@ -208,7 +207,7 @@ const SunLight = () => {
         },
       });
   
-      console.log("조명 수준 업데이트 성공:", response.data);
+      console.log("조명 수준 업데이트 성공");
     } catch (error) {
       console.error("조명 수준 업데이트에 실패했습니다:", error);
     }
@@ -217,7 +216,7 @@ const SunLight = () => {
   const handleDeleteDevice = async () => {
     const token = getToken();
     try {
-      const response = await axios.delete('/api/hardware/control', {
+      await axios.delete('/api/hardware/control', {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -226,12 +225,12 @@ const SunLight = () => {
         },
       });
 
-      alert("기기가 성공적으로 삭제되었습니다."); 
+      setDeleteMessage("기기가 성공적으로 삭제되었습니다."); 
     } catch (error) {
       if (error.response && error.response.status === 404) {
-        alert("자외선 조절기 기기를 찾을 수 없습니다.");
+        setDeleteMessage("자외선 조절기 기기를 찾을 수 없습니다.");
       } else {
-        alert("기기 삭제에 실패했습니다.");
+        setDeleteMessage("기기 삭제에 실패했습니다.");
       }
       console.error("기기 삭제에 실패했습니다:", error);
     }
@@ -247,9 +246,9 @@ const SunLight = () => {
           <SliderLabel style={{ top: '0%' }}>40°C</SliderLabel>
           <SliderLabel style={{ top: '50%' }}>20°C</SliderLabel>
           <SliderLabel style={{ top: '95%' }}>0°C</SliderLabel>
-          <Marker style={{ top: `${100 - calculateLeft(goalLight)}%` }}>
+          <Marker style={{ top: `${98 - calculateLeft(goalLight)}%` }}>
             <div style={{ backgroundColor: 'orange', width: '10px', height: '10px', borderRadius: '50%', margin: '10px' }} />
-            현재
+            Now
           </Marker>
         </SliderContainer>
 

@@ -209,7 +209,6 @@ const AirConditioner = () => {
         },
       });
 
-      alert("성공적으로 업데이트 되었습니다!");
     } catch (error) {
       alert("업데이트에 실패하였습니다 " + error.message);
     }

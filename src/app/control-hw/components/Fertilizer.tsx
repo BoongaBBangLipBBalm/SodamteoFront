@@ -50,7 +50,6 @@ const SliderContainer = styled.div`
   margin: 20px 0;
   background: linear-gradient(to top, #8B4513, #F4A460);
   border-radius: 5px;
-  height: 50vh;
 `;
 
 const SliderLabel = styled.div`
@@ -207,13 +206,15 @@ const Fertilizer = () => {
   const handleOptionClick = async (option) => {
     setSelectedValue(option);
     setShowOptions(false);
-    await handleTempChange(parseInt(option, 10));
+    const newTemp = parseInt(option, 10);
+    setGoalTemp(newTemp); // Update the state immediately
+    await handleTempChange(newTemp);
   };
 
   const handleTempChange = async (newTemp) => {
     const token = getToken();
     try {
-      const response = await axios.patch('/api/hardware/control', {
+      await axios.patch('/api/hardware/control', {
         device: 'Fertilizer',
         targetValue: newTemp,
       }, {
@@ -222,17 +223,15 @@ const Fertilizer = () => {
           'Authorization': `Bearer ${token}`,
         },
       });
-
-      alert("온도가 성공적으로 업데이트되었습니다.");
     } catch (error) {
-      alert("온도 업데이트에 실패하였습니다: " + error.message);
+      alert("업데이트에 실패하였습니다: " + error.message);
     }
   };
 
   const handleDeleteDevice = async () => {
     const token = getToken();
     try {
-      const response = await axios.delete('/api/hardware/control', {
+      await axios.delete('/api/hardware/control', {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -252,7 +251,7 @@ const Fertilizer = () => {
     }
   };
 
-  const calculateLeft = (temp) => ((temp / 100) * 100);
+  const calculateLeft = (temp) => ((temp / 100) * 100); // Adjust if necessary for your temperature range
 
   return (
     <Container>
@@ -264,9 +263,9 @@ const Fertilizer = () => {
           <SliderLabel style={{ top: '0%' }}>100</SliderLabel>
           <SliderLabel style={{ top: '50%' }}>50</SliderLabel>
           <SliderLabel style={{ top: '95%' }}>0</SliderLabel>
-          <Marker style={{ top: `${100 - calculateLeft(goalTemp)}%` }}>
+          <Marker style={{ top: `${98 - calculateLeft(goalTemp)}%` }}>
             <div style={{ backgroundColor: 'orange', width: '10px', height: '10px', borderRadius: '50%', margin: '10px' }} />
-            현재
+            Now
           </Marker>
         </SliderContainer>
 
