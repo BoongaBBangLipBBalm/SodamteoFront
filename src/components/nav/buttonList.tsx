@@ -31,7 +31,7 @@ const page_data: IPageData[] = [
     {name: "forecast", URLName: "/forecast", buttons_id: [0,1,5,6,2,3]},
     {name: "disease-control", URLName: "/disease-control", buttons_id: [0,1,5,6,2,3]},
     {name: "setting", URLName: "/setting", buttons_id: [0,1,5,6,2,3]},
-    {name: "login", URLName: "/Login", buttons_id: [7,8]},
+    {name: "login", URLName: "/login", buttons_id: [7,8]},
     {name: "register", URLName: "/sign-up", buttons_id: [7,8]},
     {name: "test2", URLName: "/test2", buttons_id: [2,3]},
 ];
