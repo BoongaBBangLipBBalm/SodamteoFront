@@ -8,11 +8,13 @@ interface NavigationProps {
 }
 
 const Nav = styled.nav`
+  z-index: 100;
   width: 100%;
   padding-top: 1rem;
   display: flex;
   justify-content: flex-start;
   align-items: center;
+  background-color: white;
 `;
 
 const NavItem = styled.button<{ $isSelected: boolean }>`

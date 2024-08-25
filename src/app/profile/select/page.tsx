@@ -2,7 +2,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import styled from "styled-components";
 import CardViewer from "./components/cardViewer";
 import AddProfileButton from "./components/addProfile";
@@ -32,10 +32,10 @@ const PushCardDataByAPI = (data: any): {[index: string]: ICardProps[]} => {
             farmID:data[i].farmID, 
             farmName: data[i].farmName, 
             imageURL: GetCropImgURL(data[i].cropName),
-            temperature: data[i].temperature,
-            humidity: data[i].humidity,
-            ph: data[i].ph,
-            rainfall: data[i].rainfall
+            temperature: data[i].farm_environment.temperature,
+            humidity: data[i].farm_environment.humidity,
+            ph: data[i].farm_environment.ph,
+            rainfall: data[i].farm_environment.rainfall
         };
         cardList.cardDatas.push(newCardData);
     }
@@ -43,6 +43,7 @@ const PushCardDataByAPI = (data: any): {[index: string]: ICardProps[]} => {
 }
 
 const ProfileSelection: React.FC = () => {
+
     const [cardList, setCardList] = useState<{[index: string]: ICardProps[]}>({"cardDatas":[
         {
             "farmID": -1,

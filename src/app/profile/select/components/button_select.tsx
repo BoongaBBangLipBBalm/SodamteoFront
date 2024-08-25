@@ -67,7 +67,7 @@ const ProfileSelectButton: React.FC<ProfileSelectButtonProps> = ({ farmID }) => 
 
     return (
         <Button onClick={handleSelect} disabled={loading}>
-            {loading ? "Loading..." : "Select"}
+            {loading ? "로딩중..." : "선택"}
         </Button>
     );
 };

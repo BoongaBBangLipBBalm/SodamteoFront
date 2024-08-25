@@ -16,14 +16,21 @@ export interface IPhoto {
 }
 
 const PhotoWrapper = styled.div`
-  position: relative;
-  width: 15rem; /* 240px / 16 = 15rem */
-  transform: translate(0, -50%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 20rem;
+  padding: 5%;
+  height: 100%; /* Ensure it takes the full height */
 `;
 
 const PhotoImage = styled.img`
-  width: 100%;
+  max-width: 90%;
+  max-height: 90%;
+  object-fit: contain; /* Ensures the image scales correctly */
+  border-radius: 0.938rem;
 `;
+
 
 const PhotoContainer = styled.div`
   width: 100%;

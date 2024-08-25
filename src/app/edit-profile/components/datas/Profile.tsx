@@ -5,7 +5,7 @@ import { typeToIdMap } from '@/app/profile/add/components/profileDatas';
 
 const DataName = styled.div`
     font-family: 'Pretendard_Regular';
-    font-size: 1.563rem;
+    font-size: 1.25rem;
     color: black;
     width: 5rem;
     margin-right: 1.25rem;
@@ -101,14 +101,14 @@ const Profile: React.FC<ProfileProps> = ({ profileName, setProfileName, selected
 
     return (
         <DataPreset
-            title="Profile"
+            title="프로필"
             dataContainers={[
                 <DataContainer key="1">
-                    <DataName>Name</DataName>
+                    <DataName>팜 이름</DataName>
                     <StringInput type="text" value={profileName} onChange={handleTextChange} disabled={false}/>
                 </DataContainer>,
                 <DataContainer key="2">
-                    <DataName>Type</DataName>
+                    <DataName>작물</DataName>
                     <SelectWrapper>
                         <SelectOption value={selectedType} onChange={handleSelectChange} disabled={true}>
                             {grains.map((key, index) => (

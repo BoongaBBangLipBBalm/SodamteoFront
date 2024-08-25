@@ -28,21 +28,23 @@ const card_config = { // value: rem
 }
 
 const CardContainer = styled.div<{$isSelected: boolean}>`
+    opacity: ${(props) => props.$isSelected ? `1` : `0.5`};;
     position: relative;
     width: ${(props) => props.$isSelected ? NumToRem(card_config.selectedCard_height * card_config.sizeRatio) : NumToRem(card_config.unselectedCard_height * card_config.sizeRatio)};
     height: ${(props) => props.$isSelected ? NumToRem(card_config.selectedCard_height) : NumToRem(card_config.unselectedCard_height)};
     background-color: #F8F7F7;
-    margin: 0 1.063rem;
     filter: drop-shadow(0px 4px 8px rgba(0,0,0,0.15));
     border-radius: 20px;
     padding: ${(props) => props.$isSelected ? NumToRem(card_config.selectedCard_height * card_config.sizeRatio * 0.1) : NumToRem(card_config.unselectedCard_height * card_config.sizeRatio * 0.1)};
     display: flex;
     flex-direction: column;
-    margin: 2rem auto;
+    margin: auto; // 마진을 auto로 설정해 중앙 정렬 유지
     &:hover .delete-button {
         display: block;
     }
+    transition: 0.1s opacity;
 `;
+
 
 function NumToRem(value: number) {
     return String(value) + "rem";
@@ -69,7 +71,7 @@ const TextConatiner = styled.div`
 
 const ProfileName = styled.span<{$isSelected: boolean}>`
     display: inline-block;
-    font-size: ${props => props.$isSelected ? "1.25rem" : "1rem"};
+    font-size: ${props => props.$isSelected ? "1.25rem" : "0.6rem"};
     font-family: "Pretendard-Regular";
     color: black;
     margin-left: 0.375rem;
@@ -114,7 +116,6 @@ const Card = (props: ICardSelected) => {
     const { isSelected, data } = props;
 
     useEffect(() => {
-        
     }, [props.data]);
 
     return (
@@ -129,10 +130,10 @@ const Card = (props: ICardSelected) => {
             {
                 isSelected
                 ?   <StatusContainer>
-                        <SimpleStatus imageURL="/img/profile/temperature.svg" currentValue={props.data.temperature} left_color="#625FFF" right_color="#E37F7F"></SimpleStatus>
-                        <SimpleStatus imageURL="/img/profile/humidity.svg" currentValue={props.data.humidity} left_color="#625FFF" right_color="#E37F7F"></SimpleStatus>
-                        <SimpleStatus imageURL="/img/profile/bug.svg" currentValue={props.data.ph} left_color="#5FFF65" right_color="#E37F7F"></SimpleStatus>
-                        <SimpleStatus imageURL="/img/profile/sunlight.svg" currentValue={props.data.rainfall} left_color="white" right_color="#625FFF"></SimpleStatus>
+                        <SimpleStatus imageURL="/img/profile/temperature.svg" minValue={-10} maxValue={50} currentValue={props.data.temperature} left_color="#625FFF" right_color="#E37F7F" toFixed={1} unit={"°C"}></SimpleStatus>
+                        <SimpleStatus imageURL="/img/profile/humidity.svg" minValue={0} maxValue={100} currentValue={props.data.humidity} left_color="#625FFF" right_color="#E37F7F" toFixed={0} unit={"%"}></SimpleStatus>
+                        <SimpleStatus imageURL="/img/profile/pH.svg" minValue={0} maxValue={14} currentValue={props.data.ph} left_color="#5FFF65" right_color="#E37F7F" toFixed={1} unit={"pH"}></SimpleStatus>
+                        <SimpleStatus imageURL="/img/profile/rainfall.svg" minValue={0} maxValue={500} currentValue={props.data.rainfall} left_color="white" right_color="#625FFF" toFixed={0} unit={"mm"}></SimpleStatus>
                     </StatusContainer>
                 :   null
             }

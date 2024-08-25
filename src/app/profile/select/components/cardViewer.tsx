@@ -1,42 +1,36 @@
-// cardViewer.tsx
 import styled from "styled-components";
 import Card from "./card";
-import ProfileMoveButton from "./ProfileMoveButton";
 import React, { useEffect, useRef, useState } from "react";
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
-import styles from "./cardViewer.module.css";
 import { ICardProps } from "./card";
 
 const ViewerConatiner = styled.div`
-    
     width: 100%;
     padding: 0 3.68rem;
-    
 `;
 
 export interface ICardDataProps {
     cardDatas: ICardProps[];
     startDataIdx: number;
-    setCardList: (cardList: {[index: string]: ICardProps[]})=>void;
+    setCardList: (cardList: { [index: string]: ICardProps[] }) => void;
 }
 
 const Wrapper = styled.div`
-    
     .slick-initialized {
         display: flex;
         justify-content: center;
         align-items: center;
     }
-
 `;
 
 const StyledSlider = styled(Slider)`
-    
+
     height: 100%;
     width: 100%;
     position: relative;
+    
     .slick-prev::before,
     .slick-next::before {
         opacity: 0;
@@ -46,22 +40,28 @@ const StyledSlider = styled(Slider)`
         display: flex;
         align-items: center;
         vertical-align: center;
+        padding: 1rem 0;
     }
 `;
 
-const SliderPrevButton = styled.button`
+const SliderPrevButton = styled.button<{ disabled: boolean }>`
     background-color: transparent;
     border: none;
     position: absolute;
     left: 0px;
     z-index: 3;
+    pointer-events: ${({ disabled }) => (disabled ? "none" : "auto")};
+    opacity: ${({ disabled }) => (disabled ? 0.5 : 1)};
 `;
-const SliderNextButton = styled.button`
+
+const SliderNextButton = styled.button<{ disabled: boolean }>`
     background-color: transparent;
     border: none;
     position: absolute;
     right: 0px;
     z-index: 3;
+    pointer-events: ${({ disabled }) => (disabled ? "none" : "auto")};
+    opacity: ${({ disabled }) => (disabled ? 0.5 : 1)};
 `;
 
 const SliderButtonDiv = styled.div`
@@ -80,73 +80,83 @@ const SliderButtonDiv = styled.div`
 `;
 
 const CardViewer = (props: ICardDataProps) => {
-
     const sliderRef = useRef<Slider | null>(null);
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const [cards, setCards] = useState(props.cardDatas);
+    const [isSliding, setIsSliding] = useState(false);  // Track if a slide transition is happening
 
     const goToSlide = (index: number) => {
         if (sliderRef.current) {
-        sliderRef.current.slickGoTo(index);
+            sliderRef.current.slickGoTo(index);
         }
     };
 
-    const [currentIndex, setCurrentIndex] = useState(0);
-    const [cards, setCards] = useState(props.cardDatas);
-    
+    const handleSlideChange = (indexChange: number) => {
+        if (!isSliding) {
+            setIsSliding(true);
+            setCurrentIndex((prevIndex) => {
+                const newIndex = (prevIndex + indexChange + cards.length) % cards.length;
+                goToSlide(newIndex);
+                return newIndex;
+            });
+        }
+    };
 
     const MovePrev = () => {
-        setCurrentIndex((currentIndex-1)%cards.length);
-    }
+        handleSlideChange(-1);
+    };
 
     const MoveNext = () => {
-        setCurrentIndex((currentIndex+1)%cards.length);
-    }
+        handleSlideChange(1);
+    };
 
-    const PrevArrow = ({ currentSlide, slideCount, ...props }: any) => (
-        <SliderPrevButton onClick={MovePrev}><SliderButtonDiv><img src="/img/profile/move_previous.svg" alt="<"></img></SliderButtonDiv></SliderPrevButton>
-    )
-    const NextArrow = ({ currentSlide, slideCount, ...props }: any) => (
-        <SliderNextButton onClick={MoveNext}><SliderButtonDiv><img src="/img/profile/move_next.svg" alt="<"></img></SliderButtonDiv></SliderNextButton>
-    )
+    const PrevArrow = (props: any) => (
+        <SliderPrevButton {...props} disabled={isSliding}>
+            <SliderButtonDiv>
+                <img src="/img/profile/move_previous.svg" alt="<" />
+            </SliderButtonDiv>
+        </SliderPrevButton>
+    );
+
+    const NextArrow = (props: any) => (
+        <SliderNextButton {...props} disabled={isSliding}>
+            <SliderButtonDiv>
+                <img src="/img/profile/move_next.svg" alt=">" />
+            </SliderButtonDiv>
+        </SliderNextButton>
+    );
 
     useEffect(() => {
-    }, [currentIndex]);
-
-    useEffect(() => {
-
-        let cardList: ICardProps[] = [];
-        cardList=props.cardDatas;
-
-        // Hard Coding OMG
-        if(props.cardDatas.length == 1) {
-            for(var i = 0 ; i < 4 ; i++) {
-                cardList.push(...props.cardDatas);
+        let cardResult: ICardProps[] = [];
+        if(props.cardDatas.length != 0) {
+            while(cardResult.length < 4) {
+                cardResult = [...cardResult, ...props.cardDatas];
             }
         }
-        else if(props.cardDatas.length < 4) {
-            cardList=[...props.cardDatas, ...props.cardDatas];
-        }
+        setCards(cardResult);
+    }, [props.cardDatas]);
 
-        setCards(cardList);
+    useEffect(() => {
         setCurrentIndex(props.startDataIdx);
         goToSlide(props.startDataIdx);
-    }, [props.cardDatas]);
+    }, [cards]);
 
     const Setting = {
         speed: 300,
-        arrows: (cards.length > 1),
+        arrows: true,
         draggable: false,
         dots: false,
-        infinite: true,
         slidesToScroll: 1,
-        slidesToShow: (cards.length < 2 ? 1 : 3),
-        centerMode:true,
-        centerPadding:"0",
-        prevArrow:(<SliderPrevButton onClick={MovePrev}><SliderButtonDiv><img src="/img/profile/move_previous.svg" alt="<"></img></SliderButtonDiv></SliderPrevButton>),
-        nextArrow:(<SliderNextButton onClick={MoveNext}><SliderButtonDiv><img src="/img/profile/move_next.svg" alt="<"></img></SliderButtonDiv></SliderNextButton>),
+        slidesToShow: 3,
+        centerMode: true,
+        centerPadding: "0",
+        prevArrow: <PrevArrow />,
+        nextArrow: <NextArrow />,
         afterChange: (newIndex: number) => {
+            setIsSliding(false);  // End transition
             setCurrentIndex(newIndex);
         }
-    }
+    };
 
     return (
         <ViewerConatiner>
@@ -154,18 +164,15 @@ const CardViewer = (props: ICardDataProps) => {
                 <StyledSlider {...Setting} ref={sliderRef}>
                     {cards.map((data, index) => (
                         <div key={index}>
-                            {
-                                currentIndex === index
-                                ? <Card data={data} isSelected={true}></Card>
-                                : <Card data={data} isSelected={false}></Card>
-                            }
+                            {currentIndex === index
+                                ? <Card data={data} isSelected={true} />
+                                : <Card data={data} isSelected={false} />}
                         </div>
                     ))}
                 </StyledSlider>
             </Wrapper>
         </ViewerConatiner>
-        
-    )
-}
+    );
+};
 
 export default CardViewer;
