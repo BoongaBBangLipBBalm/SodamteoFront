@@ -13,7 +13,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import { getToken } from "@/utils/localStorage"; // Import token fetching utility
+import { getToken } from "@/utils/localStorage"; 
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
@@ -108,8 +108,8 @@ const HumidityGraph: React.FC = () => {
         const currentData = responseData.Current;
 
         // Extract labels and humidity data
-        const labels = currentData.map((entry: any, index: number) => `${6 - index * 2} hours ago`);
-        labels[labels.length - 1] = "Now";  
+        const labels = currentData.map((entry: any, index: number) => `${8 - index * 2}시간 전`);
+        labels[labels.length - 1] = "현재";  
 
         const humidities = currentData.map((entry: any) => entry.humidity); 
 
@@ -117,7 +117,7 @@ const HumidityGraph: React.FC = () => {
           labels: labels,
           datasets: [
             {
-              label: "Humidity",
+              label: "습도",
               data: humidities,
               fill: true,
               backgroundColor: "rgba(153, 102, 255, 0.2)", 
@@ -140,7 +140,7 @@ const HumidityGraph: React.FC = () => {
   return (
     <Container>
       <Content>
-        <ContentHeader>Humidity Graph</ContentHeader>
+        <ContentHeader>습도 상태</ContentHeader>
         <GraphContainer>
           <Line data={data} options={options} />
         </GraphContainer>

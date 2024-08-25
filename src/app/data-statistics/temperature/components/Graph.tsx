@@ -57,13 +57,18 @@ const options = {
       title: {
         display: false,
       },
+      ticks: {
+        callback: function (value) {
+          return value.toFixed(1) + "°C"; // Format y-axis labels to one decimal place
+        },
+      },
     },
   },
   plugins: {
     tooltip: {
       callbacks: {
         label: function (context) {
-          return `${context.raw}°C`;
+          return `${context.raw.toFixed(1)}°C`; // Format tooltip values to one decimal place
         },
       },
     },
@@ -76,9 +81,10 @@ const options = {
   },
 };
 
+
 const Graph: React.FC = () => {
   const [data, setData] = useState({
-    labels: ["6 hours ago", "4 hours ago", "2 hours ago", "Now"],
+    labels: ["6시간 전", "4시간 전", "2시간 전", "현재"],
     datasets: [
       {
         label: "Temperature",
@@ -103,8 +109,8 @@ const Graph: React.FC = () => {
       if (response.ok) {
         const responseData = await response.json();
         const currentData = responseData.Current;
-        const labels = currentData.map((entry: any, index: number) => `${6 - index * 2} hours ago`);
-        labels[labels.length - 1] = "Now"; 
+        const labels = currentData.map((entry: any, index: number) => `${8 - index * 2}시간 전`);
+        labels[labels.length - 1] = "현재"; 
 
         const temperatures = currentData.map((entry: any) => entry.temperature);
 
@@ -112,7 +118,7 @@ const Graph: React.FC = () => {
           labels: labels,
           datasets: [
             {
-              label: "Temperature",
+              label: "온도",
               data: temperatures,
               fill: true,
               backgroundColor: "rgba(75,192,192,0.2)",
@@ -135,7 +141,7 @@ const Graph: React.FC = () => {
   return (
     <Container>
       <Content>
-        <ContentHeader>Graph</ContentHeader>
+        <ContentHeader>토양 온도 상태</ContentHeader>
         <GraphContainer>
           <Line data={data} options={options} />
         </GraphContainer>

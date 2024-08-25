@@ -126,16 +126,14 @@ const Graph: React.FC = () => {
         const responseData = await response.json();
         const currentData = responseData.Current;
 
-        // Extract values for N, P, K, and pH from the API data
-        const labels = currentData.map((entry: any, index: number) => `${6 - index * 2} hours ago`);
-        labels[labels.length - 1] = "Now";  // Set the last label as "Now"
+        const labels = currentData.map((entry: any, index: number) => `${8 - index * 2}시간 전`);
+        labels[labels.length - 1] = "현재";  // Set the last label as "Now"
 
         const nValues = currentData.map((entry: any) => entry.N);
         const pValues = currentData.map((entry: any) => entry.P);
         const kValues = currentData.map((entry: any) => entry.K);
         const phValues = currentData.map((entry: any) => entry.ph);
 
-        // Update the graph with the fetched data
         setData({
           labels: labels,
           datasets: [
@@ -178,13 +176,13 @@ const Graph: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchData(); // Fetch the data when the component mounts
+    fetchData();
   }, []);
 
   return (
     <Container>
       <Content>
-        <ContentHeader>Graph</ContentHeader>
+        <ContentHeader>비료 상태</ContentHeader>
         <GraphContainer>
           <Line data={data} options={options} />
         </GraphContainer>
