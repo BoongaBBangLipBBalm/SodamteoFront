@@ -139,9 +139,33 @@ const ChartContainer = styled.div`
   height: 400vh; /* Adjust height as needed */
 `;
 
+const DataContainer = styled.div`
+  margin-top: 20px;
+`;
+
+const DataSection = styled.div`
+  margin-bottom: 20px;
+`;
+
+const DataTitle = styled.h3`
+  margin-bottom: 10px;
+  font-size: 18px;
+`;
+
+const DataList = styled.ul`
+  list-style-type: none;
+  padding: 0;
+`;
+
+const DataItem = styled.li`
+  margin-bottom: 5px;
+  font-size: 14px;
+`;
+
 const DashboardChart = () => {
   const [crop, setCrop] = useState<string>('Rice');
-  const [labels, setLabels] = useState<string[]>([]);
+  const [salesLabels, setSalesLabels] = useState<string[]>([]);
+  const [forecastLabels, setForecastLabels] = useState<string[]>([]);
   const [salesData, setSalesData] = useState<number[]>([]);
   const [forecastData, setForecastData] = useState<number[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -158,19 +182,36 @@ const DashboardChart = () => {
       }
       const data = await response.json();
 
-      const fetchedLabels = data.predictions.map((pred: { date: string }) => pred.date);
-      const fetchedForecastData = data.predictions.map((pred: { price: number }) => pred.price);
-      const fetchedSalesData = data.recent_data.map((item: { price: number }) => item.price);
+      const fetchedSalesData = data.recent_data.map((item: { date: string; price: number }) => ({
+        date: new Date(item.date),
+        price: item.price,
+      }));
 
-      setLabels(fetchedLabels);
-      setForecastData(fetchedForecastData);
-      setSalesData(fetchedSalesData);
+      const fetchedForecastData = data.predictions.map((pred: { date: string; price: number }) => ({
+        date: new Date(pred.date),
+        price: pred.price,
+      }));
+
+      const recentLabels = fetchedSalesData.map(item => formatDate(item.date)); 
+      const forecastLabels = fetchedForecastData.map(item => formatDate(item.date)); 
+
+      const salesData = fetchedSalesData.map(item => item.price);
+      const forecastData = fetchedForecastData.map(item => item.price);
+
+      setSalesLabels(recentLabels);
+      setForecastLabels(forecastLabels);
+      setSalesData(salesData);
+      setForecastData(forecastData);
     } catch (error) {
       setError('Failed to fetch data');
       console.error("Error fetching data:", error);
     } finally {
       setLoading(false);
     }
+  };
+
+  const formatDate = (date: Date) => {
+    return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`;
   };
 
   const handlePredictClick = async () => {
@@ -215,10 +256,10 @@ const DashboardChart = () => {
   };
 
   const data = {
-    labels: labels,
+    labels: [...salesLabels, ...forecastLabels],
     datasets: [
       {
-        label: 'Sales',
+        label: '판매 가격',
         data: salesData,
         borderColor: 'rgba(75,192,192,1)',
         backgroundColor: 'rgba(75,192,192,0.2)',
@@ -226,8 +267,8 @@ const DashboardChart = () => {
         tension: 0.4,
       },
       {
-        label: 'Forecast',
-        data: forecastData,
+        label: '예측 가격',
+        data: Array(salesData.length).fill(null).concat(forecastData), 
         borderColor: 'rgba(53, 162, 235, 1)',
         backgroundColor: 'rgba(53, 162, 235, 0.2)',
         fill: true,
@@ -258,8 +299,8 @@ const DashboardChart = () => {
         ticks: {
           callback: (value: number) => `${value.toFixed(0)} 원`,
         },
-        min: Math.min(...salesData) * 0.98,
-        max: Math.max(...forecastData.length > 0 ? forecastData : salesData) * 1.02,
+        min: Math.min(...salesData) * 0.85,
+        max: Math.max(...forecastData.length > 0 ? forecastData : salesData) * 1.15,
       },
     },
   };
@@ -275,9 +316,6 @@ const DashboardChart = () => {
             <OptionList>
               <OptionButton onClick={() => handleOptionClick('Rice')}>Rice</OptionButton>
             </OptionList>
-            <OptionList>
-              <OptionButton onClick={() => handleOptionClick('Wheat')}>Wheat</OptionButton>
-            </OptionList>
           </SelectList>
         </div>
         
@@ -289,6 +327,30 @@ const DashboardChart = () => {
       <ChartContainer>
         <Line data={data} options={options} />
       </ChartContainer>
+
+      <DataContainer>
+        <DataSection>
+          <DataTitle>Recent Sales Data</DataTitle>
+          <DataList>
+            {salesData.map((price, index) => (
+              <DataItem key={index}>
+                {salesLabels[index]}: {price.toLocaleString()} 원
+              </DataItem>
+            ))}
+          </DataList>
+        </DataSection>
+        
+        <DataSection>
+          <DataTitle>Forecast Data</DataTitle>
+          <DataList>
+            {forecastData.map((price, index) => (
+              <DataItem key={index}>
+                {forecastLabels[index]}: {price.toLocaleString()} 원
+              </DataItem>
+            ))}
+          </DataList>
+        </DataSection>
+      </DataContainer>
     </div>
   );
 };
