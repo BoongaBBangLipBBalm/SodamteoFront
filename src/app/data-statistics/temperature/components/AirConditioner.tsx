@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import styled, { css } from "styled-components";
+import styled from "styled-components";
 import { getToken } from "@/utils/localStorage";
 import AIToggleButton from "../../components/AIToggleButton";
 
@@ -13,7 +13,6 @@ const Container = styled.div`
   background-color: #f8f7f6;
   border-radius: 20px;
   margin: 20px;
-  position: relative; /* Necessary for overlay */
 `;
 
 const HeaderContainer = styled.div`
@@ -49,7 +48,7 @@ const Marker = styled.div`
   transform: translateY(-50%);
   display: flex;
   align-items: center;
-  font-size: 12px;
+  font-size: 14px;
 `;
 
 const Knob = styled.div`
@@ -68,7 +67,7 @@ const ScaleLabelContainer = styled.div`
   display: flex;
   justify-content: space-between;
   width: 100%;
-  font-size: 12px;
+  font-size: 14px;
   color: #333;
   margin-top: 5px;
 `;
@@ -169,21 +168,6 @@ const SelectContainer = styled.div`
   position: relative;
 `;
 
-const Overlay = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(192, 192, 192, 0.6); /* Gray overlay */
-  z-index: 10;
-  border-radius: 20px;
-
-  ${props => !props.isAuto && css`
-    display: none;
-  `}
-`;
-
 const AirConditioner = () => {
   const [isOn, setIsOn] = useState(false);
   const [goalTemp, setGoalTemp] = useState(25);
@@ -270,19 +254,19 @@ const AirConditioner = () => {
 
   return (
     <Container>
-      <Overlay isAuto={isAuto} /> {/* Gray overlay when AI is enabled */}
       <HeaderContainer>
-        <h1>Air Conditioner</h1>
         <AIToggleButton isAuto={isAuto} onToggle={handleAIToggle} />
         <SelectContainer>
           <div style={{ position: 'relative' }}>
             <SelectButton onClick={handleTempSelectClick} $show={showTempOptions}>
-              {goalTemp}°C
+              {goalTemp.toFixed(1)}°C {/* Updated to show one decimal place */}
             </SelectButton>
             <SelectList $show={showTempOptions}>
-              {Array.from({ length: 25 }, (_, i) => 16 + i).map(temp => (
+              {Array.from({ length: 25 }, (_, i) => (16 + i).toFixed(1)).map(temp => (
                 <OptionList key={temp}>
-                  <OptionButton onClick={() => handleTempOptionClick(temp)}>{temp}°C</OptionButton>
+                  <OptionButton onClick={() => handleTempOptionClick(parseFloat(temp))}>
+                    {temp}°C
+                  </OptionButton>
                 </OptionList>
               ))}
             </SelectList>
@@ -292,8 +276,8 @@ const AirConditioner = () => {
       <FlexContainer>
         <SliderContainer ref={sliderRef}>
           <Knob left={calculateLeft(goalTemp)} onMouseDown={handleKnobDrag} />
-          <Marker style={{ left: `${calculateLeft(goalTemp)}%` }}>
-            Goal
+          <Marker style={{ left: `${calculateLeft(goalTemp)}%`, marginLeft: '10px' }}>
+            {goalTemp.toFixed(1)}°C {/* Updated to show one decimal place */}
           </Marker>
         </SliderContainer>
       </FlexContainer>
