@@ -83,7 +83,8 @@ const CardViewer = (props: ICardDataProps) => {
     const sliderRef = useRef<Slider | null>(null);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [cards, setCards] = useState(props.cardDatas);
-    const [isSliding, setIsSliding] = useState(false);  // Track if a slide transition is happening
+    const [isSliding, setIsSliding] = useState(false);
+    const [canUseButton, setCanUseButton] = useState(true);
 
     const goToSlide = (index: number) => {
         if (sliderRef.current) {
@@ -111,7 +112,7 @@ const CardViewer = (props: ICardDataProps) => {
     };
 
     const PrevArrow = (props: any) => (
-        <SliderPrevButton {...props} disabled={isSliding}>
+        <SliderPrevButton {...props} disabled={isSliding || !canUseButton}>
             <SliderButtonDiv>
                 <img src="/img/profile/move_previous.svg" alt="<" />
             </SliderButtonDiv>
@@ -119,7 +120,7 @@ const CardViewer = (props: ICardDataProps) => {
     );
 
     const NextArrow = (props: any) => (
-        <SliderNextButton {...props} disabled={isSliding}>
+        <SliderNextButton {...props} disabled={isSliding || !canUseButton}>
             <SliderButtonDiv>
                 <img src="/img/profile/move_next.svg" alt=">" />
             </SliderButtonDiv>
@@ -128,17 +129,35 @@ const CardViewer = (props: ICardDataProps) => {
 
     useEffect(() => {
         let cardResult: ICardProps[] = [];
-        if(props.cardDatas.length != 0) {
+        setCanUseButton(props.cardDatas.length > 1);
+        if(props.cardDatas.length > 1) {
             while(cardResult.length < 4) {
                 cardResult = [...cardResult, ...props.cardDatas];
             }
+        }
+        else if(props.cardDatas.length == 1) {
+            const nullData = {
+                "farmID": -1,
+                "farmName": "",
+                "cropName": "",
+                "imageURL": "",
+                "temperature": 0.1,
+                "humidity": 0.2,
+                "ph": 0.3,
+                "rainfall": 0.4
+            }
+            cardResult.push(props.cardDatas[0]);
+            cardResult.push(nullData);
+            cardResult.push(nullData);
+            cardResult.push(nullData);
+            
         }
         setCards(cardResult);
     }, [props.cardDatas]);
 
     useEffect(() => {
-        setCurrentIndex(props.startDataIdx);
         goToSlide(props.startDataIdx);
+        setCurrentIndex(props.startDataIdx);
     }, [cards]);
 
     const Setting = {

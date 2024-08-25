@@ -32,6 +32,12 @@ font-size: 1rem;
   }
 `;
 
+const englishToKorean: {[key: string]:string} = {
+  "All": "전체",
+  "Diseases": "질병",
+  "Normal": "정상"
+}
+
 const Navigation: React.FC<NavigationProps> = ({ categories, onSelectCategory, selectedCategory }) => {
   return (
     <Nav>

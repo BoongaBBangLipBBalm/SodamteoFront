@@ -54,26 +54,6 @@ const ProfileSelection: React.FC = () => {
             "humidity": 0.2,
             "ph": 0.3,
             "rainfall": 0.4
-        },
-        {
-            "farmID": -1,
-            "farmName": "No Data",
-            "cropName": "No Crop",
-            "imageURL": "",
-            "temperature": 0.1,
-            "humidity": 0.2,
-            "ph": 0.3,
-            "rainfall": 0.4
-        },
-        {
-            "farmID": -1,
-            "farmName": "No Data",
-            "cropName": "No Crop",
-            "imageURL": "",
-            "temperature": 0.1,
-            "humidity": 0.2,
-            "ph": 0.3,
-            "rainfall": 0.4
         }
     ]});
 
