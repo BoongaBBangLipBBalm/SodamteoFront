@@ -127,8 +127,10 @@ const Album: React.FC<AlbumProps> = ({ selectedCategory, photos, onPhotoSelect, 
     centerPadding: '0', 
     vertical: true,
     afterChange: (index: number) => {
-      onPhotoSelect(photos[index]);
-      updateInertAttributes(index);
+      if(index != -1) {
+        onPhotoSelect(photos[index]);
+        updateInertAttributes(index);
+      }
     },
     prevArrow: (
       <SliderPrevButton>
@@ -151,6 +153,8 @@ const Album: React.FC<AlbumProps> = ({ selectedCategory, photos, onPhotoSelect, 
     updateInertAttributes(photos.length - 1);
     onPhotoSelect(photos[photos.length - 1]);
   }, [photos]);
+
+  
 
   return (
     <AlbumContainer>

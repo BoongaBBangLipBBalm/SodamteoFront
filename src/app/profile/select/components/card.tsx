@@ -71,7 +71,7 @@ const TextConatiner = styled.div`
 
 const ProfileName = styled.span<{$isSelected: boolean}>`
     display: inline-block;
-    font-size: ${props => props.$isSelected ? "1.25rem" : "1rem"};
+    font-size: ${props => props.$isSelected ? "1.25rem" : "0.6rem"};
     font-family: "Pretendard-Regular";
     color: black;
     margin-left: 0.375rem;
@@ -130,10 +130,10 @@ const Card = (props: ICardSelected) => {
             {
                 isSelected
                 ?   <StatusContainer>
-                        <SimpleStatus imageURL="/img/profile/temperature.svg" minValue={-10} maxValue={50} currentValue={props.data.temperature} left_color="#625FFF" right_color="#E37F7F"></SimpleStatus>
-                        <SimpleStatus imageURL="/img/profile/humidity.svg" minValue={0} maxValue={100} currentValue={props.data.humidity} left_color="#625FFF" right_color="#E37F7F"></SimpleStatus>
-                        <SimpleStatus imageURL="/img/profile/bug.svg" minValue={0} maxValue={14} currentValue={props.data.ph} left_color="#5FFF65" right_color="#E37F7F"></SimpleStatus>
-                        <SimpleStatus imageURL="/img/profile/sunlight.svg" minValue={0} maxValue={500} currentValue={props.data.rainfall} left_color="white" right_color="#625FFF"></SimpleStatus>
+                        <SimpleStatus imageURL="/img/profile/temperature.svg" minValue={-10} maxValue={50} currentValue={props.data.temperature} left_color="#625FFF" right_color="#E37F7F" toFixed={1} unit={"°C"}></SimpleStatus>
+                        <SimpleStatus imageURL="/img/profile/humidity.svg" minValue={0} maxValue={100} currentValue={props.data.humidity} left_color="#625FFF" right_color="#E37F7F" toFixed={0} unit={"%"}></SimpleStatus>
+                        <SimpleStatus imageURL="/img/profile/pH.svg" minValue={0} maxValue={14} currentValue={props.data.ph} left_color="#5FFF65" right_color="#E37F7F" toFixed={1} unit={"pH"}></SimpleStatus>
+                        <SimpleStatus imageURL="/img/profile/rainfall.svg" minValue={0} maxValue={500} currentValue={props.data.rainfall} left_color="white" right_color="#625FFF" toFixed={0} unit={"mm"}></SimpleStatus>
                     </StatusContainer>
                 :   null
             }

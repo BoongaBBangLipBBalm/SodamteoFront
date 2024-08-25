@@ -161,7 +161,7 @@ const DiseaseControl: React.FC = () => {
         const tempPhotoData = GetIPhotoDataByGET(response);
         setAllPhotos(tempPhotoData);
         setFilteredPhotos(tempPhotoData);
-        setSelectedPhoto(tempPhotoData[0] || null);
+        setSelectedPhoto(tempPhotoData[tempPhotoData.length - 1]);
 
       } catch (error) {
         console.error('Error fetching photos:', error);
@@ -239,7 +239,7 @@ const DiseaseControl: React.FC = () => {
     setSelectedCategory(category);
     const updatedPhotos = filterPhotos(category, allPhotos);
     setFilteredPhotos(updatedPhotos);
-    setSelectedPhoto(updatedPhotos[0] || null);
+    setSelectedPhoto(updatedPhotos[updatedPhotos.length - 1]);
   };
 
   const GetIPhotoDataByGET = (data: any): IPhoto[] => {
