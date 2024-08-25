@@ -11,12 +11,37 @@ import { getToken } from "@/utils/localStorage";
 
 const Wrapper = styled.div`
   width: 100%;
+  font-family: 'Pretendard-Regular';
 `;
 
 const Header = styled.h1`
-  padding: 15px 20px;
-  font-weight: 500;
+  font-size: 1.5rem;
+  margin: 0 0.625rem;
+  padding: 1rem 1.25rem;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  border-radius: 0.3125rem;
+
+  &:hover {
+    opacity: 0.8;
+  }
+
+
 `;
+
+
+const Nav = styled.nav`
+  width: 100%;
+  padding-top: 1rem;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+`;
+
+
+
+
 
 const Container = styled.div`
   width: 100%;

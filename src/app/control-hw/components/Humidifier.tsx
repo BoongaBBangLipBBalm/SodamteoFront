@@ -34,8 +34,8 @@ const FlexContainer = styled.div`
 
 const SliderContainer = styled.div`
   position: relative;
-  width: 12px;
-  height: 60vh;
+  width: 20px;
+  height: 50vh;
   margin: 20px 0;
   background: linear-gradient(to top, ${props => props.gradient});
   border-radius: 5px;
@@ -43,35 +43,102 @@ const SliderContainer = styled.div`
 
 const SliderLabel = styled.div`
   position: absolute;
-  left: 20px;
+  right: 15px;
   transform: translateX(-50%);
-  font-size: 12px;
+  font-size: 14px;
 `;
 
 const Marker = styled.div`
   position: absolute;
-  left: 100%;
+  left: 130%;
   transform: translateX(-50%);
   display: flex;
   align-items: center;
-  font-size: 12px;
+  font-size: 14px;
 `;
 
-const ScaleLabelContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  width: 80px;
-  font-size: 12px;
-  color: #333;
-  margin-top: 5px;
-`;
-
-const SelectBox = styled.select`
+const SelectButton = styled.button`
+  width: 90px;
   padding: 10px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  margin-top: 20px;
+  margin: 10px 0;
+  font-size: 15px;
+  background-color: white;
+  border: 1px solid #274c4b;
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: left;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  color: black;
+  position: relative;
+  transition: border-color 0.3s, outline 0.3s;
+
+  &:hover,
+  &:focus {
+    border: 1px solid #274c4b;
+    outline: 2px solid #749f73;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-40%) rotate(0deg);
+    border: 5px solid transparent;
+    border-top-color: #274c4b;
+    transition: transform 0.3s;
+  }
+
+  ${({ $show }) => $show && `
+    &::after {
+      transform: translateY(-80%) rotate(180deg);
+    }
+  `}
+`;
+
+const SelectList = styled.ul`
+  list-style-type: none;
+  display: ${(props) => (props.$show ? 'block' : 'none')};
+  position: absolute;
+  width: 90px;
+  top: 47px;
+  left: 0;
+  padding: 0;
+  border: 1px solid #274c4b;
+  box-shadow: 4px 4px 14px rgba(0, 0, 0, 0.15);
+  border-radius: 10px;
+  background-color: white;
+  z-index: 1000;
+  max-height: 130px;
+  overflow-y: auto;
+`;
+
+const OptionButton = styled.button`
+  width: 100%;
+  padding: 7px 10px;
+  border: none;
+  background-color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  font-size: 15px;
+  color: black;
+
+  &:hover,
+  &:focus {
+    background-color: #f8f7f6;
+  }
+`;
+
+const OptionList = styled.li`
+  padding: 3px;
+  margin: 0 3px;
+  color: black;
 `;
 
 const DeleteButton = styled.button`
@@ -82,7 +149,7 @@ const DeleteButton = styled.button`
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  margin-top: 20px;
+  margin-top: 10px;
   &:hover {
     background-color: #c9302c;
   }
@@ -92,9 +159,9 @@ const Humidifier = () => {
   const [isOn, setIsOn] = useState(false);
   const [goalHumidity, setGoalHumidity] = useState(50); // Default value
   const [deleteMessage, setDeleteMessage] = useState(''); // Message displayed after delete
+  const [showOptions, setShowOptions] = useState(false);
   const circleKnobRef = useRef(null);
 
-  // Fetch humidifier status on component mount
   useEffect(() => {
     const fetchHumidifierStatus = async () => {
       const token = getToken(); // Assuming getToken fetches the stored token
@@ -109,8 +176,8 @@ const Humidifier = () => {
         const humidifier = data.find(device => device.device === 'Humidifier');
         if (humidifier) {
           const { status, isAuto } = humidifier;
-          setIsOn(isAuto);  // Set the AI mode state
-          setGoalHumidity(status); // Update the goal humidity
+          setIsOn(isAuto);  
+          setGoalHumidity(status); 
         } else {
           console.error("Humidifier device not found in the response");
         }
@@ -122,7 +189,6 @@ const Humidifier = () => {
     fetchHumidifierStatus();
   }, []);
 
-  // Update the goal humidity on the server
   const updateHumidifierStatus = async (newHumidity) => {
     const token = getToken();
     try {
@@ -137,35 +203,24 @@ const Humidifier = () => {
       });
 
       const { status } = response.data;
-      setGoalHumidity(status); // Update state with new status
+      setGoalHumidity(status); 
       console.log("Humidifier status updated successfully:", response.data);
     } catch (error) {
       console.error("Failed to update humidifier status:", error);
     }
   };
 
-  // Handle knob dragging to adjust humidity
-  const handleKnobDrag = (e) => {
-    const circleRect = circleKnobRef.current.getBoundingClientRect();
-    const offsetX = e.clientX - circleRect.left;
-    let newHumidity = (offsetX / circleRect.width) * 95; // Updated to max 95
-    newHumidity = Math.max(25, Math.min(95, newHumidity));
-    setGoalHumidity(newHumidity);
-
-    // Update the humidity on the server
-    updateHumidifierStatus(newHumidity);
+  const handleSelectClick = () => {
+    setShowOptions((prevShowOptions) => !prevShowOptions);
   };
 
-  // Handle selecting a new humidity value from the dropdown
-  const handleSelectChange = (e) => {
-    const newHumidity = Number(e.target.value);
-    setGoalHumidity(newHumidity);
+  const handleOptionClick = async (option) => {
+    setGoalHumidity(option);
+    setShowOptions(false);
 
-    // Update the humidity on the server
-    updateHumidifierStatus(newHumidity);
+    updateHumidifierStatus(option);
   };
 
-  // Delete the humidifier device
   const handleDeleteDevice = async () => {
     const token = getToken();
     try {
@@ -190,29 +245,37 @@ const Humidifier = () => {
   };
 
   // Calculate position for the marker based on humidity
-  const calculateLeft = (humidity) => ((humidity - 25) / (95 - 25)) * 100; // Updated to max 95
+  const calculateTop = (humidity) => ((95 - humidity) / (95 - 25)) * 100; // Updated to max 95
 
   return (
     <Container>
       <Title>Humidifier</Title>
       <FlexContainer>
         <SliderContainer gradient="#003333, #99CCCC">
-          <SliderLabel style={{ top: '0%' }}>95%</SliderLabel> {/* Updated max label */}
+          <SliderLabel style={{ top: '0%' }}>95%</SliderLabel>
           <SliderLabel style={{ top: '50%' }}>60%</SliderLabel>
-          <SliderLabel style={{ top: '100%' }}>25%</SliderLabel>
-          <Marker style={{ top: `${100 - calculateLeft(goalHumidity)}%` }}>
-            <div style={{ backgroundColor: 'orange', width: '10px', height: '10px', borderRadius: '50%' }} />
-            Goal
+          <SliderLabel style={{ top: '95%' }}>25%</SliderLabel>
+          <Marker style={{ top: `${calculateTop(goalHumidity)}%` }}>
+            <div style={{ backgroundColor: 'orange', width: '10px', height: '10px', borderRadius: '50%', margin: '10px' }} />
+            Now
           </Marker>
         </SliderContainer>
-        <SelectBox value={goalHumidity} onChange={handleSelectChange}>
-          {[...Array(15).keys()].map(i => (
-            <option key={i} value={25 + i * 5}>{25 + i * 5}%</option> // Updated to max 95
-          ))}
-        </SelectBox>
-        {/* Replace ToggleContainer with AIToggleButton */}
+        <div style={{ position: 'relative' }}>
+          <SelectButton onClick={handleSelectClick} $show={showOptions}>
+            {goalHumidity.toFixed(1)}%
+          </SelectButton>
+          <SelectList $show={showOptions}>
+            {[...Array(15).keys()].map(i => (
+              <OptionList key={i}>
+                <OptionButton onClick={() => handleOptionClick(25 + i * 5)}>
+                  {25 + i * 5}%
+                </OptionButton>
+              </OptionList>
+            ))}
+          </SelectList>
+        </div>
         <AIToggleButton isAuto={isOn} onToggle={setIsOn} />
-        <DeleteButton onClick={handleDeleteDevice}>Delete Device</DeleteButton>
+        <DeleteButton onClick={handleDeleteDevice}>Delete</DeleteButton>
         {deleteMessage && <p>{deleteMessage}</p>}
       </FlexContainer>
     </Container>

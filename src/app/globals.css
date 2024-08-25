@@ -107,3 +107,9 @@ a {
   font-weight: bold;
   src: url("/fonts/Pretendard_Bold.otf") format("opentype");
 }
+
+@font-face {
+  font-family: 'Pretendard-Regular';
+  font-weight: regular;
+  src: url("/fonts/Pretendard_Regular.otf") format("opentype");
+}
