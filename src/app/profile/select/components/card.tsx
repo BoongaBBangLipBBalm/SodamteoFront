@@ -32,17 +32,17 @@ const CardContainer = styled.div<{$isSelected: boolean}>`
     width: ${(props) => props.$isSelected ? NumToRem(card_config.selectedCard_height * card_config.sizeRatio) : NumToRem(card_config.unselectedCard_height * card_config.sizeRatio)};
     height: ${(props) => props.$isSelected ? NumToRem(card_config.selectedCard_height) : NumToRem(card_config.unselectedCard_height)};
     background-color: #F8F7F7;
-    margin: 0 1.063rem;
     filter: drop-shadow(0px 4px 8px rgba(0,0,0,0.15));
     border-radius: 20px;
     padding: ${(props) => props.$isSelected ? NumToRem(card_config.selectedCard_height * card_config.sizeRatio * 0.1) : NumToRem(card_config.unselectedCard_height * card_config.sizeRatio * 0.1)};
     display: flex;
     flex-direction: column;
-    margin: 2rem auto;
+    margin: auto; // 마진을 auto로 설정해 중앙 정렬 유지
     &:hover .delete-button {
         display: block;
     }
 `;
+
 
 function NumToRem(value: number) {
     return String(value) + "rem";

@@ -2,7 +2,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import styled from "styled-components";
 import CardViewer from "./components/cardViewer";
 import AddProfileButton from "./components/addProfile";
@@ -43,6 +43,7 @@ const PushCardDataByAPI = (data: any): {[index: string]: ICardProps[]} => {
 }
 
 const ProfileSelection: React.FC = () => {
+
     const [cardList, setCardList] = useState<{[index: string]: ICardProps[]}>({"cardDatas":[
         {
             "farmID": -1,
