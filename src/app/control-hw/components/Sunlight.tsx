@@ -16,6 +16,7 @@ const Container = styled.div`
   background-color: #f8f7f6;
   border-radius: 20px;
   margin: 20px;
+  height: 85vh;
 `;
 
 const Title = styled.h2`
@@ -38,6 +39,7 @@ const SliderContainer = styled.div`
   margin: 20px 0;
   background: linear-gradient(to top, #FF0000, #660000); /* Reverted to original gradient */
   border-radius: 5px;
+  height: 60vh;
 `;
 
 const SliderLabel = styled.div`
