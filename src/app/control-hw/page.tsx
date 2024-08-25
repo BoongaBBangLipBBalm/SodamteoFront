@@ -17,7 +17,7 @@ const Wrapper = styled.div`
 const Header = styled.h1`
   font-size: 2rem;
   margin: 0.5rem 0.625rem;
-  padding: 1rem 1.25rem;
+  padding: 0.5rem 1.25rem;
   border: none;
   background-color: transparent;
   cursor: pointer;
@@ -26,22 +26,7 @@ const Header = styled.h1`
   &:hover {
     opacity: 0.8;
   }
-
-
 `;
-
-
-const Nav = styled.nav`
-  width: 100%;
-  padding-top: 1rem;
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-`;
-
-
-
-
 
 const Container = styled.div`
   width: 100%;
@@ -50,13 +35,17 @@ const Container = styled.div`
   align-items: center;
   height: 90vh;
   gap: 20px;
+  font-family: 'Pretendard-Regular';
 `;
 
 const HeaderContainer = styled.div`
   display: flex;
   width: 100%;
   justify-content: space-between;
+  font-size: 2em;
+  padding: 5px;
 `;
+
 
 const controlHW = () => {
   const [hardwareList, setHardwareList] = useState([]);
@@ -91,7 +80,7 @@ const controlHW = () => {
   return (
     <Wrapper>
       <HeaderContainer>
-        <Header>Control Hardware</Header>
+        <Header>기기 제어</Header>
         <AddProfileButton></AddProfileButton>
       </HeaderContainer>
       <Container>

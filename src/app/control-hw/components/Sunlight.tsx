@@ -4,9 +4,10 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import axios from 'axios';
 import { getToken } from "@/utils/localStorage";
-import AIToggleButton from "@/app/data-statistics/components/AIToggleButton";
+import DeleteButton from "./DeleteButton";
 
 const Container = styled.div`
+  max-width: 230spx;
   width: 60%;
   display: flex;
   flex-direction: column;
@@ -35,11 +36,10 @@ const FlexContainer = styled.div`
 const SliderContainer = styled.div`
   position: relative;
   width: 20px;
-  height: 50vh;
+  height: 55vh;
   margin: 20px 0;
   background: linear-gradient(to top, #FF0000, #660000);
   border-radius: 5px;
-  height: 55vh;
 `;
 
 const SliderLabel = styled.div`
@@ -154,20 +154,6 @@ const SelectContainer = styled.div`
   position: relative;
 `;
 
-const DeleteButton = styled.button`
-  padding: 10px 20px;
-  font-size: 16px;
-  background-color: #d9534f;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  margin-top: 20px;
-  &:hover {
-    background-color: #c9302c;
-  }
-`;
-
 const SunLight = () => {
   const [isOn, setIsOn] = useState(false);
   const [goalLight, setGoalLight] = useState<number>(20);
@@ -189,34 +175,32 @@ const SunLight = () => {
         if (sunlightDevice) {
           const { status, isAuto } = sunlightDevice;
           setIsOn(isAuto);
-          setGoalLight(Number(status)); // status를 숫자로 변환
+          setGoalLight(Number(status));
         } else {
-          console.error("Sunlight device not found in the response");
+          console.error("자외선 조절기 기기를 찾을 수 없습니다.");
         }
       } catch (error) {
-        console.error("Failed to fetch sunlight data:", error);
+        console.error("자외선 조절기 상태를 가져오는 데 실패했습니다:", error);
       }
     };
   
     fetchSunlightData();
   }, []);
   
-  
-
   const handleSelectClick = () => {
-    setShowOptions((prevShowOptions) => !prevShowOptions);
+    setShowOptions(prevShowOptions => !prevShowOptions);
   };
 
   const handleOptionClick = async (option: string) => {
-    const numericOption = parseFloat(option); // 문자열을 숫자로 변환
-    setGoalLight(numericOption); // 숫자로 설정
+    const numericOption = parseFloat(option); 
+    setGoalLight(numericOption); 
     setShowOptions(false);
   
     const token = getToken();
     try {
       const response = await axios.patch('/api/hardware/control', {
         device: 'Blind',
-        targetValue: numericOption, // 숫자 값을 서버에 전송
+        targetValue: numericOption, 
       }, {
         headers: {
           'Content-Type': 'application/json',
@@ -224,9 +208,9 @@ const SunLight = () => {
         },
       });
   
-      console.log("Light level update success:", response.data);
+      console.log("조명 수준 업데이트 성공:", response.data);
     } catch (error) {
-      console.error("Failed to update light level:", error);
+      console.error("조명 수준 업데이트에 실패했습니다:", error);
     }
   };
   
@@ -242,14 +226,14 @@ const SunLight = () => {
         },
       });
 
-      setDeleteMessage(response.data.message); // Set success message
+      alert("기기가 성공적으로 삭제되었습니다."); 
     } catch (error) {
       if (error.response && error.response.status === 404) {
-        setDeleteMessage("Sunlight device not found");
+        alert("자외선 조절기 기기를 찾을 수 없습니다.");
       } else {
-        setDeleteMessage("Failed to delete device");
+        alert("기기 삭제에 실패했습니다.");
       }
-      console.error("Failed to delete device:", error);
+      console.error("기기 삭제에 실패했습니다:", error);
     }
   };
 
@@ -257,22 +241,22 @@ const SunLight = () => {
 
   return (
     <Container>
-      <Title>Blind</Title>
+      <Title>자외선 제어</Title>
       <FlexContainer>
-        <SliderContainer gradient="#FF0000, #660000"> {/* Gradient restored */}
+        <SliderContainer>
           <SliderLabel style={{ top: '0%' }}>40°C</SliderLabel>
           <SliderLabel style={{ top: '50%' }}>20°C</SliderLabel>
           <SliderLabel style={{ top: '95%' }}>0°C</SliderLabel>
           <Marker style={{ top: `${100 - calculateLeft(goalLight)}%` }}>
-            <div style={{ backgroundColor: 'orange', width: '10px', height: '10px', borderRadius: '50%', margin: '10px'  }} />
-            Now
+            <div style={{ backgroundColor: 'orange', width: '10px', height: '10px', borderRadius: '50%', margin: '10px' }} />
+            현재
           </Marker>
         </SliderContainer>
 
         <SelectContainer>
-        <SelectButton onClick={handleSelectClick} $show={showOptions}>
-          {typeof goalLight === 'number' ? goalLight.toFixed(1) : 'N/A'}
-        </SelectButton>
+          <SelectButton onClick={handleSelectClick} $show={showOptions}>
+            {goalLight.toFixed(1)}°C
+          </SelectButton>
 
           <SelectList $show={showOptions}>
             {[...Array(9).keys()].map(i => (
@@ -285,7 +269,7 @@ const SunLight = () => {
           </SelectList>
         </SelectContainer>
 
-        <DeleteButton onClick={handleDeleteDevice}>Delete</DeleteButton>
+        <DeleteButton onClick={handleDeleteDevice} message={deleteMessage} />
         {deleteMessage && <p>{deleteMessage}</p>}
       </FlexContainer>
     </Container>

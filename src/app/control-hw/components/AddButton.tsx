@@ -5,14 +5,14 @@ import { getToken } from "@/utils/localStorage";
 const deviceOptions = {
   "온도 제어": "Airconditioner",
   "습도 제어": "Humidifier",
-  "자와선 제어": "Blind",
+  "자외선 제어": "Blind",
   "비료 제어": "Fertilizer"
 };
 
 const SelectButton = styled.button`
   width: 130px;
   padding: 10px;
-  margin: 0px;
+  margin: 0;
   font-size: 15px;
   line-height: 14px;
   background-color: white;
@@ -156,14 +156,14 @@ const SubmitButton = styled.button`
   border-radius: 4px;
   cursor: pointer;
   width: 130px;
-  margin: 0px;
+  margin: 0;
 
   &:hover {
     background-color: #193736;
   }
 `;
 
-const AddDeviceForm = ({ closeForm }) => {
+const AddDeviceForm = ({ closeForm, onDeviceAdded }) => {
   const [selectedDevice, setSelectedDevice] = useState("");
   const [showOptions, setShowOptions] = useState(false);
 
@@ -199,6 +199,7 @@ const AddDeviceForm = ({ closeForm }) => {
 
       if (response.ok) {
         alert("기기가 성공적으로 추가되었습니다.");
+        onDeviceAdded(); // 기기 추가 후 화면 갱신
         closeForm();
       } else if (response.status === 400) {
         alert("이미 존재하는 기기입니다.");
@@ -236,12 +237,17 @@ const AddProfileButton = () => {
     setIsFormVisible(!isFormVisible);
   };
 
+  const handleDeviceAdded = () => {
+    // 화면을 새로 고침하거나 데이터를 새로 가져오는 로직을 여기에 추가합니다.
+    window.location.reload(); // 페이지를 새로 고침하여 화면 갱신
+  };
+
   return (
     <>
       <Container onClick={handleFormToggle}>
         <Image src="/img/profile/add.svg" alt="Add Device" />
       </Container>
-      {isFormVisible && <AddDeviceForm closeForm={handleFormToggle} />}
+      {isFormVisible && <AddDeviceForm closeForm={handleFormToggle} onDeviceAdded={handleDeviceAdded} />}
     </>
   );
 };
