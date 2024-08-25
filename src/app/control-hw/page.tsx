@@ -15,8 +15,8 @@ const Wrapper = styled.div`
 `;
 
 const Header = styled.h1`
-  font-size: 1.5rem;
-  margin: 0 0.625rem;
+  font-size: 2rem;
+  margin: 0.5rem 0.625rem;
   padding: 1rem 1.25rem;
   border: none;
   background-color: transparent;
