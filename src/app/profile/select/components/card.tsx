@@ -116,7 +116,6 @@ const Card = (props: ICardSelected) => {
     const { isSelected, data } = props;
 
     useEffect(() => {
-        
     }, [props.data]);
 
     return (
@@ -131,10 +130,10 @@ const Card = (props: ICardSelected) => {
             {
                 isSelected
                 ?   <StatusContainer>
-                        <SimpleStatus imageURL="/img/profile/temperature.svg" currentValue={props.data.temperature} left_color="#625FFF" right_color="#E37F7F"></SimpleStatus>
-                        <SimpleStatus imageURL="/img/profile/humidity.svg" currentValue={props.data.humidity} left_color="#625FFF" right_color="#E37F7F"></SimpleStatus>
-                        <SimpleStatus imageURL="/img/profile/bug.svg" currentValue={props.data.ph} left_color="#5FFF65" right_color="#E37F7F"></SimpleStatus>
-                        <SimpleStatus imageURL="/img/profile/sunlight.svg" currentValue={props.data.rainfall} left_color="white" right_color="#625FFF"></SimpleStatus>
+                        <SimpleStatus imageURL="/img/profile/temperature.svg" minValue={-10} maxValue={50} currentValue={props.data.temperature} left_color="#625FFF" right_color="#E37F7F"></SimpleStatus>
+                        <SimpleStatus imageURL="/img/profile/humidity.svg" minValue={0} maxValue={100} currentValue={props.data.humidity} left_color="#625FFF" right_color="#E37F7F"></SimpleStatus>
+                        <SimpleStatus imageURL="/img/profile/bug.svg" minValue={0} maxValue={14} currentValue={props.data.ph} left_color="#5FFF65" right_color="#E37F7F"></SimpleStatus>
+                        <SimpleStatus imageURL="/img/profile/sunlight.svg" minValue={0} maxValue={500} currentValue={props.data.rainfall} left_color="white" right_color="#625FFF"></SimpleStatus>
                     </StatusContainer>
                 :   null
             }
