@@ -2,6 +2,94 @@ import React, { useState } from "react";
 import styled, { keyframes } from "styled-components";
 import { getToken } from "@/utils/localStorage";
 
+const deviceOptions = {
+    "온도 제어": "Airconditioner",
+    "습도 제어": "Humidifier",
+    "자와선 제어": "Blind",
+    "비료 제어": "Fertilizer"
+};
+
+const SelectButton = styled.button`
+  width: 130px;
+  padding: 10px;
+  margin: 0px;
+  font-size: 15px;
+  line-height: 14px;
+  background-color: white;
+  border: 1px solid #274c4b;
+  box-sizing: border-box;
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: left;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  color: black;
+  position: relative;
+  transition: border-color 0.3s, outline 0.3s;
+
+  &:hover,
+  &:focus {
+    border: 1px solid #274c4b;
+    outline: 2px solid #749f73;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%) rotate(0deg);
+    border: 5px solid transparent;
+    border-top-color: #274c4b;
+    transition: transform 0.3s;
+  }
+
+  ${({ $show }) => $show && `
+    &::after {
+      transform: translateY(-50%) rotate(180deg);
+    }
+  `}
+`;
+
+const SelectList = styled.ul`
+  list-style-type: none;
+  display: ${(props) => (props.$show ? 'block' : 'none')};
+  position: absolute;
+  width: 130px;
+  top: 100px;
+  left: 75px;
+  margin: 0;
+  padding: 0;
+  border: 1px solid #274c4b;
+  box-sizing: border-box;
+  box-shadow: 4px 4px 14px rgba(0, 0, 0, 0.15);
+  border-radius: 10px;
+  background-color: white;
+  z-index: 1000;
+  max-height: 130px;
+  overflow-y: auto;
+`;
+
+const OptionButton = styled.button`
+  width: 100%;
+  padding: 7px 10px;
+  border: none;
+  background-color: white;
+  cursor: pointer;
+  text-align: left;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  font-size: 15px;
+  color: black;
+
+  &:hover,
+  &:focus {
+    background-color: #f8f7f6;
+  }
+`;
+
 const Container = styled.button`
     position: absolute;
     right: 1.563rem;
@@ -57,12 +145,7 @@ const Form = styled.form`
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     animation: ${fadeIn} 0.5s ease-out;
-`;
-
-const Select = styled.select`
-    padding: 0.5rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    font-size: 13px;
 `;
 
 const SubmitButton = styled.button`
@@ -72,28 +155,34 @@ const SubmitButton = styled.button`
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    width: 130px;
+    margin: 0px;
 
     &:hover {
-        background-color: #193736;
+      background-color: #193736;
     }
 `;
 
 const AddDeviceForm = () => {
     const [selectedDevice, setSelectedDevice] = useState("");
-    const [responseMessage, setResponseMessage] = useState("");
+    const [showOptions, setShowOptions] = useState(false);
+
+    const handleOptionClick = (english) => {
+        setSelectedDevice(english);
+        setShowOptions(false);
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         if (!selectedDevice) {
-            setResponseMessage("Please select a device.");
             return;
         }
 
         try {
-            const token = getToken(); // 로컬 저장소에서 토큰 가져오기
+            const token = getToken(); // Get token from local storage
             if (!token) {
-                setResponseMessage("No authentication token found.");
+                alert("인증 토큰을 찾을 수 없습니다."); // Display alert in Korean
                 return;
             }
 
@@ -101,38 +190,43 @@ const AddDeviceForm = () => {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`, // 토큰 추가
+                    Authorization: `Bearer ${token}`, // Add token to request
                 },
                 body: JSON.stringify({
-                    device: selectedDevice,
+                    device: selectedDevice,  // Send selected device in English to the server
                 }),
             });
 
             if (response.ok) {
                 const data = await response.json();
-                setResponseMessage(`Device added successfully: ${data.device}, farmID: ${data.farmID}`);
+                alert(`기기가 성공적으로 추가되었습니다:`); // Success message in Korean
             } else if (response.status === 400) {
-                setResponseMessage("Bad Request: Invalid input");
+                alert("이미 존재하는 기기입니다."); // Bad request message in Korean
             } else {
-                setResponseMessage("Server Error");
+                alert("서버 오류가 발생했습니다."); // Server error message in Korean
             }
         } catch (error) {
-            setResponseMessage("An error occurred: " + error.message);
+            alert("오류가 발생했습니다: " + error.message); // Error message in Korean
         }
     };
 
     return (
         <FormWrapper>
             <Form onSubmit={handleSubmit}>
-                <Select value={selectedDevice} onChange={(e) => setSelectedDevice(e.target.value)}>
-                    <option value="">디바이스 선택</option>
-                    <option value="Airconditioner">Airconditioner</option>
-                    <option value="Humidifier">Humidifier</option>
-                    <option value="Blind">Blind</option>
-                    <option value="Fertilizer">Fertilizer</option>
-                </Select>
-                <SubmitButton type="submit">추가하기</SubmitButton>
-                {responseMessage && <p>{responseMessage}</p>}
+                <SelectButton $show={showOptions} onClick={() => setShowOptions(!showOptions)}>
+                    {Object.entries(deviceOptions).find(([k, v]) => v === selectedDevice)?.[0] || "디바이스 선택"}
+                </SelectButton>
+                <SelectList $show={showOptions}>
+                    {Object.entries(deviceOptions).map(([korean, english]) => (
+                        <OptionButton key={english} onClick={() => handleOptionClick(english)}>
+                            {korean}
+                        </OptionButton>
+                    ))}
+                </SelectList>
+                <SubmitButton type="submit" disabled={!selectedDevice}>
+                  추가하기
+                </SubmitButton>
+
             </Form>
         </FormWrapper>
     );
