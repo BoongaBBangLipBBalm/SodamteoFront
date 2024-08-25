@@ -7,7 +7,7 @@
     },
     {
         "id": 1,
-        "name": "하드웨어 조작",
+        "name": "기기 제어",
         "imageURL": "/img/nav/control_hardware.svg",
         "toURL": "/control-hw"
     },
