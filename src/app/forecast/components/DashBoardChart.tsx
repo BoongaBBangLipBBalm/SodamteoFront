@@ -65,7 +65,7 @@ const SelectList = styled.ul<{ $show: boolean }>`
   display: ${(props) => (props.$show ? 'block' : 'none')};
   position: absolute;
   width: 90px;
-  top: 117px;
+  top: 124px;
   right: 120px;
   margin-right: 10px;
   padding: 0;
