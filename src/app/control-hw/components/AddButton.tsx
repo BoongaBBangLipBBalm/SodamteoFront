@@ -3,10 +3,10 @@ import styled, { keyframes } from "styled-components";
 import { getToken } from "@/utils/localStorage";
 
 const deviceOptions = {
-    "온도 제어": "Airconditioner",
-    "습도 제어": "Humidifier",
-    "자와선 제어": "Blind",
-    "비료 제어": "Fertilizer"
+  "온도 제어": "Airconditioner",
+  "습도 제어": "Humidifier",
+  "자와선 제어": "Blind",
+  "비료 제어": "Fertilizer"
 };
 
 const SelectButton = styled.button`
@@ -57,8 +57,8 @@ const SelectList = styled.ul`
   display: ${(props) => (props.$show ? 'block' : 'none')};
   position: absolute;
   width: 130px;
-  top: 100px;
-  left: 75px;
+  top: 93px;
+  left: 67px;
   margin: 0;
   padding: 0;
   border: 1px solid #274c4b;
@@ -91,158 +91,159 @@ const OptionButton = styled.button`
 `;
 
 const Container = styled.button`
-    position: absolute;
-    right: 1.563rem;
-    top: 1.563rem;
-    width: 2.5rem;
-    height: 2.5rem;
-    border-radius: 100%;
-    background-color: #274C4B;
-    filter: drop-shadow(1px 1px 10px rgba(0,0,0,0.25));
-    border: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1001; 
+  position: absolute;
+  right: 1.563rem;
+  top: 1.563rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 100%;
+  background-color: #274C4B;
+  filter: drop-shadow(1px 1px 10px rgba(0,0,0,0.25));
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1001; 
 
-    &:hover {
-        background-color: #193736;
-    }
+  &:hover {
+    background-color: #193736;
+  }
 `;
 
 const Image = styled.img`
-    width: auto;
-    height: 1.125rem;
+  width: auto;
+  height: 1.125rem;
 `;
 
 const fadeIn = keyframes`
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 `;
 
 const FormWrapper = styled.div`
-    position: absolute;
-    top: 0;
-    right: 0;
-    padding: 40px 50px;
-    display: flex;
-    justify-content: center;
-    z-index: 1000; 
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 40px 50px;
+  display: flex;
+  justify-content: center;
+  z-index: 1000; 
 `;
 
 const Form = styled.form`
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    padding: 1rem;
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    animation: ${fadeIn} 0.5s ease-out;
-    font-size: 13px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  animation: ${fadeIn} 0.5s ease-out;
+  font-size: 13px;
 `;
 
 const SubmitButton = styled.button`
-    padding: 0.5rem;
-    background-color: #274C4B;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    width: 130px;
-    margin: 0px;
+  padding: 0.5rem;
+  background-color: #274C4B;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 130px;
+  margin: 0px;
 
-    &:hover {
-      background-color: #193736;
-    }
+  &:hover {
+    background-color: #193736;
+  }
 `;
 
-const AddDeviceForm = () => {
-    const [selectedDevice, setSelectedDevice] = useState("");
-    const [showOptions, setShowOptions] = useState(false);
+const AddDeviceForm = ({ closeForm }) => {
+  const [selectedDevice, setSelectedDevice] = useState("");
+  const [showOptions, setShowOptions] = useState(false);
 
-    const handleOptionClick = (english) => {
-        setSelectedDevice(english);
-        setShowOptions(false);
-    };
+  const handleOptionClick = (english) => {
+    setSelectedDevice(english);
+    setShowOptions(false);
+  };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-        if (!selectedDevice) {
-            return;
-        }
+    if (!selectedDevice) {
+      return;
+    }
 
-        try {
-            const token = getToken(); // Get token from local storage
-            if (!token) {
-                alert("인증 토큰을 찾을 수 없습니다."); // Display alert in Korean
-                return;
-            }
+    try {
+      const token = getToken();
+      if (!token) {
+        alert("인증 토큰을 찾을 수 없습니다.");
+        return;
+      }
 
-            const response = await fetch("/api/hardware/control", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`, // Add token to request
-                },
-                body: JSON.stringify({
-                    device: selectedDevice,  // Send selected device in English to the server
-                }),
-            });
+      const response = await fetch("/api/hardware/control", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          device: selectedDevice,
+        }),
+      });
 
-            if (response.ok) {
-                const data = await response.json();
-                alert(`기기가 성공적으로 추가되었습니다:`); // Success message in Korean
-            } else if (response.status === 400) {
-                alert("이미 존재하는 기기입니다."); // Bad request message in Korean
-            } else {
-                alert("서버 오류가 발생했습니다."); // Server error message in Korean
-            }
-        } catch (error) {
-            alert("오류가 발생했습니다: " + error.message); // Error message in Korean
-        }
-    };
+      if (response.ok) {
+        alert("기기가 성공적으로 추가되었습니다.");
+        closeForm();
+      } else if (response.status === 400) {
+        alert("이미 존재하는 기기입니다.");
+      } else {
+        alert("서버 오류가 발생했습니다.");
+      }
+    } catch (error) {
+      alert("오류가 발생했습니다: " + error.message);
+    }
+  };
 
-    return (
-        <FormWrapper>
-            <Form onSubmit={handleSubmit}>
-                <SelectButton $show={showOptions} onClick={() => setShowOptions(!showOptions)}>
-                    {Object.entries(deviceOptions).find(([k, v]) => v === selectedDevice)?.[0] || "디바이스 선택"}
-                </SelectButton>
-                <SelectList $show={showOptions}>
-                    {Object.entries(deviceOptions).map(([korean, english]) => (
-                        <OptionButton key={english} onClick={() => handleOptionClick(english)}>
-                            {korean}
-                        </OptionButton>
-                    ))}
-                </SelectList>
-                <SubmitButton type="submit" disabled={!selectedDevice}>
-                  추가하기
-                </SubmitButton>
+  return (
+    <FormWrapper>
+      <Form onSubmit={handleSubmit}>
+        <SelectButton $show={showOptions} onClick={() => setShowOptions(!showOptions)}>
+          {Object.entries(deviceOptions).find(([k, v]) => v === selectedDevice)?.[0] || "디바이스 선택"}
+        </SelectButton>
 
-            </Form>
-        </FormWrapper>
-    );
+        <SelectList $show={showOptions}>
+          {Object.entries(deviceOptions).map(([korean, english]) => (
+            <OptionButton key={english} onClick={() => handleOptionClick(english)}>
+              {korean}
+            </OptionButton>
+          ))}
+        </SelectList>
+      </Form>
+    </FormWrapper>
+  );
 };
 
 const AddProfileButton = () => {
-    const [isFormVisible, setIsFormVisible] = useState(false);
+  const [isFormVisible, setIsFormVisible] = useState(false);
 
-    return (
-        <>
-            <Container onClick={() => setIsFormVisible(!isFormVisible)}>
-                <Image src="/img/profile/add.svg" alt="Add Device"></Image>
-            </Container>
-            {isFormVisible && <AddDeviceForm />}
-        </>
-    );
+  const handleFormToggle = () => {
+    setIsFormVisible(!isFormVisible);
+  };
+
+  return (
+    <>
+      <Container onClick={handleFormToggle}>
+        <Image src="/img/profile/add.svg" alt="Add Device" />
+      </Container>
+      {isFormVisible && <AddDeviceForm closeForm={handleFormToggle} />}
+    </>
+  );
 };
 
 export default AddProfileButton;
