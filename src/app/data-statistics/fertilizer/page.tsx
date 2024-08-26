@@ -32,6 +32,7 @@ const Container = styled.div`
   height: 100vh;
   background-color: #f4f4f4;
   width: 100%;
+  font-family: 'Pretendard-Regular';
 `;
 
 const Content = styled.div`
@@ -65,7 +66,6 @@ const DataStatistics: React.FC = () => {
   const [co2, setCo2] = useState(400);
 
   const fetchData = () => {
-    // Simulating fetching data from a server
     const newTemp = Math.random() * (30 - 18) + 18;
     const newHumid = Math.random() * (70 - 30) + 30;
     const newCo2 = Math.random() * (500 - 300) + 300;

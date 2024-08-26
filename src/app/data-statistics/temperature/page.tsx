@@ -32,6 +32,7 @@ const Container = styled.div`
   height: 100vh;
   background-color: #f4f4f4;
   width: 100%;
+  font-family: 'Pretendard-Regular';
 `;
 
 const Content = styled.div`

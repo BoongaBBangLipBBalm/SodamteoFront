@@ -4,9 +4,11 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import axios from 'axios';
 import { getToken } from "@/utils/localStorage";
-import AIToggleButton from "@/app/data-statistics/components/AIToggleButton"; // AIToggleButton import
+import AIToggleButton from "@/app/data-statistics/components/AIToggleButton"; 
+import DeleteButton from "./DeleteButton";
 
 const Container = styled.div`
+  max-width: 230px;
   width: 60%;
   display: flex;
   flex-direction: column;
@@ -34,7 +36,6 @@ const Title = styled.h2`
   text-align: center; 
 `;
 
-
 const FlexContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -49,7 +50,6 @@ const SliderContainer = styled.div`
   margin: 20px 0;
   background: linear-gradient(to top, #8B4513, #F4A460);
   border-radius: 5px;
-  height: 50vh;
 `;
 
 const SliderLabel = styled.div`
@@ -66,15 +66,6 @@ const Marker = styled.div`
   display: flex;
   align-items: center;
   font-size: 15px;
-`;
-
-const ScaleLabelContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  width: 80px;
-  font-size: 12px;
-  color: #333;
-  margin-top: 5px;
 `;
 
 const SelectButton = styled.button`
@@ -173,25 +164,11 @@ const SelectContainer = styled.div`
   position: relative;
 `;
 
-const DeleteButton = styled.button`
-  padding: 10px 20px;
-  font-size: 16px;
-  background-color: #d9534f;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  margin-top: 10px;
-  &:hover {
-    background-color: #c9302c;
-  }
-`;
-
 const Fertilizer = () => {
   const [isOn, setIsOn] = useState(false);
   const [goalTemp, setGoalTemp] = useState(20);
   const [showOptions, setShowOptions] = useState(false);
-  const [selectedValue, setSelectedValue] = useState("20"); // Default value updated to match SelectBox options
+  const [selectedValue, setSelectedValue] = useState("20"); 
   const [deleteMessage, setDeleteMessage] = useState('');
 
   useEffect(() => {
@@ -210,12 +187,12 @@ const Fertilizer = () => {
           const { status, isAuto } = fertilizerDevice;
           setIsOn(isAuto);
           setGoalTemp(status);
-          setSelectedValue(status.toString()); // Update selectedValue to match the goalTemp
+          setSelectedValue(status.toString()); 
         } else {
-          console.error("Fertilizer device not found in the response");
+          alert("비료 기기를 찾을 수 없습니다.");
         }
       } catch (error) {
-        console.error("Failed to fetch fertilizer data:", error);
+        alert("비료 기기 데이터를 가져오는 데 실패했습니다: " + error.message);
       }
     };
 
@@ -229,13 +206,15 @@ const Fertilizer = () => {
   const handleOptionClick = async (option) => {
     setSelectedValue(option);
     setShowOptions(false);
-    await handleTempChange(parseInt(option, 10));
+    const newTemp = parseInt(option, 10);
+    setGoalTemp(newTemp); // Update the state immediately
+    await handleTempChange(newTemp);
   };
 
   const handleTempChange = async (newTemp) => {
     const token = getToken();
     try {
-      const response = await axios.patch('/api/hardware/control', {
+      await axios.patch('/api/hardware/control', {
         device: 'Fertilizer',
         targetValue: newTemp,
       }, {
@@ -244,17 +223,15 @@ const Fertilizer = () => {
           'Authorization': `Bearer ${token}`,
         },
       });
-
-      console.log("Temperature update success:", response.data);
     } catch (error) {
-      console.error("Failed to update temperature:", error);
+      alert("업데이트에 실패하였습니다: " + error.message);
     }
   };
 
   const handleDeleteDevice = async () => {
     const token = getToken();
     try {
-      const response = await axios.delete('/api/hardware/control', {
+      await axios.delete('/api/hardware/control', {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -263,30 +240,30 @@ const Fertilizer = () => {
         },
       });
 
-      setDeleteMessage(response.data.message); // Set success message
+      setDeleteMessage("기기가 성공적으로 삭제되었습니다.");
     } catch (error) {
       if (error.response && error.response.status === 404) {
-        setDeleteMessage("Fertilizer device not found");
+        setDeleteMessage("이미 삭제된 기기입니다.");
       } else {
-        setDeleteMessage("Failed to delete device");
+        setDeleteMessage("기기 삭제에 실패하였습니다: " + error.message);
       }
-      console.error("Failed to delete device:", error);
+      console.error("기기 삭제에 실패하였습니다:", error);
     }
   };
 
-  const calculateLeft = (temp) => ((temp / 100) * 100);
+  const calculateLeft = (temp) => ((temp / 100) * 100); // Adjust if necessary for your temperature range
 
   return (
     <Container>
       <HeaderContainer>
-        <Title>Fertilizer</Title>
+        <Title>비료 제어</Title>
       </HeaderContainer>
       <FlexContainer>
         <SliderContainer>
           <SliderLabel style={{ top: '0%' }}>100</SliderLabel>
           <SliderLabel style={{ top: '50%' }}>50</SliderLabel>
           <SliderLabel style={{ top: '95%' }}>0</SliderLabel>
-          <Marker style={{ top: `${100 - calculateLeft(goalTemp)}%` }}>
+          <Marker style={{ top: `${98 - calculateLeft(goalTemp)}%` }}>
             <div style={{ backgroundColor: 'orange', width: '10px', height: '10px', borderRadius: '50%', margin: '10px' }} />
             Now
           </Marker>
@@ -306,10 +283,8 @@ const Fertilizer = () => {
             ))}
           </SelectList>
         </SelectContainer>
-
         <AIToggleButton isAuto={isOn} onToggle={setIsOn} />
-        <DeleteButton onClick={handleDeleteDevice}>Delete</DeleteButton>
-        {deleteMessage && <p>{deleteMessage}</p>}
+        <DeleteButton onClick={handleDeleteDevice} message={deleteMessage} />
       </FlexContainer>
     </Container>
   );

@@ -5,8 +5,10 @@ import styled from "styled-components";
 import axios from 'axios';
 import { getToken } from "@/utils/localStorage";
 import AIToggleButton from "@/app/data-statistics/components/AIToggleButton";
+import DeleteButton from "./DeleteButton";
 
 const Container = styled.div`
+  max-width: 230px;
   width: 60%;
   display: flex;
   flex-direction: column;
@@ -154,25 +156,10 @@ const SelectContainer = styled.div`
   position: relative;
 `;
 
-const DeleteButton = styled.button`
-  padding: 10px 20px;
-  font-size: 16px;
-  background-color: #d9534f;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  margin-top: 10px;
-  &:hover {
-    background-color: #c9302c;
-  }
-`;
-
 const AirConditioner = () => {
   const [isOn, setIsOn] = useState(false);
   const [goalTemp, setGoalTemp] = useState("23.5"); // Default value, will be updated from API
   const [showOptions, setShowOptions] = useState(false);
-  const [deleteMessage, setDeleteMessage] = useState('');
 
   useEffect(() => {
     const fetchAirConditionerStatus = async () => {
@@ -191,10 +178,10 @@ const AirConditioner = () => {
           setIsOn(isAuto);
           setGoalTemp(status.toFixed(1));
         } else {
-          console.error("Air conditioner device not found in the response");
+          alert("해당 기기를 찾을 수 없습니다");
         }
       } catch (error) {
-        console.error("Failed to fetch air conditioner status:", error);
+        alert("기기 삭제를 실패했습니다: " + error.message);
       }
     };
 
@@ -222,9 +209,8 @@ const AirConditioner = () => {
         },
       });
 
-      console.log("Temperature update success:", response.data);
     } catch (error) {
-      console.error("Failed to update temperature:", error);
+      alert("업데이트에 실패하였습니다 " + error.message);
     }
   };
 
@@ -240,14 +226,13 @@ const AirConditioner = () => {
         },
       });
 
-      setDeleteMessage(response.data.message); 
+      alert('기기가 성공적으로 삭제되었습니다');
     } catch (error) {
       if (error.response && error.response.status === 404) {
-        setDeleteMessage("Air conditioner device not found");
+        alert("이미 삭제된 기기입니다");
       } else {
-        setDeleteMessage("Failed to delete device");
+        alert("기기 삭제에 실패하였습니다: " + error.message);
       }
-      console.error("Failed to delete device:", error);
     }
   };
 
@@ -259,7 +244,7 @@ const AirConditioner = () => {
 
   return (
     <Container>
-      <Title>Air Conditioner</Title>
+      <Title>온도 제어</Title>
       <FlexContainer>
         <SliderContainer gradient="#FF5733, #3333FF">
           <SliderLabel style={{ top: '0%' }}>30°C</SliderLabel>
@@ -289,10 +274,7 @@ const AirConditioner = () => {
         <AIToggleButton isAuto={isOn} onToggle={setIsOn} />
       </FlexContainer>
 
-      <DeleteButton onClick={handleDeleteDevice}>
-        Delete
-      </DeleteButton>
-      {deleteMessage && <p>{deleteMessage}</p>}
+      <DeleteButton onClick={handleDeleteDevice} />
     </Container>
   );
 };

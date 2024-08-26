@@ -6,6 +6,7 @@ const ToggleContainer = styled.div`
   display: flex;
   align-items: center;
   margin: 10px;
+  width: 100px;
 `;
 
 const ToggleLabel = styled.label`

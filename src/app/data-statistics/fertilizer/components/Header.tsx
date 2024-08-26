@@ -41,7 +41,7 @@ const RotatingContainer = styled.div`
 const Header = () => {
   const [activeIndex, setActiveIndex] = useState(2);
   const router = useRouter();
-  const names = ["Humidity", "Temperature", "Nutrition"];
+  const names = ["Humidity", "Temperature", "Fertilizer"];
 
   const handleNameClick = (index) => {
     setActiveIndex(index);

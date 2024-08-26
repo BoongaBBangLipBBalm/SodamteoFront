@@ -19,7 +19,8 @@ const Container = styled.div`
 const FlexContainer = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 10px;
+  
   width: 80%;
 `;
 

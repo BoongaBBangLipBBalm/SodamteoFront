@@ -40,7 +40,7 @@ const FlexContainer = styled.div`
 const SliderContainer = styled.div`
   position: relative;
   width: 100%;
-  height: 12px;
+  height: 14px;
   background: linear-gradient(to right, #003333, #99CCCC);
   border-radius: 5px;
 `;
@@ -63,7 +63,7 @@ const Marker = styled.div`
   transform: translateY(-50%);
   display: flex;
   align-items: center;
-  font-size: 12px;
+  font-size: 14px;
 `;
 
 const ScaleLabelContainer = styled.div`
@@ -250,7 +250,6 @@ const Humidifier: React.FC = () => {
   return (
     <Container>
       <HeaderContainer>
-        <Title>Humidifier</Title>
         <AIToggleButton isAuto={isOn} onToggle={handleToggle} />
         <SelectContainer>
           <div style={{ position: "relative" }}>
@@ -272,7 +271,7 @@ const Humidifier: React.FC = () => {
       <FlexContainer>
         <SliderContainer>
           <Knob left={calculateLeft(goalHumidity)} />
-          <Marker style={{ left: `${calculateLeft(goalHumidity)}%` }}>Goal</Marker>
+          <Marker style={{ left: `${calculateLeft(goalHumidity)}%` }}>Now</Marker>
         </SliderContainer>
       </FlexContainer>
       <ScaleLabelContainer>
@@ -280,7 +279,6 @@ const Humidifier: React.FC = () => {
         <div>50%</div>
         <div>75%</div>
       </ScaleLabelContainer>
-      <StatusDisplay>현재 습도: {humidifierStatus !== null ? `${humidifierStatus.toFixed(1)}%` : "로딩 중..."}</StatusDisplay>
     </Container>
   );
 };

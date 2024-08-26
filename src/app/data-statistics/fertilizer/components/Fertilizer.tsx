@@ -57,7 +57,7 @@ const Marker = styled.div`
   transform: translateY(-50%);
   display: flex;
   align-items: center;
-  font-size: 12px;
+  font-size: 14px;
 `;
 
 const Knob = styled.div`
@@ -76,7 +76,7 @@ const ScaleLabelContainer = styled.div`
   display: flex;
   justify-content: space-between;
   width: 100%;
-  font-size: 12px;
+  font-size: 14px;
   color: #333;
   margin-top: 5px;
 `;
@@ -290,7 +290,7 @@ const Fertilizer = () => {
             document.removeEventListener('mousemove', handleKnobDrag);
           }, { once: true });
         }} />
-        <Marker style={{ left: `${calculateLeft(selectedValue)}%` }}>Status</Marker>
+        <Marker style={{ left: `${calculateLeft(selectedValue)}%` }}>Now</Marker>
       </SliderContainer>
       <ScaleLabelContainer>
         <div>0.0</div>
